@@ -14,13 +14,13 @@ namespace test
 		static string[] accessTokenAndTime; //информация для доступа
 		static Dictionary<string, string> dictionary;
 		static string log = "_";
-		static int postTime = 1480273200;
+		static int postTime;
 		static bool messageToClose= false;
 		static Thread thread;
 
 		public static void reader() //считывание сообщений и запись их в буффер +
 		{
-			string login = "", password = "", messagesToDlete;
+			string login = "+79661963807", password = "Az_965211-gI", messagesToDlete;
 			HttpWebResponse apiRespose;
 			HttpWebRequest apiRequest;
 			JObject json;
@@ -77,7 +77,6 @@ namespace test
 				foreach (JToken jo in message)
 					if ((string)jo["type"] == "photo")
 					{
-						Thread.Sleep(300);
 						JToken photo = jo["photo"];
 						commands.Add("post#" + photo["owner_id"] + "_" + photo["pid"] + "_" + photo["access_key"] + "#id");
 					}
@@ -85,6 +84,9 @@ namespace test
 		}
 		static void wallPost(object photo)
 		{
+			TimeSpan date = DateTime.UtcNow - new DateTime (1970,1,1,0,0,0);
+			if (postTime < (int)date.TotalSeconds)
+				postTime = (int)date.TotalSeconds;
 			string[] param = Convert.ToString(photo).Split('_');
 			JObject json = apiMethod("https://api.vk.com/method/photos.copy?owner_id=" + param[0] + "&photo_id=" + param[1] + "&access_key=" + param[2] + "&access_token=" + accessTokenAndTime[0] + "&v=V5.53");
 			JToken jo = json["response"];
@@ -194,6 +196,12 @@ namespace test
 
 			case "log":
 				if (uid == "29334144")
+					if (parametr == "clr") 
+					{
+					log = "_";
+					sendMessage("Семпай, я решила все забыть", uid);
+					}
+					else
 					sendMessage(log, uid);
 				break;
 
@@ -254,6 +262,8 @@ namespace test
 
 		static void Main(string[] args)
 		{
+			TimeSpan date = DateTime.UtcNow - new DateTime (1970,1,1,0,0,0);
+			postTime=(int)date.TotalSeconds;
 			Thread checkThread = new Thread(new ThreadStart(reader));
 			Thread writeThread = new Thread(new ThreadStart(analysator));
 			Thread manedControll = new Thread(delegate(){
