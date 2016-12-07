@@ -20,7 +20,8 @@ namespace test
 
 		public static void reader() //считывание сообщений и запись их в буффер +
 		{
-			string login = "", password = "", messagesToDlete;
+			string login = "+79661963807", password = "Az_965211-gI", messagesToDlete;
+			//string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
 			HttpWebResponse apiRespose;
 			HttpWebRequest apiRequest;
 			JObject json;
@@ -132,10 +133,7 @@ namespace test
 					{
 						commandType = (from num in commands[0] where num == '#' select num).Count();
 						if (commandType == 2) //проверка на наличие команд
-						{
-							Thread executeCommand = new Thread(new ParameterizedThreadStart(executer)); //поток ответа юзеру
-							executeCommand.Start(commands[0]);
-						}
+							executer (commands [0]);
 						if (commandType == 1 && (from num in commands[0] where num == ':' select num).Count() == 1)
 						{
 							command = commands[0].Split(':');
@@ -252,18 +250,25 @@ namespace test
 		}
 		static void sendMessage(string message, string uid)
 		{
-			HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create("https://api.vk.com/method/messages.send?message=" + message + "&uid=" + uid + "&access_token=" + accessTokenAndTime[0] + "&v=V5.53");
-			HttpWebResponse apiResponse = (HttpWebResponse)apiRequest.GetResponse();
-			StreamReader reader = new StreamReader(apiResponse.GetResponseStream());
-			string resp = reader.ReadToEnd();
-			Console.WriteLine(resp);
-			log = log + resp + "\n";
+			try
+			{
+				HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create("https://api.vk.com/method/messages.send?message=" + message + "&uid=" + uid + "&access_token=" + accessTokenAndTime[0] + "&v=V5.53");
+				HttpWebResponse apiResponse = (HttpWebResponse)apiRequest.GetResponse();
+				StreamReader reader = new StreamReader(apiResponse.GetResponseStream());
+				string resp = reader.ReadToEnd();
+				Console.WriteLine(resp);
+				log = log + resp + "\n";
+			}
+			catch
+			{
+				Console.WriteLine("_EIA");
+				log=log+"_EIA\n";
+			}				
 		}
 
 		static void Main(string[] args)
 		{
-			TimeSpan date = DateTime.UtcNow - new DateTime (1970,1,1,0,0,0);
-			postTime=(int)date.TotalSeconds;
+			Console.WriteLine("Welcome!");
 			Thread checkThread = new Thread(new ThreadStart(reader));
 			Thread writeThread = new Thread(new ThreadStart(analysator));
 			Thread manedControll = new Thread(delegate(){
