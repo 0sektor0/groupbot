@@ -19,6 +19,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
+            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
@@ -228,7 +230,6 @@ namespace test
             while (true)
             {
                 json = apiMethod($"https://api.vk.com/method/wall.post?owner_id=-121519170&publish_date={postTime}&attachments=photo390383074_{Convert.ToString(jo)}&message={HttpUtility.UrlEncode(message)}&access_token={accessTokenAndTime[0]}&v=V5.53");
-                Console.WriteLine(json);
                 if (Convert.ToString(json["error"]) == "")
                 {
                     log = log + "" + Convert.ToString(json["response"]) + "\n";
