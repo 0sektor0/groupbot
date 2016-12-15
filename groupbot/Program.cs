@@ -14,11 +14,13 @@ namespace test
         static List<string> commands = new List<string>();
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
-        static string log = "_", adress = @"/home/sektor/words.dat";
+        static string log = "_", adress = @"D:\words.dat";
         static int postTime;
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
+            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
@@ -112,6 +114,7 @@ namespace test
                 if (parametr[0] == ' ')
                     parametr = parametr.Remove(0, 1);
             }
+            //Console.WriteLine(parametr);
             switch (Command[0])
             {
                 case "search":
@@ -174,6 +177,12 @@ namespace test
             JObject json = apiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
             JToken albums = null;
             string aid = "";
+            string[] parametrs=null;
+            if (parametr.Contains('/'))
+            {
+                parametrs = parametr.Split('/');
+                parametr = parametrs[0];
+            }
             if (json["response"] != null)
             {
                 albums = json["response"];
@@ -181,6 +190,8 @@ namespace test
                     if ((string)album["title"] == parametr)
                     {
                         aid = (string)album["aid"];
+                        if (!dictionary.ContainsKey(aid))
+                            dictionary[aid] = "0";
                         break;
                     }
                 if (aid == "")
@@ -189,11 +200,23 @@ namespace test
                 {
                     sendMessage("Семпай, я начала работу, может вы хоть раз попробуете сделать все сами, и тогда-то вы поймете, какого это, когда тебя напрягают по всякой ерунде, ААААН?", uid);
                     json = apiMethod($"https://api.vk.com/method/photos.get?owner_id={albumOwnerId}&album_id={aid}&access_token={accessTokenAndTime[0]}&v=V5.53");
-                    foreach (JToken photo in json["response"])
+                    JToken photos = json["response"];
+                    int counter = photos.Count<JToken>(), i = Convert.ToInt32(dictionary[aid]);
+                    try
+                    {
+                        if (parametrs.Length == 2)
+                            counter = Convert.ToInt32(parametrs[1]);
+                    }
+                    catch { }               
+                    while (counter>0 && i!=photos.Count<JToken>())
                     {
                         Thread.Sleep(1000);
-                        wallPost($"{photo["owner_id"]}_{photo["pid"]}_{photo["access_token"]}", $"#{parametr}");
+                        wallPost($"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", $"#{parametr}");
+                        //Console.WriteLine(photos[i]["pid"]);
+                        counter--;
+                        i++;
                     }
+                    dictionary[aid] = Convert.ToString(i);
                     sendMessage("Семпай, все готово", uid);
                 }
             }
@@ -228,6 +251,7 @@ namespace test
             while (true)
             {
                 json = apiMethod($"https://api.vk.com/method/wall.post?owner_id=-121519170&publish_date={postTime}&attachments=photo390383074_{Convert.ToString(jo)}&message={HttpUtility.UrlEncode(message)}&access_token={accessTokenAndTime[0]}&v=V5.53");
+                //Console.WriteLine(json);
                 if (Convert.ToString(json["error"]) == "")
                 {
                     log = log + "" + Convert.ToString(json["response"]) + "\n";
