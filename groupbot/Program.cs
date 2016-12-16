@@ -14,11 +14,13 @@ namespace test
         static List<string> commands = new List<string>();
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
-        static string log = "_", adress = @"/home/sektor/words.dat";
+        static string log = "_", adress = @"D:\words.dat";
         static int postTime;
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
+            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
@@ -209,7 +211,7 @@ namespace test
                     while (counter>0 && i!=photos.Count<JToken>())
                     {
                         Thread.Sleep(1000);
-                        wallPost($"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", $"#{parametr}");
+                        wallPost($"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", $"#{parametr}@hentai_im_kosty");
                         //Console.WriteLine(photos[i]["pid"]);
                         counter--;
                         i++;
