@@ -24,7 +24,7 @@ class VK
         Regex value, name;
         List<string> allCookies = new List<string>();  //разкомментить потом
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        HttpWebRequest request1 = (HttpWebRequest)HttpWebRequest.Create($"https://oauth.vk.com/authorize?client_id=5635484&redirect_uri=https://oauth.vk.com/blank.html&scope={scope}&response_type=token&v=5.53&display=wap");
+        HttpWebRequest request1 = (HttpWebRequest)HttpWebRequest.Create("https://oauth.vk.com/authorize?client_id=5635484&redirect_uri=https://oauth.vk.com/blank.html&scope="+scope+"&response_type=token&v=5.53&display=wap");
         HttpWebResponse response1 = (HttpWebResponse)request1.GetResponse();
         dataReader = new StreamReader(response1.GetResponseStream());
         html = dataReader.ReadToEnd();
