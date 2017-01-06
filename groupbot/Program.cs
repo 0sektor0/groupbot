@@ -14,11 +14,13 @@ namespace test
         static List<string> commands = new List<string>();
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
-        static string log = "_", adress = @"/home/sektor/words.dat";
+        static string log = "_", adress = @"D:\words.dat";
         static int postTime;
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
+            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
@@ -52,9 +54,9 @@ namespace test
                             apiRespose = (HttpWebResponse)apiRequest.GetResponse();
                             if (token["fwd_messages"] != null)
                                 foreach (JToken reMeesage in token["fwd_messages"])
-                                    getAttachments(reMeesage);
+                                    getAttachments(reMeesage); //photos in each fwd message
                             else
-                                getAttachments(token);
+                                getAttachments(token); //photos in message
                             apiRequest.Abort();
                         }
                 }
@@ -88,13 +90,13 @@ namespace test
                                 {
                                     dictionary.Add(newWord, newValue);
                                     Console.WriteLine(newWord + ": " + newValue);
-                                    log = log + newWord + ": " + newValue + "\n";
+                                    log += newWord + ": " + newValue + "\n";
                                 }
                                 if (!dictionary[newWord].Contains(newValue))
                                 {
                                     dictionary[newWord] = dictionary[newWord] + "; " + newValue;
                                     Console.WriteLine($"command updated {newWord}: {newValue}");
-                                    log = log + "command updated " + newWord + ": " + newValue + "\n";
+                                    log += "command updated " + newWord + ": " + newValue + "\n";
                                 }
                             }
                         }
@@ -131,30 +133,33 @@ namespace test
                             sendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", uid);
                     }
                     Console.WriteLine("dictionary saved");
-                    log = log + "dictionary saved\n";
+                    log += "dictionary saved\n";
                     break;
 
                 case "log":
                     if (uid == "29334144")
+                    {
                         if (parametr == "clr")
                         {
                             log = "_";
                             sendMessage("Семпай, я решила все забыть", uid);
                         }
-                    if (parametr == "count")
-                        sendMessage($"{dictionary.Keys.Count}", uid);
-                    else
-                        sendMessage(log, uid);
+                        if (parametr == "count")
+                            sendMessage($"{dictionary.Keys.Count}", uid);
+                        else
+                            sendMessage(log, uid);
+                    }
                     break;
 
                 case "remove":
                     dictionary.Remove(parametr);
                     Console.WriteLine("word {0} removed", parametr);
-                    log = log + "word " + parametr + " removed\n";
+                    log += "word " + parametr + " removed\n";
                     break;
 
                 case "post":
                     if (Command[2] == "id")
+                        //Console.WriteLine(parametr);
                         wallPost(parametr, "");
                     else
                         Console.WriteLine("access not permited");
@@ -166,7 +171,7 @@ namespace test
 
                 default:
                     Console.WriteLine("wrong command");
-                    log = log + "wrong command\n";
+                    log += "wrong command\n";
                     break;
             }
         }
@@ -210,7 +215,9 @@ namespace test
                     {
                         Thread.Sleep(1000);
                         wallPost($"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", $"#{parametr}@hentai_im_kosty");
+                        //JObject messageResp = apiMethod($"https://api.vk.com/method/messages.send?attachment=photo{photos[i]["owner_id"]}_{photos[i]["pid"]}&chat_id=1&access_token={accessTokenAndTime[0]}&v=V5.53");
                         //Console.WriteLine(photos[i]["pid"]);
+                        //Console.WriteLine(messageResp);
                         counter--;
                         i++;
                     }
@@ -238,11 +245,21 @@ namespace test
             if (postTime < (int)date.TotalSeconds)
                 postTime = (int)date.TotalSeconds;
             string[] param = Convert.ToString(photo).Split('_');
-            JObject json = apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessTokenAndTime[0]}&v=V5.53");
-            JToken jo = json["response"];
+            JObject json;
+            JToken jo=null;
+            for (int i=0; i<4; i++)
+            {
+                json = apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessTokenAndTime[0]}&v=V5.53");
+                jo = json["response"];
+                if (jo != null)
+                    break;
+                else
+                    Thread.Sleep(1000);
+            }
             if (jo == null)
             {
                 Console.Write("_EIResp");
+                log += "_EIResp\n";
                 return;
             }
             Console.WriteLine(jo);
@@ -252,12 +269,15 @@ namespace test
                 //Console.WriteLine(json);
                 if (Convert.ToString(json["error"]) == "")
                 {
-                    log = log + "" + Convert.ToString(json["response"]) + "\n";
-                    Console.WriteLine(json["response"]);
+                    JToken answer = json["response"];
+                    log += $"post_id: {answer["post_id"]}\n";
+                    Console.WriteLine($"post_id: {answer["post_id"]}");
                     postTime = postTime + 3600;
                     break;
                 }
+                //Console.WriteLine(json);
                 Console.Write("_EIPost");
+                log += "_EIPost\n";
                 postTime = postTime + 3600;
                 Thread.Sleep(1000);
             }
@@ -298,12 +318,12 @@ namespace test
                 StreamReader reader = new StreamReader(apiResponse.GetResponseStream());
                 string resp = reader.ReadToEnd();
                 Console.WriteLine(resp);
-                log = log + resp + "\n";
+                log += resp + "\n";
             }
             catch
             {
                 Console.WriteLine("_EIA");
-                log = log + "_EIA\n";
+                log += "_EIA\n";
             }
         }
 
