@@ -14,11 +14,13 @@ namespace test
         static List<string> commands = new List<string>();
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
-        static string log = "_", adress = @"/home/sektor/words.dat";
+        static string log = "_", adress = @"home/sektor/words.dat";
         static int postTime;
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
+            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
@@ -167,6 +169,22 @@ namespace test
                     fromAlbum(parametr,uid, "399761627");
                     break;
 
+                case "time":
+                    if (uid == "29334144")
+                    {
+                        if (parametr == "")
+                            sendMessage($"{postTime}", "29334144");
+                        else
+                        {
+                            IEnumerable<char> letters = from char ch in parametr where (ch < 48 || ch > 57) select ch;
+                            if (letters.Count<char>() == 0)
+                                postTime = Convert.ToInt32(parametr);
+                            else
+                                sendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", "29334144");
+                        }
+                    }
+                    break;
+
                 default:
                     Console.WriteLine("wrong command");
                     log += "wrong command\n";
@@ -311,6 +329,7 @@ namespace test
         {
             try
             {
+                Thread.Sleep(1000);
                 HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
                 HttpWebResponse apiResponse = (HttpWebResponse)apiRequest.GetResponse();
                 StreamReader reader = new StreamReader(apiResponse.GetResponseStream());
