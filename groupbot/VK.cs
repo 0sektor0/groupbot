@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 class VK
 {
     static string cookiestring(List<string> list)
@@ -117,5 +118,14 @@ class VK
             fileDic.Flush();
             return (new string[] { Temp[1], Temp[3], login, password, scope });
         }
+    }
+    static public JObject ApiMethod(string request)
+    {
+        HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create(request);
+        HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
+        StreamReader respStream = new StreamReader(apiRespose.GetResponseStream());
+        JObject json = JObject.Parse(respStream.ReadToEnd());
+        respStream.Close();
+        return json;
     }
 }
