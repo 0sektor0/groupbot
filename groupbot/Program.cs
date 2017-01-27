@@ -14,13 +14,15 @@ namespace test
         static List<string> commands = new List<string>();
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
-        static string adress = @"/home/sektor/words.dat";
-        //static string adress = @"D:\words.dat";
+        //static string adress = @"home/sektor/words.dat";
+        static string adress = @"D:\words.dat";
         static Dictionary<string, Group> groups= new Dictionary<string, Group>();
         static Group CurentGroup;
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
+            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
