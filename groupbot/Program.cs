@@ -21,8 +21,6 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
-            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
