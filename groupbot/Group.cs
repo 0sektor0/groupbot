@@ -44,7 +44,7 @@ class Group
         Console.WriteLine(jo);
         while (true)
         {
-            json = VK.ApiMethod($"https://api.vk.com/method/wall.post?owner_id=-121519170&publish_date={PostTime}&attachments=photo390383074_{Convert.ToString(jo)}&message={System.Web.HttpUtility.UrlEncode(message)}&access_token={AccessToken}&v=V5.53");
+            json = VK.ApiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments=photo390383074_{Convert.ToString(jo)}&message={System.Web.HttpUtility.UrlEncode(message)}&access_token={AccessToken}&v=V5.53");
             //Console.WriteLine(json);
             if (Convert.ToString(json["error"]) == "")
             {
