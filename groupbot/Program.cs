@@ -14,8 +14,8 @@ namespace test
         static List<string> commands = new List<string>();
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
-        //static string adress = @"home/sektor/words.dat";
-        static string adress = @"D:\words.dat";
+        static string adress = @"/home/sektor/words.dat";
+        //static string adress = @"D:\words.dat";
         static Dictionary<string, Group> groups= new Dictionary<string, Group>();
         static Group CurentGroup;
 
