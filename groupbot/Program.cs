@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using System.Threading;
 using System.Net;
-using System.Web;
 using Newtonsoft.Json.Linq;
 
 namespace test
@@ -14,10 +13,10 @@ namespace test
         static List<string> commands = new List<string>();
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
-        static string adress = @"/home/sektor/words.dat";
-        //static string adress = @"D:\words.dat";
+        static string adress = @"words.dat";
         static Dictionary<string, Group> groups= new Dictionary<string, Group>();
         static Group CurentGroup;
+        static DateTime lastCheckTime;
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
@@ -56,9 +55,9 @@ namespace test
                             apiRespose = (HttpWebResponse)apiRequest.GetResponse();
                             if (token["fwd_messages"] != null)
                                 foreach (JToken reMeesage in token["fwd_messages"])
-                                    getAttachments(reMeesage); //photos in each fwd message
+                                    getAttachments(reMeesage, uid); //photos in each fwd message
                             else
-                                getAttachments(token); //photos in message
+                                getAttachments(token, uid); //photos in message
                             apiRequest.Abort();
                         }
                 }
@@ -72,8 +71,21 @@ namespace test
             string[] command;
             string newWord, newValue;
             int commandType;
+            TimeSpan timeFromLastCheck;
             while (true)
-                if (commands.Count != 0)
+            {
+                timeFromLastCheck = DateTime.UtcNow - lastCheckTime;
+                if ((int)timeFromLastCheck.TotalSeconds >= 14400) //автоматическое сохранение групп
+                {
+                    lastCheckTime = DateTime.UtcNow;
+                    foreach (Group groupToSave in groups.Values)
+                    {
+                        groupToSave.Save();
+                        groupToSave.fillSapse(accessTokenAndTime[0]);
+                    }
+                }
+
+                if (commands.Count != 0) //обработка комманд из буффера
                 {
                     if (commands[0] != null)
                     {
@@ -105,6 +117,7 @@ namespace test
                         commands.RemoveAt(0);
                     }
                 }
+            }
         }
         public static void executer(object command)
         {
@@ -160,11 +173,7 @@ namespace test
                     break;
 
                 case "post":
-                    if (Command[2] == "id")
-                        //Console.WriteLine(parametr);
-                        CurentGroup.Post(parametr, "", accessTokenAndTime[0]);
-                    else
-                        Console.WriteLine("access not permited");
+                    CurentGroup.copyPhoto(parametr, "", accessTokenAndTime[0]);
                     break;
 
                 case "album":
@@ -186,12 +195,12 @@ namespace test
 
                 case "group":
                     if (parametr == "")
-                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}", uid);
+                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}", uid);
                     else
                         if (groups.Keys.Contains<string>(parametr))
                     {
                         CurentGroup = groups[parametr];
-                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}", uid);
+                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}", uid);
                     }
                     else
                         sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", uid);
@@ -242,7 +251,7 @@ namespace test
                     while (counter>0 && i!=photos.Count<JToken>())
                     {
                         Thread.Sleep(1000);
-                        CurentGroup.Post($"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", $"#{parametr}@{CurentGroup.name}", accessTokenAndTime[0]);
+                        CurentGroup.copyPhoto($"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", $"#{parametr}@{CurentGroup.name}", accessTokenAndTime[0]);
                         //JObject messageResp = VK.ApiMethod($"https://api.vk.com/method/messages.send?attachment=photo{photos[i]["owner_id"]}_{photos[i]["pid"]}&chat_id=1&access_token={accessTokenAndTime[0]}&v=V5.53");
                         //Console.WriteLine(photos[i]["pid"]);
                         //Console.WriteLine(messageResp);
@@ -254,7 +263,7 @@ namespace test
                 }
             }
         }
-        static void getAttachments(JToken message) // берем фото
+        static void getAttachments(JToken message, string uid) // берем фото
         {
             if (message["attachments"] != null)
             {
@@ -263,27 +272,9 @@ namespace test
                     if ((string)jo["type"] == "photo")
                     {
                         JToken photo = jo["photo"];
-                        commands.Add("post#" + photo["owner_id"] + "_" + photo["pid"] + "_" + photo["access_key"] + "#id");
+                        commands.Add("post#" + photo["owner_id"] + "_" + photo["pid"] + "_" + photo["access_key"] + "#"+uid);
                     }
             }
-        }
-        public static Dictionary<string, string> inizializeDictionary(string path) //+
-        {
-            string[] buffer;
-            Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.OpenOrCreate)))
-                while (reader.PeekChar() > -1)
-                {
-                    buffer = reader.ReadString().Split(':');
-                    dictionary.Add(buffer[0], buffer[1]);
-                }
-            return dictionary;
-        }
-        public static void saveDictionary(string path)
-        {
-            using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.OpenOrCreate)))
-                foreach (string key in dictionary.Keys)
-                    writer.Write(key + ": " + dictionary[key]);
         }
         static void sendMessage(string message, string uid)
         {
@@ -304,11 +295,35 @@ namespace test
             }
         }
 
+        public static Dictionary<string, string> inizializeDictionary(string path) //+
+        {
+            string[] buffer;
+            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.OpenOrCreate)))
+                while (reader.PeekChar() > -1)
+                {
+                    buffer = reader.ReadString().Split(':');
+                    dictionary.Add(buffer[0], buffer[1]);
+                }
+            return dictionary;
+        }
+        public static void saveDictionary(string path)
+        {
+            using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.OpenOrCreate)))
+                foreach (string key in dictionary.Keys)
+                    writer.Write(key + ": " + dictionary[key]);
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome!");
-            groups.Add("2d",new Group("hentai_im_kosty", "121519170"));
-            groups.Add("3d", new Group("porno_im_kosty", "138077475"));
+            lastCheckTime = DateTime.UtcNow;
+            //groups.Add("2d",new Group("hentai_im_kosty", "121519170"));
+            //groups.Add("3d", new Group("porno_im_kosty", "138077475"));
+            groups.Add("2d", Group.load("hentai_im_kosty.grp"));
+            Console.WriteLine($"hentai_im_kosty.grp deserialization ended");
+            groups.Add("3d", Group.load("porno_im_kosty.grp"));
+            Console.WriteLine($"porno_im_kosty.grp deserialization ended");
             CurentGroup = groups["2d"];
             Thread checkThread = new Thread(new ThreadStart(reader));
             dictionary = inizializeDictionary(adress);
