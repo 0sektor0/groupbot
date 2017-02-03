@@ -12,7 +12,7 @@ public class Group
     public string name;
     public int PostTime=0;
     public string log="_";
-    private string id;
+    public string id;
     public List<string> posts= new List<string>();
 
     public Group(string name, string id)
@@ -22,8 +22,6 @@ public class Group
     }
     public Group()
     {
-        this.name = null;
-        this.id = null;
     }
     static public Group load(string groupAdress)
     {
