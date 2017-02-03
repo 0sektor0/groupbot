@@ -325,8 +325,6 @@ namespace test
             groups.Add("3d", Group.load("porno_im_kosty.xml"));
             Console.WriteLine($"porno_im_kosty.grp deserialization ended");
             CurentGroup = groups["2d"];
-            groups["2d"].Save();
-            groups["3d"].Save();
             Thread checkThread = new Thread(new ThreadStart(reader));
             dictionary = inizializeDictionary(adress);
             checkThread.Start();
