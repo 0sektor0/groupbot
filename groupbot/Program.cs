@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
-            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
+            //string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
@@ -143,9 +143,11 @@ namespace test
                 case "save":
                     if (uid == "29334144")
                     {
-                        saveDictionary(adress);
-                        if (parametr == "ack")
-                            sendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", uid);
+					saveDictionary(adress);
+					foreach (Group groupToSave in groups.Values)
+						groupToSave.Save();
+                    if (parametr == "ack")
+                        sendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", uid);
                     }
                     Console.WriteLine("dictionary saved");
                     CurentGroup.log += "dictionary saved\n";
