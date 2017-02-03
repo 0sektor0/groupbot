@@ -320,11 +320,13 @@ namespace test
             lastCheckTime = DateTime.UtcNow;
             //groups.Add("2d",new Group("hentai_im_kosty", "121519170"));
             //groups.Add("3d", new Group("porno_im_kosty", "138077475"));
-            groups.Add("2d", Group.load("hentai_im_kosty.grp"));
+            groups.Add("2d", Group.load("hentai_im_kosty.xml"));
             Console.WriteLine($"hentai_im_kosty.grp deserialization ended");
-            groups.Add("3d", Group.load("porno_im_kosty.grp"));
+            groups.Add("3d", Group.load("porno_im_kosty.xml"));
             Console.WriteLine($"porno_im_kosty.grp deserialization ended");
             CurentGroup = groups["2d"];
+            groups["2d"].Save();
+            groups["3d"].Save();
             Thread checkThread = new Thread(new ThreadStart(reader));
             dictionary = inizializeDictionary(adress);
             checkThread.Start();

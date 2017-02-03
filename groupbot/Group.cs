@@ -4,9 +4,10 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 
 [Serializable]
-class Group
+public class Group
 {
     public string name;
     public int PostTime=0;
@@ -19,20 +20,31 @@ class Group
         this.name= name;
         this.id = id;
     }
+    public Group()
+    {
+        this.name = null;
+        this.id = null;
+    }
     static public Group load(string groupAdress)
     {
         Console.WriteLine($"{groupAdress} deserialization started");
-        BinaryFormatter formatter = new BinaryFormatter();
+        /*BinaryFormatter formatter = new BinaryFormatter();
         using (FileStream fs = new FileStream(groupAdress, FileMode.OpenOrCreate))
-           return (Group)formatter.Deserialize(fs);
+           return (Group)formatter.Deserialize(fs);*/
+        XmlSerializer formatter = new XmlSerializer(typeof(Group));
+        using (FileStream fs = new FileStream(groupAdress, FileMode.OpenOrCreate))
+            return (Group)formatter.Deserialize(fs);
     }
     public void Save()
     {
-        BinaryFormatter binFormat = new BinaryFormatter();
+        /*BinaryFormatter binFormat = new BinaryFormatter();
         using (Stream fStream = new FileStream($"{name}.grp", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
-        {
             binFormat.Serialize(fStream, this);
-        }
+        Console.WriteLine($"_{name}:saved");
+        log += $"_{name}:saved\n";*/
+        XmlSerializer formatter = new XmlSerializer(typeof(Group));
+        using (FileStream fs = new FileStream($"{name}.xml", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+            formatter.Serialize(fs, this);
         Console.WriteLine($"_{name}:saved");
         log += $"_{name}:saved\n";
     }
