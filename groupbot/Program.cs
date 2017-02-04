@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
-            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
+            //string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
@@ -175,7 +175,7 @@ namespace test
                     break;
 
                 case "post":
-                    CurentGroup.copyPhoto(parametr, "", accessTokenAndTime[0]);
+                    CurentGroup.createPost(parametr, "", accessTokenAndTime[0]);
                     break;
 
                 case "album":
@@ -206,6 +206,12 @@ namespace test
                     }
                     else
                         sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", uid);
+                    break;
+
+                case "postpon":
+                    sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", uid);
+                    CurentGroup.fillSapse(accessTokenAndTime[0]);
+                    sendMessage("я закончила, но не гарантирую, что все прошло успешно",uid);
                     break;
 
                 default:
@@ -253,7 +259,7 @@ namespace test
                     while (counter>0 && i!=photos.Count<JToken>())
                     {
                         Thread.Sleep(1000);
-                        CurentGroup.copyPhoto($"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", $"#{parametr}@{CurentGroup.name}", accessTokenAndTime[0]);
+                        CurentGroup.createPost($"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", $"#{parametr}@{CurentGroup.name}", accessTokenAndTime[0]);
                         //JObject messageResp = VK.ApiMethod($"https://api.vk.com/method/messages.send?attachment=photo{photos[i]["owner_id"]}_{photos[i]["pid"]}&chat_id=1&access_token={accessTokenAndTime[0]}&v=V5.53");
                         //Console.WriteLine(photos[i]["pid"]);
                         //Console.WriteLine(messageResp);
@@ -326,7 +332,7 @@ namespace test
             Console.WriteLine($"hentai_im_kosty.grp deserialization ended");
             groups.Add("3d", Group.load("porno_im_kosty.xml"));
             Console.WriteLine($"porno_im_kosty.grp deserialization ended");
-            CurentGroup = groups["2d"];
+            CurentGroup = groups["3d"];
             Thread checkThread = new Thread(new ThreadStart(reader));
             dictionary = inizializeDictionary(adress);
             checkThread.Start();

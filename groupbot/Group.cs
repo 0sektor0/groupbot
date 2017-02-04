@@ -13,7 +13,7 @@ public class Group
     public int PostTime=0;
     public string log="_";
     public string id;
-    public List<string> posts= new List<string>();
+    public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста]
 
     public Group(string name, string id)
     {
@@ -46,7 +46,7 @@ public class Group
         Console.WriteLine($"_{name}:saved");
         log += $"_{name}:saved\n";
     }
-    public int postponedInf(string AccessToken)
+    private int postponedInf(string AccessToken)
     {
         JObject json;
         JToken jo;
@@ -62,7 +62,7 @@ public class Group
         }
         return count;
     }
-    public void copyPhoto(object photo, string message, string AccessToken) //копировать фото в альбом бота, а также запись в список постов группы
+    public void createPost(object photo, string message, string AccessToken) //копировать фото в альбом бота, а также запись в список постов группы
     {
         JObject json;
         JToken jo=null;
@@ -82,50 +82,75 @@ public class Group
             log += "_EICopy\n";
             return;
         }
-        posts.Add((string)jo);
-        Post(message, AccessToken);
+        string[] post = {message,(string)jo};
+        posts.Add(post);
+        sendPost(AccessToken);
     }
-    public void Post(string message, string AccessToken)
+    private void sendPost(string AccessToken)
     {
         if (posts[0] != null)
         {
-            JToken jo = posts[0];
+            string[] post = posts[0];
             JObject json;
+            JToken jo;
             TimeSpan date = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
             if (PostTime < (int)date.TotalSeconds)
-                PostTime = (int)date.TotalSeconds+3600;
+                PostTime = (int)date.TotalSeconds + 3600;
+            json = VK.ApiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments=photo390383074_{Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={AccessToken}&v=V5.53");
+            //Console.WriteLine(json);
+            jo = json["error"];
             //Console.WriteLine(jo);
-            json = VK.ApiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments=photo390383074_{Convert.ToString(jo)}&message={System.Web.HttpUtility.UrlEncode(message)}&access_token={AccessToken}&v=V5.53");
-            //Console.WriteLine(json);
-            if (Convert.ToString(json["error"]) == "") //попытка отправки поста
+            switch (Convert.ToString(jo["error_code"]))
             {
-                JToken answer = json["response"];
-                log += $"post_id: {answer["post_id"]}\n";
-                Console.WriteLine($"post_id: {answer["post_id"]}");
-                PostTime = PostTime + 3600;
-                posts.RemoveAt(0);
+                case "":
+                    jo = json["response"];
+                    log += $"post_id: {jo["post_id"]}\n";
+                    Console.WriteLine($"post_id: {jo["post_id"]}");
+                    PostTime = PostTime + 3600;
+                    posts.RemoveAt(0);
+                    break;
+                case "214":
+                    Console.WriteLine("_214Error");
+                    log += "_214Error\n";
+                    Console.WriteLine(jo["error_msg"]);
+                    log += $"{jo["error_msg"]}\n";
+                    int count = postponedInf(AccessToken);
+                    if (count < 100) //проверка на лимит постов
+                    {
+                        Console.Write("_SS");
+                        log += "_SS\n";
+                    }
+                    else
+                    {
+                        Console.Write("_LIMIT");
+                        log += "_LIMIT\n";
+                    }
+                    break;
+                default:
+                    Console.Write("_UnError");
+                    log += "_UnError\n";
+                    break;
             }
-            else // запрос текущего состояния отложки при ошибке отправки
-            {
-                int count = postponedInf(AccessToken);
-                if (count < 100) //проверка на лимит постов
-                    Post(message, AccessToken);
-                else
-                {
-                    Console.Write("_LIMIT");
-                    log += "_LIMIT\n";
-                }
-            }
-            //Console.WriteLine(json);
         }
     }
     public void fillSapse(string AccessToken)
     {
-        for (int i = postponedInf(AccessToken); i <= 100; i++)
+        try
         {
-            Thread.Sleep(1000);
-            Post("", AccessToken);
+            Console.WriteLine("_DeploymentStart");
+            log += "_DeploymentStart\n";
+            for (int i = postponedInf(AccessToken); i <= 100; i++)
+            {
+                if (posts[0] != null)
+                {
+                    Thread.Sleep(1000);
+                    sendPost(AccessToken);
+                }
+            }
+            Console.WriteLine("_DeploymentEnd");
+            log += "_DeploymentEnd\n";
         }
+        catch { };
     }
 }
 
