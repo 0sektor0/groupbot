@@ -53,6 +53,7 @@ public class Group
         int count;
         Thread.Sleep(1000);
         json = VK.ApiMethod($"https://api.vk.com/method/wall.get?owner_id=-{id}&count=100&filter=postponed&access_token={AccessToken}&v=V5.53");
+        //Console.WriteLine(json);
         jo = json["response"];
         count = Convert.ToInt32(jo[0]);
         if (count > 0 && count<=100)
@@ -88,19 +89,22 @@ public class Group
     }
     private void sendPost(string AccessToken)
     {
-        if (posts[0] != null)
+        if (posts.Count>0)
         {
             string[] post = posts[0];
             JObject json;
             JToken jo;
             TimeSpan date = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
+            string errorCode = "";
             if (PostTime < (int)date.TotalSeconds)
                 PostTime = (int)date.TotalSeconds + 3600;
             json = VK.ApiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments=photo390383074_{Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={AccessToken}&v=V5.53");
             //Console.WriteLine(json);
             jo = json["error"];
+            if (jo != null)
+                errorCode = Convert.ToString(jo["error_code"]);
             //Console.WriteLine(jo);
-            switch (Convert.ToString(jo["error_code"]))
+            switch (errorCode)
             {
                 case "":
                     jo = json["response"];
@@ -135,22 +139,20 @@ public class Group
     }
     public void fillSapse(string AccessToken)
     {
-        try
-        {
             Console.WriteLine("_DeploymentStart");
             log += "_DeploymentStart\n";
             for (int i = postponedInf(AccessToken); i <= 100; i++)
             {
-                if (posts[0] != null)
+                if (posts.Count > 0)
                 {
                     Thread.Sleep(1000);
                     sendPost(AccessToken);
                 }
+                else
+                    break;
             }
             Console.WriteLine("_DeploymentEnd");
             log += "_DeploymentEnd\n";
-        }
-        catch { };
     }
 }
 

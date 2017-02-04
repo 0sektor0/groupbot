@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            //string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
-            string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
+            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
@@ -332,7 +332,7 @@ namespace test
             Console.WriteLine($"hentai_im_kosty.grp deserialization ended");
             groups.Add("3d", Group.load("porno_im_kosty.xml"));
             Console.WriteLine($"porno_im_kosty.grp deserialization ended");
-            CurentGroup = groups["3d"];
+            CurentGroup = groups["2d"];
             Thread checkThread = new Thread(new ThreadStart(reader));
             dictionary = inizializeDictionary(adress);
             checkThread.Start();
