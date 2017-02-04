@@ -1,9 +1,18 @@
 <?xml version="1.0"?>
 <Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <name>hentai_im_kosty</name>
-  <PostTime>1486372020</PostTime>
-  <log>_post_id: 3762
+  <PostTime>1486375620</PostTime>
+  <log>_{"response":5172}
+_214Error
+Access to adding post denied: a post is already scheduled for this time
+_SS
+{"response":5175}
 </log>
   <id>121519170</id>
-  <posts />
+  <posts>
+    <ArrayOfString>
+      <string />
+      <string>456242937</string>
+    </ArrayOfString>
+  </posts>
 </Group>
