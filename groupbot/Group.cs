@@ -139,6 +139,7 @@ public class Group
     }
     public void fillSapse(string AccessToken)
     {
+		try{
             Console.WriteLine("_DeploymentStart");
             log += "_DeploymentStart\n";
             for (int i = postponedInf(AccessToken); i <= 100; i++)
@@ -153,6 +154,8 @@ public class Group
             }
             Console.WriteLine("_DeploymentEnd");
             log += "_DeploymentEnd\n";
+		}
+		catch{log += "_EIfs\n";};
     }
 }
 
