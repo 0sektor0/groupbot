@@ -25,6 +25,8 @@ namespace test
             HttpWebResponse apiRespose;
             HttpWebRequest apiRequest;
             JObject json;
+            JToken token, message;
+            string uid;
             accessTokenAndTime = VK.VKauth(login, password, "274556");
             DateTime authtime = DateTime.UtcNow;
 
@@ -42,24 +44,25 @@ namespace test
                 {
                     json = VK.ApiMethod($"https://api.vk.com/method/messages.get?count=10&access_token={accessTokenAndTime[0]}&v=V5.53");
                     messagesToDlete = "";
-                    JToken token = json["response"];
-                    string uid;
-                    if (token != null)
-                        if (token.Count() > 1)
+                    message = json["response"];
+                    if (message != null)
+                    {
+                        for (int i = 1; i < message.Count(); i++)
                         {
-                            token = token[1];
+                            token = message[i];
                             uid = (string)token["uid"];
                             commands.Add((string)token["body"] + "#" + uid);
                             messagesToDlete = messagesToDlete + token["mid"] + ",";
-                            apiRequest = (HttpWebRequest)HttpWebRequest.Create($"https://api.vk.com/method/messages.delete?message_ids={messagesToDlete}&count=20&access_token={accessTokenAndTime[0]}&v=V5.53");
-                            apiRespose = (HttpWebResponse)apiRequest.GetResponse();
                             if (token["fwd_messages"] != null)
                                 foreach (JToken reMeesage in token["fwd_messages"])
                                     getAttachments(reMeesage, uid); //photos in each fwd message
                             else
                                 getAttachments(token, uid); //photos in message
-                            apiRequest.Abort();
                         }
+                        apiRequest = (HttpWebRequest)HttpWebRequest.Create($"https://api.vk.com/method/messages.delete?message_ids={messagesToDlete}&count=20&access_token={accessTokenAndTime[0]}&v=V5.53");
+                        apiRespose = (HttpWebResponse)apiRequest.GetResponse();
+                        apiRequest.Abort();
+                    }
                 }
                 catch { Console.Write("_EIReq"); }
                 Thread.Sleep(1000);
