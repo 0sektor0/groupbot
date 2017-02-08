@@ -2,8 +2,10 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="groupbot/Program.cs">
     <Files>
-      <File FileName="groupbot/Program.cs" Line="152" Column="27" />
+      <File FileName="groupbot/Program.cs" Line="153" Column="5" />
       <File FileName="groupbot/Group.cs" Line="1" Column="1" />
+      <File FileName="groupbot/bin/Debug/hentai_im_kosty.xml" Line="29" Column="9" />
+      <File FileName="groupbot/bin/Debug/porno_im_kosty.xml" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
