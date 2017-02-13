@@ -1,29 +1,315 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>hentai_im_kosty</name>
-  <PostTime>1486872900</PostTime>
-  <log>_{"response":5480}
-{"response":5481}
-post_id: 4002
-{"response":5484}
-post_id: 4003
-_hentai_im_kosty:saved
-_DeploymentStart
-_DeploymentEnd
-{"response":5487}
-post_id: 4010
-post_id: 4011
-post_id: 4012
-post_id: 4013
-_hentai_im_kosty:saved
-_DeploymentStart
-_EIfs
-evaluate:  оценить
-post_id: 4016
-post_id: 4017
-post_id: 4019
-{"response":5493}
+  <PostTime>1487600100</PostTime>
+  <log>_{"response":5858}
+{"response":5859}
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+{"response":5869}
+{"response":5871}
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+_214Error
+Access to adding post denied: cannot schedule more than 150 posts
+_LIMIT
+{"response":5877}
+{"response":5879}
 </log>
   <id>121519170</id>
-  <posts />
+  <posts>
+    <ArrayOfString>
+      <string />
+      <string>456244013</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244015</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244017</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244018</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244019</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244020</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244021</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244022</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244023</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244024</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244025</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244026</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244027</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244028</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244029</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244030</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244031</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244032</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244033</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244034</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244035</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244036</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244037</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244038</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244039</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244040</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244041</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244042</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244043</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244044</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244045</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244046</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244047</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244048</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244049</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244050</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244051</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244052</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244053</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244054</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244055</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244056</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244057</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244058</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244059</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244060</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244061</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244062</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244063</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244064</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244065</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244066</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244067</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244068</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244069</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244070</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244071</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244072</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244073</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244074</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244075</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244076</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244077</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244078</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244079</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>456244080</string>
+    </ArrayOfString>
+  </posts>
 </Group>
