@@ -5,8 +5,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
+using System.Threading;
 class VK
 {
+    private static int requesrControlCounter = 0;
+    private static DateTime lastRequestTime = DateTime.UtcNow;
     static string cookiestring(List<string> list)
     {
         string cookiestr = "";
@@ -14,7 +17,7 @@ class VK
             cookiestr = cookiestr + str + ";";
         return cookiestr;
     }
-    static public string[] VKauth(string login, string password, string scope)
+    static public string[] auth(string login, string password, string scope)
     {
         byte[] byteData;
         Stream dataWriter;
@@ -119,13 +122,41 @@ class VK
             return (new string[] { Temp[1], Temp[3], login, password, scope });
         }
     }
-    static public JObject ApiMethod(string request)
+    static private void requestAcceptionCheck()
     {
+        //Console.WriteLine(requesrControlCounter);
+        TimeSpan lastRequestTimeSec = DateTime.UtcNow - lastRequestTime;
+        if (lastRequestTimeSec.TotalSeconds > 1)
+        {
+            lastRequestTime = DateTime.UtcNow;
+            requesrControlCounter = 0;
+        }
+        if (requesrControlCounter > 3)
+        {
+            Thread.Sleep(1000);
+            requesrControlCounter = 0;
+        }
+    }
+    static public JObject apiMethod(string request)
+    {
+        requestAcceptionCheck();
+        requesrControlCounter++;
         HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create(request);
         HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
         StreamReader respStream = new StreamReader(apiRespose.GetResponseStream());
         JObject json = JObject.Parse(respStream.ReadToEnd());
         respStream.Close();
+        //Console.WriteLine(json);
         return json;
+    }
+    static public void emptyApiMethod(string request)
+    {
+        requestAcceptionCheck();
+        requesrControlCounter++;
+        HttpWebResponse apiRespose;
+        HttpWebRequest apiRequest;
+        apiRequest = (HttpWebRequest)HttpWebRequest.Create(request);
+        apiRespose = (HttpWebResponse)apiRequest.GetResponse();
+        apiRequest.Abort();
     }
 }

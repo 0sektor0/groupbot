@@ -23,6 +23,7 @@ public class Group
     public Group()
     {
     }
+
     static public Group load(string groupAdress)
     {
         Console.WriteLine($"{groupAdress} deserialization started");
@@ -46,13 +47,13 @@ public class Group
         Console.WriteLine($"_{name}:saved");
         log += $"_{name}:saved\n";
     }
+
     private int postponedInf(string AccessToken)
     {
         JObject json;
         JToken jo;
         int count;
-        Thread.Sleep(1000);
-        json = VK.ApiMethod($"https://api.vk.com/method/wall.get?owner_id=-{id}&count=100&filter=postponed&access_token={AccessToken}&v=V5.53");
+        json = VK.apiMethod($"https://api.vk.com/method/wall.get?owner_id=-{id}&count=100&filter=postponed&access_token={AccessToken}&v=V5.53");
         //Console.WriteLine(json);
         jo = json["response"];
         count = Convert.ToInt32(jo[0]);
@@ -63,27 +64,35 @@ public class Group
         }
         return count;
     }
-    public void createPost(object photo, string message, string AccessToken) //копировать фото в альбом бота, а также запись в список постов группы
+    public void createPost(List<string> photos, string message, string AccessToken) //копировать фото в альбом бота, а также запись в список постов группы
     {
         JObject json;
         JToken jo=null;
-        string[] param = Convert.ToString(photo).Split('_');
-        for (int i = 0; i < 4; i++)
+        string[] param;
+        string postPhotos = "";
+
+        foreach (string photo in photos)
         {
-            json = VK.ApiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={AccessToken}&v=V5.53");
-            jo = json["response"];
-            if (jo != null)
-                break;
-            else
-                Thread.Sleep(1000);
+            param = Convert.ToString(photo).Split('_');
+            for (int i = 0; i < 4; i++)
+            {
+                json = VK.apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={AccessToken}&v=V5.53");
+                jo = json["response"];
+                if (jo != null)
+                {
+                    postPhotos += $",photo390383074_{(string)jo}";
+                    break;
+                }
+            }
+            if (jo == null)
+            {
+                Console.Write("_EICopy");
+                log += "_EICopy\n";
+                return;
+            }
         }
-        if (jo == null)
-        {
-            Console.Write("_EICopy");
-            log += "_EICopy\n";
-            return;
-        }
-        string[] post = {message,(string)jo};
+        postPhotos=postPhotos.Remove(0,1);
+        string[] post = { message, postPhotos};
         posts.Add(post);
         sendPost(AccessToken);
     }
@@ -98,7 +107,7 @@ public class Group
             string errorCode = "";
             if (PostTime < (int)date.TotalSeconds)
                 PostTime = (int)date.TotalSeconds + 3600;
-            json = VK.ApiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments=photo390383074_{Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={AccessToken}&v=V5.53");
+            json = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={AccessToken}&v=V5.53");
             //Console.WriteLine(json);
             jo = json["error"];
             if (jo != null)
@@ -139,23 +148,17 @@ public class Group
     }
     public void fillSapse(string AccessToken)
     {
-		try{
             Console.WriteLine("_DeploymentStart");
             log += "_DeploymentStart\n";
             for (int i = postponedInf(AccessToken); i <= 100; i++)
             {
                 if (posts.Count > 0)
-                {
-                    Thread.Sleep(1000);
                     sendPost(AccessToken);
-                }
                 else
                     break;
             }
             Console.WriteLine("_DeploymentEnd");
             log += "_DeploymentEnd\n";
-		}
-		catch{log += "_EIfs\n";};
     }
 }
 

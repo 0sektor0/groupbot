@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Threading;
-using System.Net;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace test
 {
     class Program
     {
-        static List<string> commands = new List<string>();
+        static List<Command> commands = new List<Command>();
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
         static string adress = @"words.dat";
@@ -20,14 +20,11 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
-            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
-            HttpWebResponse apiRespose;
-            HttpWebRequest apiRequest;
+            //string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             JObject json;
-            JToken token, message;
-            string uid;
-            accessTokenAndTime = VK.VKauth(login, password, "274556");
+            JToken message;
+            accessTokenAndTime = VK.auth(login, password, "274556");
             DateTime authtime = DateTime.UtcNow;
 
             Console.WriteLine("Acces granted");
@@ -36,32 +33,20 @@ namespace test
             {
                 if ((DateTime.UtcNow - authtime).TotalSeconds > 86400)
                 {
-                    accessTokenAndTime = VK.VKauth(login, password, "274556");
+                    accessTokenAndTime = VK.auth(login, password, "274556");
                     authtime = DateTime.UtcNow;
                     Console.WriteLine("token updated");
                 }
                 try
                 {
-                    json = VK.ApiMethod($"https://api.vk.com/method/messages.get?count=10&access_token={accessTokenAndTime[0]}&v=V5.53");
+                    json = VK.apiMethod($"https://api.vk.com/method/messages.get?count=10&access_token={accessTokenAndTime[0]}&v=V5.53");
                     messagesToDlete = "";
                     message = json["response"];
                     if (message != null)
                     {
                         for (int i = 1; i < message.Count(); i++)
-                        {
-                            token = message[i];
-                            uid = (string)token["uid"];
-                            commands.Add((string)token["body"] + "#" + uid);
-                            messagesToDlete = messagesToDlete + token["mid"] + ",";
-                            if (token["fwd_messages"] != null)
-                                foreach (JToken reMeesage in token["fwd_messages"])
-                                    getAttachments(reMeesage, uid); //photos in each fwd message
-                            else
-                                getAttachments(token, uid); //photos in message
-                        }
-                        apiRequest = (HttpWebRequest)HttpWebRequest.Create($"https://api.vk.com/method/messages.delete?message_ids={messagesToDlete}&count=20&access_token={accessTokenAndTime[0]}&v=V5.53");
-                        apiRespose = (HttpWebResponse)apiRequest.GetResponse();
-                        apiRequest.Abort();
+                            messagesToDlete += parseCommand(message[i]);
+                        VK.emptyApiMethod($"https://api.vk.com/method/messages.delete?message_ids={messagesToDlete}&count=20&access_token={accessTokenAndTime[0]}&v=V5.53");
                     }
                 }
                 catch { Console.Write("_EIReq"); }
@@ -69,11 +54,41 @@ namespace test
             }
 
         }
+        static string parseCommand(JToken message)
+        {
+            JToken token;
+            token = message;
+            string uid = (string)token["uid"];
+            List<string> photos = new List<string>();
+            int comType = (from num in Convert.ToString(token["body"]) where num == '#' select num).Count();
+            if(token["fwd_messages"]!=null)
+                foreach (JToken reMeessage in token["fwd_messages"])
+                    photos.AddRange(getAttachments(reMeessage, uid)); //photos in each fwd message
+            photos.AddRange(getAttachments(token, uid)); //photos in message
+            Command command = new Command(uid, photos);
+
+            switch (comType)
+            {
+                case 1:
+                    string[] parametrs = Convert.ToString(token["body"]).Split('#');
+                    command.type = parametrs[0];
+                    command.parametr = parametrs[1];
+                    commands.Add(command);
+                    break;
+
+                case 0:
+                    command.parametr = Convert.ToString(token["body"]);
+                    commands.Add(command);
+                    break;
+
+                default:
+                    break;
+            }
+            return token["mid"] + ",";
+        }
+
         public static void analysator()
         {
-            string[] command;
-            string newWord, newValue;
-            int commandType;
             TimeSpan timeFromLastCheck;
             while (true)
             {
@@ -92,15 +107,73 @@ namespace test
                 {
                     if (commands[0] != null)
                     {
-                        commandType = (from num in commands[0] where num == '#' select num).Count();
-                        if (commandType == 2) //проверка на наличие команд
-                            executer(commands[0]);
-                        if (commandType == 1 && (from num in commands[0] where num == ':' select num).Count() == 1)
+                        executer(commands[0]);
+                        commands.RemoveAt(0);
+                    }
+                }
+            }
+        }
+        public static void executer(Command command)
+        {
+            if (command.parametr != "")
+            {
+                command.parametr = command.parametr.ToLower();
+                if (command.parametr[0] == ' ')
+                    command.parametr = command.parametr.Remove(0, 1);
+            }
+
+            switch (command.type)
+            {
+                case "search":
+                    if (dictionary.ContainsKey(command.parametr) && command.parametr != "")
+                        command.parametr = dictionary[command.parametr];
+                    else
+                        command.parametr = $"я не знаю слова {command.parametr}. Неужели, xоть что-то из ваших скудных знаний может мне пригодиться? я приятно удивлена, научите меня семпай";
+                    sendMessage(command.parametr, command.uid);
+                    break;
+
+                case "save":
+                    if (command.uid == "29334144")
+                    {
+					saveDictionary(adress);
+					foreach (Group groupToSave in groups.Values)
+						groupToSave.Save();
+                    if (command.parametr == "ack")
+                        sendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", command.uid);
+                    }
+                    Console.WriteLine("dictionary saved");
+                    CurentGroup.log += "dictionary saved\n";
+                    break;
+
+                case "log":
+                    if (command.uid == "29334144")
+                    {
+                        if (command.parametr == "clr")
                         {
-                            command = commands[0].Split(':');
-                            newWord = command[0].ToLower();
-                            command = command[1].Split('#');
-                            newValue = command[0].ToLower();
+                            CurentGroup.log = "_";
+                            sendMessage("Семпай, я решила все забыть", command.uid);
+                        }
+                        if (command.parametr == "count")
+                            sendMessage($"{dictionary.Keys.Count}", command.uid);
+                        if (command.parametr == "")
+                            sendMessage(CurentGroup.log, command.uid);
+                    }
+                    break;
+
+                case "remove":
+                    dictionary.Remove(command.parametr);
+                    Console.WriteLine("word {0} removed", command.parametr);
+                    CurentGroup.log += "word " + command.parametr + " removed\n";
+                    break;
+
+                case "null":
+                    if (command.parametr != "")
+                    {
+                        if (command.parametr.Contains(':'))
+                        {
+                            string[] word = command.parametr.Split(':');
+                            string newWord = word[0];
+                            string newValue = word[1];
                             if (newWord != "")
                             {
                                 if (!dictionary.ContainsKey(newWord))
@@ -117,104 +190,52 @@ namespace test
                                 }
                             }
                         }
-                        commands.RemoveAt(0);
                     }
-                }
-            }
-        }
-        public static void executer(object command)
-        {
-            string[] Command = command.ToString().Split('#');
-            string parametr = "", uid = Command[Command.Length - 1];
-            if (Command[1] != "")
-            {
-                parametr = Command[1].ToLower();
-                if (parametr[0] == ' ')
-                    parametr = parametr.Remove(0, 1);
-            }
-            //Console.WriteLine(parametr);
-            switch (Command[0])
-            {
-                case "search":
-                    if (dictionary.ContainsKey(parametr) && parametr != "")
-                        parametr = dictionary[parametr];
                     else
-                        parametr = $"я не знаю слова {parametr}. Неужели, xоть что-то из ваших скудных знаний может мне пригодиться? я приятно удивлена, научите меня семпай";
-                    sendMessage(parametr, uid);
-                    break;
-
-                case "save":
-                    if (uid == "29334144")
                     {
-					saveDictionary(adress);
-					foreach (Group groupToSave in groups.Values)
-						groupToSave.Save();
-                    if (parametr == "ack")
-                        sendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", uid);
+                        foreach (string atachment in command.atachments)
+                            commands.Add(new Command("post", atachment, command.uid,""));
                     }
-                    Console.WriteLine("dictionary saved");
-                    CurentGroup.log += "dictionary saved\n";
-                    break;
-
-                case "log":
-                    if (uid == "29334144")
-                    {
-                        if (parametr == "clr")
-                        {
-                            CurentGroup.log = "_";
-                            sendMessage("Семпай, я решила все забыть", uid);
-                        }
-                        if (parametr == "count")
-                            sendMessage($"{dictionary.Keys.Count}", uid);
-                        else
-                            sendMessage(CurentGroup.log, uid);
-                    }
-                    break;
-
-                case "remove":
-                    dictionary.Remove(parametr);
-                    Console.WriteLine("word {0} removed", parametr);
-                    CurentGroup.log += "word " + parametr + " removed\n";
                     break;
 
                 case "post":
-                    CurentGroup.createPost(parametr, "", accessTokenAndTime[0]);
+                    CurentGroup.createPost(command.atachments, command.parametr, accessTokenAndTime[0]); //изначально вместо параметра передавалась пустая строка
                     break;
 
                 case "album":
-                    fromAlbum(parametr,uid, "399761627");
+                    fromAlbum(command.parametr, command.uid, "399761627");
                     break;
 
                 case "time":
-                    if (parametr == "")
-                        sendMessage($"{CurentGroup.PostTime}", uid);
+                    if (command.parametr == "")
+                        sendMessage($"{CurentGroup.PostTime}", command.uid);
                     else
                     {
-                        IEnumerable<char> letters = from char ch in parametr where (ch < 48 || ch > 57) select ch;
+                        IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
                         if (letters.Count<char>() == 0)
-                            CurentGroup.PostTime = Convert.ToInt32(parametr);
+                            CurentGroup.PostTime = Convert.ToInt32(command.parametr);
                         else
-                            sendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", uid);
+                            sendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
                     }
                     break;
 
                 case "group":
-                    if (parametr == "")
-                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}", uid);
+                    if (command.parametr == "")
+                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}", command.uid);
                     else
-                        if (groups.Keys.Contains<string>(parametr))
+                        if (groups.Keys.Contains<string>(command.parametr))
                     {
-                        CurentGroup = groups[parametr];
-                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}", uid);
+                        CurentGroup = groups[command.parametr];
+                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}", command.uid);
                     }
                     else
-                        sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", uid);
+                        sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
                     break;
 
                 case "postpon":
-                    sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", uid);
+                    sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
                     CurentGroup.fillSapse(accessTokenAndTime[0]);
-                    sendMessage("я закончила, но не гарантирую, что все прошло успешно",uid);
+                    sendMessage("я закончила, но не гарантирую, что все прошло успешно", command.uid);
                     break;
 
                 default:
@@ -223,9 +244,11 @@ namespace test
                     break;
             }
         }
+
+
         static void fromAlbum(string parametr, string uid, string albumOwnerId)
         {
-            JObject json = VK.ApiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
+            JObject json = VK.apiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
             JToken albums = null;
             string aid = "";
             string[] parametrs=null;
@@ -250,7 +273,7 @@ namespace test
                 else
                 {
                     sendMessage("Семпай, я начала работу, может вы хоть раз попробуете сделать все сами, и тогда-то вы поймете, какого это, когда тебя напрягают по всякой ерунде, ААААН?", uid);
-                    json = VK.ApiMethod($"https://api.vk.com/method/photos.get?owner_id={albumOwnerId}&album_id={aid}&access_token={accessTokenAndTime[0]}&v=V5.53");
+                    json = VK.apiMethod($"https://api.vk.com/method/photos.get?owner_id={albumOwnerId}&album_id={aid}&access_token={accessTokenAndTime[0]}&v=V5.53");
                     JToken photos = json["response"];
                     int counter = photos.Count<JToken>(), i = Convert.ToInt32(dictionary[aid]);
                     try
@@ -261,9 +284,9 @@ namespace test
                     catch { }               
                     while (counter>0 && i!=photos.Count<JToken>())
                     {
-                        Thread.Sleep(1000);
-                        CurentGroup.createPost($"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", $"#{parametr}@{CurentGroup.name}", accessTokenAndTime[0]);
-                        //JObject messageResp = VK.ApiMethod($"https://api.vk.com/method/messages.send?attachment=photo{photos[i]["owner_id"]}_{photos[i]["pid"]}&chat_id=1&access_token={accessTokenAndTime[0]}&v=V5.53");
+                        //Thread.Sleep(1000);
+                        commands.Add(new Command("post", $"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", uid, $"#{parametr}@{CurentGroup.name}"));
+                        //JObject messageResp = VK.apiMethod($"https://api.vk.com/method/messages.send?attachment=photo{photos[i]["owner_id"]}_{photos[i]["pid"]}&chat_id=1&access_token={accessTokenAndTime[0]}&v=V5.53");
                         //Console.WriteLine(photos[i]["pid"]);
                         //Console.WriteLine(messageResp);
                         counter--;
@@ -274,8 +297,9 @@ namespace test
                 }
             }
         }
-        static void getAttachments(JToken message, string uid) // берем фото
+        static List<string> getAttachments(JToken message, string uid) // берем фото
         {
+            List<string> photos = new List<string>();
             if (message["attachments"] != null)
             {
                 message = message["attachments"];
@@ -283,21 +307,18 @@ namespace test
                     if ((string)jo["type"] == "photo")
                     {
                         JToken photo = jo["photo"];
-                        commands.Add("post#" + photo["owner_id"] + "_" + photo["pid"] + "_" + photo["access_key"] + "#"+uid);
+                        photos.Add(photo["owner_id"] + "_" + photo["pid"] + "_" + photo["access_key"]);
                     }
             }
+            return photos;
         }
         static void sendMessage(string message, string uid)
         {
             try
             {
-                Thread.Sleep(1000);
-                HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
-                HttpWebResponse apiResponse = (HttpWebResponse)apiRequest.GetResponse();
-                StreamReader reader = new StreamReader(apiResponse.GetResponseStream());
-                string resp = reader.ReadToEnd();
-                Console.WriteLine(resp);
-                CurentGroup.log += resp + "\n";
+                VK.emptyApiMethod($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
+                Console.WriteLine($"message sent to {uid}");
+                CurentGroup.log += $"message sent to {uid}\n";
             }
             catch
             {
@@ -336,9 +357,8 @@ namespace test
             groups.Add("3d", Group.load("porno_im_kosty.xml"));
             Console.WriteLine($"porno_im_kosty.grp deserialization ended");
             CurentGroup = groups["2d"];
-            Thread checkThread = new Thread(new ThreadStart(reader));
             dictionary = inizializeDictionary(adress);
-            checkThread.Start();
+            Task.Run(() => { reader(); });
             analysator();
         }
     }
