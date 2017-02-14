@@ -10,6 +10,7 @@ public class Command
     public List<string> atachments= new List<string>();
     public string uid;
     public string parametr="";
+
     public Command(string uid, List<string> atachments)
     {
         this.atachments.AddRange(atachments);

@@ -26,6 +26,7 @@ namespace test
             JToken message;
             accessTokenAndTime = VK.auth(login, password, "274556");
             DateTime authtime = DateTime.UtcNow;
+			int memCounter, realCounter;
 
             Console.WriteLine("Acces granted");
             Console.WriteLine("Login: " + login);
@@ -37,20 +38,32 @@ namespace test
                     authtime = DateTime.UtcNow;
                     Console.WriteLine("token updated");
                 }
-                json = VK.apiMethod($"https://api.vk.com/method/messages.get?count=10&access_token={accessTokenAndTime[0]}&v=V5.53");
+				json = VK.apiMethod($"https://api.vk.com/method/messages.get?count=10&access_token={accessTokenAndTime[0]}&v=V5.53");
                 messagesToDlete = "";
                 message = json["response"];
                 if (message != null)
                 {
-                    for (int i = 1; i < message.Count(); i++)
-                        messagesToDlete += parseCommand(message[i]);
-                    VK.emptyApiMethod($"https://api.vk.com/method/messages.delete?message_ids={messagesToDlete}&count=20&access_token={accessTokenAndTime[0]}&v=V5.53");
-                }
+					if((string)message[0]!="0")
+					{
+						memCounter=Convert.ToInt32(dictionary["0qpqp5e7"]);
+						realCounter=Convert.ToInt32(message[0]);
+						Console.WriteLine (realCounter+"_"+memCounter);
+						if(realCounter>memCounter)
+						{
+							dictionary["0qpqp5e7"]=(string)message[0];
+							for (int i = 1; i < realCounter-memCounter+1; i++)
+                    	    	messagesToDlete += parseCommand(message[i]);
+						//dictionary["0qpqp5e7"]=Convert.ToString(Convert.ToInt32(message[0])+Convert.ToInt32(dictionary["0qpqp5e7"]));
+                    	//VK.emptyApiMethod($"https://api.vk.com/method/messages.delete?message_ids={messagesToDlete}&count=20&access_token={accessTokenAndTime[0]}&v=V5.53");
+						}	
+					}
+				}
                 Thread.Sleep(1000);
             }
 
         }
-        static string parseCommand(JToken message)
+        
+		static string parseCommand(JToken message)
         {
             JToken token;
             token = message;
@@ -83,7 +96,8 @@ namespace test
             return token["mid"] + ",";
         }
 
-        public static void analysator()
+        
+		public static void analysator()
         {
             TimeSpan timeFromLastCheck;
             while (true)
@@ -110,8 +124,10 @@ namespace test
                 }
             }
         }
-        public static void executer(Command command)
-        {
+        
+		public static void executer(Command command)
+		{
+			//Console.WriteLine("analis started");
             if (command.parametr != "")
             {
                 command.parametr = command.parametr.ToLower();
@@ -227,7 +243,7 @@ namespace test
                     }
                     else
                         sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
-					if(command.atachments!=null)
+					if(command.atachments.Count>0)
 					{
 					commands.Add(new Command("null",command.atachments,command.uid,""));
 					}
@@ -243,7 +259,8 @@ namespace test
                     Console.WriteLine("wrong command");
                     CurentGroup.log += "wrong command\n";
                     break;
-            }
+			}
+			//Console.WriteLine("analis endeded");
         }
 
 
@@ -298,7 +315,8 @@ namespace test
                 }
             }
         }
-        static List<string> getAttachments(JToken message, string uid) // берем фото
+        
+		static List<string> getAttachments(JToken message, string uid) // берем фото
         {
             List<string> photos = new List<string>();
             if (message["attachments"] != null)
@@ -313,14 +331,16 @@ namespace test
             }
             return photos;
         }
-        static void sendMessage(string message, string uid)
+        
+		static void sendMessage(string message, string uid)
         {
                 VK.emptyApiMethod($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
                 Console.WriteLine($"message sent to {uid}");
                 CurentGroup.log += $"message sent to {uid}\n";
         }
 
-        public static Dictionary<string, string> inizializeDictionary(string path) //+
+        
+		public static Dictionary<string, string> inizializeDictionary(string path) //+
         {
             string[] buffer;
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
@@ -332,7 +352,8 @@ namespace test
                 }
             return dictionary;
         }
-        public static void saveDictionary(string path)
+        
+		public static void saveDictionary(string path)
         {
             using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.OpenOrCreate)))
                 foreach (string key in dictionary.Keys)

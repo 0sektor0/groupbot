@@ -44,6 +44,7 @@
     <Compile Include="VK.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="Session.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

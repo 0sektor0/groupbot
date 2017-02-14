@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+//using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 
 [Serializable]
@@ -20,9 +20,8 @@ public class Group
         this.name= name;
         this.id = id;
     }
-    public Group()
-    {
-    }
+
+    public Group(){}
 
     static public Group load(string groupAdress)
     {
@@ -34,6 +33,7 @@ public class Group
         using (FileStream fs = new FileStream(groupAdress, FileMode.OpenOrCreate))
             return (Group)formatter.Deserialize(fs);
     }
+
     public void Save()
     {
         /*BinaryFormatter binFormat = new BinaryFormatter();
@@ -64,6 +64,7 @@ public class Group
         }
         return count;
     }
+
     public void createPost(List<string> photos, string message, string AccessToken) //копировать фото в альбом бота, а также запись в список постов группы
     {
         JObject json;
@@ -99,6 +100,7 @@ public class Group
             sendPost(AccessToken);
         }
     }
+
     private void sendPost(string AccessToken)
     {
         if (posts.Count>0)
@@ -149,6 +151,7 @@ public class Group
             }
         }
     }
+
     public int fillSapse(string AccessToken)
     {
             Console.WriteLine("_DeploymentStart");
