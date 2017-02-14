@@ -71,30 +71,33 @@ public class Group
         string[] param;
         string postPhotos = "";
 
-        foreach (string photo in photos)
+        if (photos.Count != 0)
         {
-            param = Convert.ToString(photo).Split('_');
-            for (int i = 0; i < 4; i++)
+            foreach (string photo in photos)
             {
-                json = VK.apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={AccessToken}&v=V5.53");
-                jo = json["response"];
-                if (jo != null)
+                param = Convert.ToString(photo).Split('_');
+                for (int i = 0; i < 4; i++)
                 {
-                    postPhotos += $",photo390383074_{(string)jo}";
-                    break;
+                    json = VK.apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={AccessToken}&v=V5.53");
+                    jo = json["response"];
+                    if (jo != null)
+                    {
+                        postPhotos += $",photo390383074_{(string)jo}";
+                        break;
+                    }
+                }
+                if (jo == null)
+                {
+                    Console.Write("_EICopy");
+                    log += "_EICopy\n";
+                    return;
                 }
             }
-            if (jo == null)
-            {
-                Console.Write("_EICopy");
-                log += "_EICopy\n";
-                return;
-            }
+            postPhotos = postPhotos.Remove(0, 1);
+            string[] post = { message, postPhotos };
+            posts.Add(post);
+            sendPost(AccessToken);
         }
-        postPhotos=postPhotos.Remove(0,1);
-        string[] post = { message, postPhotos};
-        posts.Add(post);
-        sendPost(AccessToken);
     }
     private void sendPost(string AccessToken)
     {
@@ -146,12 +149,11 @@ public class Group
             }
         }
     }
-	public int fillSapse(string AccessToken)
+    public void fillSapse(string AccessToken)
     {
             Console.WriteLine("_DeploymentStart");
             log += "_DeploymentStart\n";
-			int postsCounter=postponedInf(AccessToken);
-		for (int i = postsCounter; i <= 100; i++)
+            for (int i = postponedInf(AccessToken); i <= 100; i++)
             {
                 if (posts.Count > 0)
                     sendPost(AccessToken);
@@ -160,7 +162,6 @@ public class Group
             }
             Console.WriteLine("_DeploymentEnd");
             log += "_DeploymentEnd\n";
-		return postsCounter+posts.Count;
     }
 }
 
