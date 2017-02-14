@@ -146,11 +146,12 @@ public class Group
             }
         }
     }
-    public void fillSapse(string AccessToken)
+	public int fillSapse(string AccessToken)
     {
             Console.WriteLine("_DeploymentStart");
             log += "_DeploymentStart\n";
-            for (int i = postponedInf(AccessToken); i <= 100; i++)
+			int postsCounter=postponedInf(AccessToken);
+		for (int i = postsCounter; i <= 100; i++)
             {
                 if (posts.Count > 0)
                     sendPost(AccessToken);
@@ -159,6 +160,7 @@ public class Group
             }
             Console.WriteLine("_DeploymentEnd");
             log += "_DeploymentEnd\n";
+		return postsCounter+posts.Count;
     }
 }
 

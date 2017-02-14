@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            //string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
-            string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
+            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             JObject json;
             JToken message;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -37,19 +37,15 @@ namespace test
                     authtime = DateTime.UtcNow;
                     Console.WriteLine("token updated");
                 }
-                try
+                json = VK.apiMethod($"https://api.vk.com/method/messages.get?count=10&access_token={accessTokenAndTime[0]}&v=V5.53");
+                messagesToDlete = "";
+                message = json["response"];
+                if (message != null)
                 {
-                    json = VK.apiMethod($"https://api.vk.com/method/messages.get?count=10&access_token={accessTokenAndTime[0]}&v=V5.53");
-                    messagesToDlete = "";
-                    message = json["response"];
-                    if (message != null)
-                    {
-                        for (int i = 1; i < message.Count(); i++)
-                            messagesToDlete += parseCommand(message[i]);
-                        VK.emptyApiMethod($"https://api.vk.com/method/messages.delete?message_ids={messagesToDlete}&count=20&access_token={accessTokenAndTime[0]}&v=V5.53");
-                    }
+                    for (int i = 1; i < message.Count(); i++)
+                        messagesToDlete += parseCommand(message[i]);
+                    VK.emptyApiMethod($"https://api.vk.com/method/messages.delete?message_ids={messagesToDlete}&count=20&access_token={accessTokenAndTime[0]}&v=V5.53");
                 }
-                catch { Console.Write("_EIReq"); }
                 Thread.Sleep(1000);
             }
 
@@ -93,13 +89,14 @@ namespace test
             while (true)
             {
                 timeFromLastCheck = DateTime.UtcNow - lastCheckTime;
-                if ((int)timeFromLastCheck.TotalSeconds >= 14400) //автоматическое сохранение групп
+				if ((int)timeFromLastCheck.TotalSeconds >= 14400) //автоматическое сохранение групп
                 {
                     lastCheckTime = DateTime.UtcNow;
                     foreach (Group groupToSave in groups.Values)
                     {
                         groupToSave.Save();
-                        groupToSave.fillSapse(accessTokenAndTime[0]);
+						if (groupToSave.fillSapse(accessTokenAndTime[0])<=12)
+							sendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
                     }
                 }
 
@@ -230,11 +227,15 @@ namespace test
                     }
                     else
                         sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
+					if(command.atachments!=null)
+					{
+					commands.Add(new Command("null",command.atachments,command.uid,""));
+					}
                     break;
 
                 case "postpon":
                     sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
-                    CurentGroup.fillSapse(accessTokenAndTime[0]);
+                    int nullCounter= CurentGroup.fillSapse(accessTokenAndTime[0]);
                     sendMessage("я закончила, но не гарантирую, что все прошло успешно", command.uid);
                     break;
 
@@ -314,17 +315,9 @@ namespace test
         }
         static void sendMessage(string message, string uid)
         {
-            try
-            {
                 VK.emptyApiMethod($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
                 Console.WriteLine($"message sent to {uid}");
                 CurentGroup.log += $"message sent to {uid}\n";
-            }
-            catch
-            {
-                Console.WriteLine("_EIA");
-                CurentGroup.log += "_EIA\n";
-            }
         }
 
         public static Dictionary<string, string> inizializeDictionary(string path) //+
