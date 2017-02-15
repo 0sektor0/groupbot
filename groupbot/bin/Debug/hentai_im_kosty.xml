@@ -1,29 +1,16 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>hentai_im_kosty</name>
-  <PostTime>1487600100</PostTime>
+  <PostTime>1487625300</PostTime>
   <log>_message sent to 29334144
-0qpqp5e7:  0
 message sent to 29334144
 message sent to 29334144
-message sent to 29334144
-message sent to 29334144
-message sent to 29334144
-_hentai_im_kosty:saved
-dictionary saved
-message sent to 29334144
+post_id: 4351
+post_id: 4352
 message sent to 29334144
 </log>
   <id>121519170</id>
   <posts>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456244013</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456244015</string>
-    </ArrayOfString>
     <ArrayOfString>
       <string />
       <string>photo390383074_456244017</string>
@@ -279,6 +266,73 @@ message sent to 29334144
     <ArrayOfString>
       <string />
       <string>photo390383074_456244080</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244120</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244121</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244122</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244123</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244124</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244125</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244138</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244140</string>
+    </ArrayOfString>
+  </posts>
+</Group>/string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244079</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244080</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244120</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244121</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244122</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244123</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244124</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456244125</string>
     </ArrayOfString>
   </posts>
 </Group>

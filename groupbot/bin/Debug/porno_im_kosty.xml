@@ -1,31 +1,43 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>porno_im_kosty</name>
-  <PostTime>1487353140</PostTime>
+  <PostTime>1487428740</PostTime>
   <log>_{"response":5635}
 _porno_im_kosty:saved
 _DeploymentStart
 _DeploymentEnd
 _porno_im_kosty:saved
+_porno_im_kosty:saved
+_porno_im_kosty:saved
+_porno_im_kosty:saved
+_DeploymentStart
+post_id: 1084
+post_id: 1085
+post_id: 1086
+post_id: 1087
+post_id: 1088
+post_id: 1089
+_UnError
+post_id: 1090
+post_id: 1091
+post_id: 1092
+post_id: 1093
+post_id: 1094
+post_id: 1095
+_DeploymentEnd
+_porno_im_kosty:saved
+_DeploymentStart
+_DeploymentEnd
+_porno_im_kosty:saved
+_DeploymentStart
+_DeploymentEnd
+_porno_im_kosty:saved
+_DeploymentStart
+_DeploymentEnd
 </log>
   <id>138077475</id>
-  <posts>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456243694</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456243696</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456243698</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456243699</string>
-    </ArrayOfString>
+  <posts />
+</Group>    </ArrayOfString>
     <ArrayOfString>
       <string />
       <string>photo390383074_456243701</string>
