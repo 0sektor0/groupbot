@@ -146,6 +146,7 @@ class VK
         StreamReader respStream = new StreamReader(apiRespose.GetResponseStream());
         JObject json = JObject.Parse(respStream.ReadToEnd());
         respStream.Close();
+		apiRequest.Abort();
         //Console.WriteLine(json);
         return json;
     }

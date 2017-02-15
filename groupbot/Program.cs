@@ -20,6 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
+			dictionary.Remove("0qpqp5e7");
+			dictionary ["0qpqp5e7"] = "90";
             string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
             //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             JObject json;
@@ -43,11 +45,15 @@ namespace test
                 message = json["response"];
                 if (message != null)
                 {
+					//Console.WriteLine(message);
 					if((string)message[0]!="0")
 					{
 						memCounter=Convert.ToInt32(dictionary["0qpqp5e7"]);
+						//Console.WriteLine(memCounter);
 						realCounter=Convert.ToInt32(message[0]);
-						Console.WriteLine (realCounter+"_"+memCounter);
+						Console.WriteLine (realCounter+":"+memCounter);
+						if (realCounter < memCounter)
+							memCounter = realCounter;
 						if(realCounter>memCounter)
 						{
 							dictionary["0qpqp5e7"]=(string)message[0];
