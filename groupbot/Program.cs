@@ -20,7 +20,7 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
+            string login = "+79661963807 ", password = "Az_965211-gI";
             //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             JObject json;
             JToken messages;
@@ -38,7 +38,6 @@ namespace test
                     Console.WriteLine("token updated");
                 }
 				json = VK.apiMethod($"https://api.vk.com/method/execute.messagesPull?access_token={accessTokenAndTime[0]}&v=V5.53");
-                messagesToDlete = "";
                 messages = json["response"];
 
                 if (messages != null)
