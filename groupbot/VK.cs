@@ -10,6 +10,7 @@ class VK
 {
     private static int requesrControlCounter = 0;
     private static DateTime lastRequestTime = DateTime.UtcNow;
+
     static string cookiestring(List<string> list)
     {
         string cookiestr = "";
@@ -17,6 +18,7 @@ class VK
             cookiestr = cookiestr + str + ";";
         return cookiestr;
     }
+
     static public string[] auth(string login, string password, string scope)
     {
         byte[] byteData;
@@ -122,6 +124,7 @@ class VK
             return (new string[] { Temp[1], Temp[3], login, password, scope });
         }
     }
+
     static private void requestAcceptionCheck()
     {
         //Console.WriteLine(requesrControlCounter);
@@ -137,6 +140,7 @@ class VK
             requesrControlCounter = 0;
         }
     }
+
     static public JObject apiMethod(string request)
     {
         requestAcceptionCheck();
@@ -150,7 +154,8 @@ class VK
         //Console.WriteLine(json);
         return json;
     }
-    static public void emptyApiMethod(string request)
+
+    static public void apiMethodEmpty(string request)
     {
         requestAcceptionCheck();
         requesrControlCounter++;
@@ -158,6 +163,28 @@ class VK
         HttpWebRequest apiRequest;
         apiRequest = (HttpWebRequest)HttpWebRequest.Create(request);
         apiRespose = (HttpWebResponse)apiRequest.GetResponse();
+        apiRequest.Abort();
+    }
+
+    static public void apiMethodEmpty(Dictionary<string,string> param, string method)
+    {
+        requestAcceptionCheck();
+        requesrControlCounter++;
+
+        HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create(method);
+        apiRequest.Method = "POST";
+        Stream postWriter = apiRequest.GetRequestStream();
+        string postParam = "";
+        foreach (string key in param.Keys)
+        {
+            Console.WriteLine($"{key} : {param[key]}");
+            postParam += $"{key}={param[key]}&";
+        }
+        byte[] postParamByte = Encoding.UTF8.GetBytes(postParam.Remove(postParam.Length-1,1));
+        postWriter.Write(postParamByte,0,postParamByte.Length);
+        postWriter.Close();
+
+        HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
         apiRequest.Abort();
     }
 }

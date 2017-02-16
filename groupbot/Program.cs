@@ -20,15 +20,12 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-			dictionary.Remove("0qpqp5e7");
-			dictionary ["0qpqp5e7"] = "90";
             string login = "+79661963807 ", password = "Az_965211-gI", messagesToDlete;
             //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
             JObject json;
-            JToken message;
+            JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
             DateTime authtime = DateTime.UtcNow;
-			int memCounter, realCounter;
 
             Console.WriteLine("Acces granted");
             Console.WriteLine("Login: " + login);
@@ -40,36 +37,23 @@ namespace test
                     authtime = DateTime.UtcNow;
                     Console.WriteLine("token updated");
                 }
-				json = VK.apiMethod($"https://api.vk.com/method/messages.get?count=10&access_token={accessTokenAndTime[0]}&v=V5.53");
+				json = VK.apiMethod($"https://api.vk.com/method/execute.messagesPull?access_token={accessTokenAndTime[0]}&v=V5.53");
                 messagesToDlete = "";
-                message = json["response"];
-                if (message != null)
+                messages = json["response"];
+
+                if (messages != null)
                 {
-					//Console.WriteLine(message);
-					if((string)message[0]!="0")
-					{
-						memCounter=Convert.ToInt32(dictionary["0qpqp5e7"]);
-						//Console.WriteLine(memCounter);
-						realCounter=Convert.ToInt32(message[0]);
-						Console.WriteLine (realCounter+":"+memCounter);
-						if (realCounter < memCounter)
-							memCounter = realCounter;
-						if(realCounter>memCounter)
-						{
-							dictionary["0qpqp5e7"]=(string)message[0];
-							for (int i = 1; i < realCounter-memCounter+1; i++)
-                    	    	messagesToDlete += parseCommand(message[i]);
-						//dictionary["0qpqp5e7"]=Convert.ToString(Convert.ToInt32(message[0])+Convert.ToInt32(dictionary["0qpqp5e7"]));
-                    	//VK.emptyApiMethod($"https://api.vk.com/method/messages.delete?message_ids={messagesToDlete}&count=20&access_token={accessTokenAndTime[0]}&v=V5.53");
-						}	
-					}
-				}
+                    //Console.WriteLine(messages);
+                    if ((string)messages[0] != "0")
+                            for(int i=1; i<messages.Count(); i++)
+                                parseCommand(messages[i]);
+                }
                 Thread.Sleep(1000);
             }
 
         }
         
-		static string parseCommand(JToken message)
+		static void parseCommand(JToken message)
         {
             JToken token;
             token = message;
@@ -99,7 +83,6 @@ namespace test
                 default:
                     break;
             }
-            return token["mid"] + ",";
         }
 
         
@@ -124,8 +107,13 @@ namespace test
                 {
                     if (commands[0] != null)
                     {
-                        executer(commands[0]);
-                        commands.RemoveAt(0);
+                        try { executer(commands[0]);}
+                        catch
+                        {
+                            Console.WriteLine("Error in method execution");
+                            CurentGroup.log += "Error in method execution\n";
+                        }
+                        finally { commands.RemoveAt(0);}
                     }
                 }
             }
@@ -162,6 +150,14 @@ namespace test
                     }
                     Console.WriteLine("dictionary saved");
                     CurentGroup.log += "dictionary saved\n";
+                    break;
+
+                case "load":
+                    if (command.uid == "29334144")
+                    {
+                        groups["2d"] = Group.load("hentai_im_kosty.xml");
+                        groups["3d"] = Group.load("porno_im_kosty.xml");
+                    }
                     break;
 
                 case "log":
@@ -340,7 +336,16 @@ namespace test
         
 		static void sendMessage(string message, string uid)
         {
-                VK.emptyApiMethod($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
+                //VK.apiMethodEmpty($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
+                VK.apiMethodEmpty(new Dictionary<string, string>()
+                {
+                    { "message",message},
+                    { "uid",uid},
+                    { "access_token",accessTokenAndTime[0]},
+                    { "v","V5.53"}
+                },
+                "https://api.vk.com/method/messages.send");
+
                 Console.WriteLine($"message sent to {uid}");
                 CurentGroup.log += $"message sent to {uid}\n";
         }
@@ -373,9 +378,9 @@ namespace test
             //groups.Add("2d",new Group("hentai_im_kosty", "121519170"));
             //groups.Add("3d", new Group("porno_im_kosty", "138077475"));
             groups.Add("2d", Group.load("hentai_im_kosty.xml"));
-            Console.WriteLine($"hentai_im_kosty.grp deserialization ended");
+            Console.WriteLine($"hentai_im_kosty.xml deserialization ended");
             groups.Add("3d", Group.load("porno_im_kosty.xml"));
-            Console.WriteLine($"porno_im_kosty.grp deserialization ended");
+            Console.WriteLine($"porno_im_kosty.xml deserialization ended");
             CurentGroup = groups["2d"];
             dictionary = inizializeDictionary(adress);
             Task.Run(() => { reader(); });
