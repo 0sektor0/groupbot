@@ -12,25 +12,13 @@ public class Group
     public int PostTime = 0;
     public string log = "_";
     public string id;
-    public bool posteponedOn = false; //автоматическая выгрузка и оповещение
-    public int limit
-    {
-        get
-        {
-            return limit;
-        }
-        set
-        {
-            if (value > 145 || value < 1)
-                limit = 145;
-            else
-                limit = value;
-        }
-    }
+    public bool posteponedOn; //автоматическая выгрузка и оповещение
+	public int limit;
     public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста]
 
-    public Group(string name, string id)
+	public Group(string name, string id, int limit)
     {
+		this.limit = limit;
         this.name= name;
         this.id = id;
     }
@@ -67,16 +55,21 @@ public class Group
         JObject json;
         JToken jo;
         int count;
-        json = VK.apiMethod($"https://api.vk.com/method/wall.get?owner_id=-{id}&count=100&filter=postponed&access_token={accessToken}&v=V5.53");
+		json = VK.apiMethod($"https://api.vk.com/method/execute.postponedInf?gid=-{id}&access_token={accessToken}&v=V5.53");
         //Console.WriteLine(json);
         jo = json["response"];
-        count = Convert.ToInt32(jo[0]);
-        if (count > 0 && count<=145)
+		if (jo != null) {
+			PostTime = (int)jo [1] + 3600; //время последнего поста	
+			return (int)jo [0];
+		} else
+			return 100;
+        /*count = Convert.ToInt32(jo[0]);
+        if (count > 0 && count<=limit)
         {
             jo = jo[count];
             PostTime = Convert.ToInt32(jo["date"]) + 3600; //время последнего поста
-        }
-        return count;
+        }*/
+        //return count;
     }
 
     public void createPost(List<string> photos, string message, string accessToken) //копировать фото в альбом бота, а также запись в список постов группы
@@ -214,11 +207,15 @@ public class Group
                 PostTime = (int)delay["start"];
                 for (int i = 0; i < (int)delay["count"]; i++)
                 {
-                    PostTime += 3600;
-                    if (postsCount >= 144)
+                    if (postsCount >= limit)
                         break;
-                    sendPost(accessToken,false);
-                    postsCount++;
+					else 
+					{
+						PostTime+=3600;
+                    	sendPost(accessToken,false);
+						PostTime-=3600;
+                    	postsCount++;
+					}
                 }
             }
 

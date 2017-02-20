@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            //string login = "+79661963807 ", password = "Az_965211-gI";
-            string login = "+79645017794", password = "Ny_965211-sR";
+            string login = "+79661963807 ", password = "Az_965211-gI";
+            //string login = "+79645017794", password = "Ny_965211-sR";
             JObject json;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -106,15 +106,15 @@ namespace test
                 {
                     if (commands[0] != null)
                     {
-                        executer(commands[0]);
-                        commands.RemoveAt(0);
-                        /*try { executer(commands[0]);}
+                        //executer(commands[0]);
+                        //commands.RemoveAt(0);
+                        try { executer(commands[0]);}
                         catch
                         {
                             Console.WriteLine("Error in method execution");
                             CurentGroup.log += "Error in method execution\n";
                         }
-                        finally { commands.RemoveAt(0);}*/
+                        finally { commands.RemoveAt(0);}
                     }
                 }
             }
@@ -237,12 +237,12 @@ namespace test
 
                 case "group":
                     if (command.parametr == "")
-                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}", command.uid);
+					sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}", command.uid);
                     else
                         if (groups.Keys.Contains<string>(command.parametr))
                     {
                         CurentGroup = groups[command.parametr];
-                        sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}", command.uid);
+						sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}", command.uid);
                     }
                     else
                         sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
