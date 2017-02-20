@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI";
-            //string login = "+79645017794", password = "Ny_965211-sR", messagesToDlete;
+            //string login = "+79661963807 ", password = "Az_965211-gI";
+            string login = "+79645017794", password = "Ny_965211-sR";
             JObject json;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -106,13 +106,15 @@ namespace test
                 {
                     if (commands[0] != null)
                     {
-                        try { executer(commands[0]);}
+                        executer(commands[0]);
+                        commands.RemoveAt(0);
+                        /*try { executer(commands[0]);}
                         catch
                         {
                             Console.WriteLine("Error in method execution");
                             CurentGroup.log += "Error in method execution\n";
                         }
-                        finally { commands.RemoveAt(0);}
+                        finally { commands.RemoveAt(0);}*/
                     }
                 }
             }
@@ -251,9 +253,20 @@ namespace test
                     break;
 
                 case "postpon":
-                    sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
-                    int nullCounter= CurentGroup.fillSapse(accessTokenAndTime[0]);
-                    sendMessage("я закончила, но не гарантирую, что все прошло успешно", command.uid);
+                    if (command.parametr == "")
+                    {
+                        sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
+                        int nullCounter = CurentGroup.fillSapse(accessTokenAndTime[0]);
+                        sendMessage("я закончила, но не гарантирую, что все прошло успешно", command.uid);
+                    }
+                    if (command.parametr == "off")
+                        CurentGroup.posteponedOn = false;
+                    if (command.parametr == "on")
+                        CurentGroup.posteponedOn = true;
+                    break;
+
+                case "aligment":
+                    CurentGroup.aligment(accessTokenAndTime[0]);
                     break;
 
                 default:
