@@ -205,28 +205,33 @@ public class Group
             jo = jo[2];
             int tempPostTime = PostTime;
 
-            if (!getInf)
-            foreach (JToken delay in jo)
-            {
-                PostTime = (int)delay["start"];
-                for (int i = 0; i < (int)delay["count"]; i++)
-                {
-                    if (postsCount >= limit)
-                        break;
-					else 
-					{
-						PostTime+=3600;
-                    	sendPost(accessToken,false);
-						PostTime-=3600;
-                    	postsCount++;
-					}
-                }
-            }
+			if (!getInf)
+			{
+            	foreach (JToken delay in jo)
+            	{
+                	PostTime = (int)delay["start"];
+                	for (int i = 0; i < (int)delay["count"]; i++)
+                	{
+                	    if (postsCount >= limit)
+                	        break;
+						else 
+						{
+							PostTime+=3600;
+                    		sendPost(accessToken,false);
+							PostTime-=3600;
+                    		postsCount++;
+						}
+                	}
+				}
 
-            Console.Write("alignment ended");
-            log += "alignment ended\n";
-            PostTime = tempPostTime;
-            return new int[] { (int)jo[0] , (int)jo[1] };
+				Console.Write("alignment ended");
+				log += "alignment ended\n";
+				PostTime = tempPostTime;
+				return new int[] { 0 };
+			}				
+			Console.Write("alignment ended");
+			log += "alignment ended\n";
+			return new int[] { errorCount , postsCount };
         }
 
         return new int[] { 0 };

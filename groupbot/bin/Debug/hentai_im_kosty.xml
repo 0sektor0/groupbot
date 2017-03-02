@@ -27,10 +27,12 @@ _DeploymentEnd
 message sent to -121519170
 post_id: 5191
 message sent to 29334144
+message sent to 29334144
 </log>
   <id>121519170</id>
   <posteponedOn>true</posteponedOn>
   <limit>145</limit>
+  <text />
   <posts>
     <ArrayOfString>
       <string />
@@ -515,12 +517,6 @@ message sent to 29334144
     <ArrayOfString>
       <string />
       <string>photo390383074_456246318</string>
-    </ArrayOfString>
-  </posts>
-</Group>fString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456246313</string>
     </ArrayOfString>
   </posts>
 </Group>

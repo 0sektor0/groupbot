@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            //string login = "+79661963807 ", password = "Az_965211-gI";
-            string login = "+79645017794", password = "Ny_965211-sR";
+            string login = "+79661963807 ", password = "Az_965211-gI";
+            //string login = "+79645017794", password = "Ny_965211-sR";
             JObject json;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -275,10 +275,14 @@ namespace test
 
                 case "alignment":
                     int[] res;
-                    if (command.parametr=="")
+					if (command.parametr=="")
                         res=CurentGroup.alignment(accessTokenAndTime[0], false);
-                    if (command.parametr=="count")
+					if (command.parametr=="count")
+					{
                         res=CurentGroup.alignment(accessTokenAndTime[0], true);
+							if (res.Length==2)
+							sendMessage($"{res[0]} {res[1]}", command.uid);
+					}
                     break;
 
                 case "tag":
