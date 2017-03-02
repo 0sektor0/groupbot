@@ -1,32 +1,8 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>hentai_im_kosty</name>
-  <PostTime>1489014900</PostTime>
+  <PostTime>1489036500</PostTime>
   <log>_message sent to 29334144
-message sent to 29334144
-wrong command
-aligment started 3/2/2017 8:37:55 AM
-post_id: 5178
-aligment ended
-message sent to 29334144
-_DeploymentStart 3/2/2017 8:38:08 AM
-post_id: 5179
-post_id: 5180
-_DeploymentEnd
-message sent to 29334144
-message sent to 29334144
-post_id: 5181
-message sent to 29334144
-message sent to 29334144
-_hentai_im_kosty:saved
-_DeploymentStart 3/2/2017 12:44:16 PM
-post_id: 5186
-post_id: 5187
-post_id: 5188
-_DeploymentEnd
-message sent to -121519170
-post_id: 5191
-message sent to 29334144
 message sent to 29334144
 </log>
   <id>121519170</id>
@@ -34,42 +10,6 @@ message sent to 29334144
   <limit>145</limit>
   <text />
   <posts>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456245018</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456245019</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456245020</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456245021</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456245022</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456245023</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456245024</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456245025</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456245026</string>
-    </ArrayOfString>
     <ArrayOfString>
       <string />
       <string>photo390383074_456245027</string>
@@ -517,6 +457,14 @@ message sent to 29334144
     <ArrayOfString>
       <string />
       <string>photo390383074_456246318</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456246338</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string />
+      <string>photo390383074_456246340</string>
     </ArrayOfString>
   </posts>
 </Group>
