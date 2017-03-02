@@ -14,6 +14,7 @@ public class Group
     public string id;
     public bool posteponedOn; //автоматическая выгрузка и оповещение
 	public int limit;
+    public string text = "";
     public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста]
 
 	public Group(string name, string id, int limit)
@@ -43,6 +44,7 @@ public class Group
             binFormat.Serialize(fStream, this);
         Console.WriteLine($"_{name}:saved");
         log += $"_{name}:saved\n";*/
+        File.Delete($"{name}.xml");
         XmlSerializer formatter = new XmlSerializer(typeof(Group));
         using (FileStream fs = new FileStream($"{name}.xml", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
             formatter.Serialize(fs, this);
@@ -102,7 +104,7 @@ public class Group
                 }
             }
             postPhotos = postPhotos.Remove(0, 1);
-            string[] post = { message, postPhotos };
+            string[] post = { $"{message} {text}", postPhotos };
             posts.Add(post);
             sendPost(accessToken, true);
         }
@@ -188,20 +190,22 @@ public class Group
         }
     }
 
-    public void aligment(string accessToken)
+    public int[] alignment(string accessToken, bool getInf)
     {
         JObject json = VK.apiMethod($"https://api.vk.com/method/execute.delaySearch?gid=-{id}&access_token={accessToken}&v=V5.53");
         JToken jo = json["response"];
+
         if (jo != null)
         {
-            Console.Write($"aligment started {DateTime.UtcNow}");
-            log += $"aligment started {DateTime.UtcNow}\n";
+            Console.Write($"alignment started {DateTime.UtcNow}");
+            log += $"alignment started {DateTime.UtcNow}\n";
 
             int errorCount = (int)jo[0];
             int postsCount = (int)jo[1];
             jo = jo[2];
             int tempPostTime = PostTime;
 
+            if (!getInf)
             foreach (JToken delay in jo)
             {
                 PostTime = (int)delay["start"];
@@ -219,10 +223,13 @@ public class Group
                 }
             }
 
-            Console.Write("aligment ended");
-            log += "aligment ended\n";
+            Console.Write("alignment ended");
+            log += "alignment ended\n";
             PostTime = tempPostTime;
+            return new int[] { (int)jo[0] , (int)jo[1] };
         }
+
+        return new int[] { 0 };
     }
 }
 

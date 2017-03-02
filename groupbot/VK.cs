@@ -177,7 +177,7 @@ class VK
         string postParam = "";
         foreach (string key in param.Keys)
         {
-            Console.WriteLine($"{key} : {param[key]}");
+            //Console.WriteLine($"{key} : {param[key]}");
             postParam += $"{key}={param[key]}&";
         }
         byte[] postParamByte = Encoding.UTF8.GetBytes(postParam.Remove(postParam.Length-1,1));

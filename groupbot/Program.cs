@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI";
-            //string login = "+79645017794", password = "Ny_965211-sR";
+            //string login = "+79661963807 ", password = "Az_965211-gI";
+            string login = "+79645017794", password = "Ny_965211-sR";
             JObject json;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -55,6 +55,7 @@ namespace test
 		static void parseCommand(JToken message)
         {
             JToken token;
+            string[] parametrs;
             token = message;
             string uid = (string)token["uid"];
             List<string> photos = new List<string>();
@@ -67,8 +68,15 @@ namespace test
 
             switch (comType)
             {
+                case 2:
+                    parametrs = Convert.ToString(token["body"]).Split('#');
+                    command.type = parametrs[0];
+                    command.parametr = "#"+parametrs[2];
+                    commands.Add(command);
+                    break;
+
                 case 1:
-                    string[] parametrs = Convert.ToString(token["body"]).Split('#');
+                    parametrs = Convert.ToString(token["body"]).Split('#');
                     command.type = parametrs[0];
                     command.parametr = parametrs[1];
                     commands.Add(command);
@@ -94,10 +102,10 @@ namespace test
 				if ((int)timeFromLastCheck.TotalSeconds >= 14400) //автоматическое сохранение групп
                 {
                     lastCheckTime = DateTime.UtcNow;
+                    commands.Add(new Command("save", "", "29334144", ""));
                     foreach (Group groupToSave in groups.Values)
                     {
-                        groupToSave.Save();
-						if (groupToSave.fillSapse(accessTokenAndTime[0])<=12)
+						if (groupToSave.fillSapse(accessTokenAndTime[0])<=24)
 							sendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
                     }
                 }
@@ -237,12 +245,12 @@ namespace test
 
                 case "group":
                     if (command.parametr == "")
-					sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}", command.uid);
+					sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}", command.uid);
                     else
                         if (groups.Keys.Contains<string>(command.parametr))
                     {
                         CurentGroup = groups[command.parametr];
-						sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}", command.uid);
+						sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}", command.uid);
                     }
                     else
                         sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
@@ -265,8 +273,18 @@ namespace test
                         CurentGroup.posteponedOn = true;
                     break;
 
-                case "aligment":
-                    CurentGroup.aligment(accessTokenAndTime[0]);
+                case "alignment":
+                    int[] res;
+                    if (command.parametr=="")
+                        res=CurentGroup.alignment(accessTokenAndTime[0], false);
+                    if (command.parametr=="count")
+                        res=CurentGroup.alignment(accessTokenAndTime[0], true);
+                    break;
+
+                case "tag":
+                    CurentGroup.text = command.parametr;
+                    CurentGroup.log += $"\n{CurentGroup.name} text change to '{command.parametr}'";
+                    Console.WriteLine($"{CurentGroup.name} text change to '{command.parametr}'");
                     break;
 
                 default:
