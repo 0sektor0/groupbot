@@ -129,12 +129,12 @@ class VK
     {
         //Console.WriteLine(requesrControlCounter);
         TimeSpan lastRequestTimeSec = DateTime.UtcNow - lastRequestTime;
-        if (lastRequestTimeSec.TotalSeconds > 1)
+        /*if (lastRequestTimeSec.TotalSeconds > 1)
         {
             lastRequestTime = DateTime.UtcNow;
             requesrControlCounter = 0;
-        }
-        if (requesrControlCounter > 3)
+        }*/
+        if (requesrControlCounter > 2)
         {
             Thread.Sleep(1000);
             requesrControlCounter = 0;
