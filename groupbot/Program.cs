@@ -105,7 +105,7 @@ namespace test
                     commands.Add(new Command("save", "", "29334144", ""));
                     foreach (Group groupToSave in groups.Values)
                     {
-						if (groupToSave.fillSapse(accessTokenAndTime[0])<=24)
+						if (groupToSave.deployment(accessTokenAndTime[0])<=24)
 							sendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
                     }
                 }
@@ -273,11 +273,11 @@ namespace test
 					}
                     break;
 
-                case "postpon":
+                case "deployment":
                     if (command.parametr == "")
                     {
                         sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
-                        int nullCounter = CurentGroup.fillSapse(accessTokenAndTime[0]);
+                        int nullCounter = CurentGroup.deployment(accessTokenAndTime[0]);
                         sendMessage("я закончила, но не гарантирую, что все прошло успешно", command.uid);
                     }
                     if (command.parametr == "off")
@@ -296,6 +296,14 @@ namespace test
 							if (res.Length==2)
 							sendMessage($"{res[0]} {res[1]}", command.uid);
 					}
+                    if (command.parametr == "last")
+                    {
+                        TimeSpan unixTime= DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
+                        double lastPostTime = (CurentGroup.PostTime- unixTime.TotalSeconds- CurentGroup.offset + CurentGroup.posts.Count*CurentGroup.offset)/3600;
+                        if (lastPostTime < 0)
+                            lastPostTime = 0;
+                        sendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {CurentGroup.offset} секунд вам осталось \n{(int)lastPostTime/24}д:{(int)(lastPostTime- ((int)lastPostTime / 24)*24)}ч",command.uid);
+                    }
                     break;
 
                 case "tag":

@@ -165,7 +165,7 @@ public class Group
         }
     }
 
-    public int fillSapse(string accessToken)
+    public int deployment(string accessToken)
     {
         if (posteponedOn) //если оповещение разрещенно
         {
