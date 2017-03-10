@@ -9,7 +9,7 @@ using System.Threading;
 class VK
 {
     private static int requesrControlCounter = 0;
-    private static DateTime lastRequestTime = DateTime.UtcNow;
+    private static DateTime lastRequestTime;
 
     static string cookiestring(List<string> list)
     {
@@ -29,6 +29,7 @@ class VK
         Match matchValue, matchName;
         Regex value, name;
         List<string> allCookies = new List<string>();  //разкомментить потом
+        lastRequestTime = DateTime.UtcNow;
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         HttpWebRequest request1 = (HttpWebRequest)HttpWebRequest.Create($"https://oauth.vk.com/authorize?client_id=5635484&redirect_uri=https://oauth.vk.com/blank.html&scope={scope}&response_type=token&v=5.53&display=wap");
         HttpWebResponse response1 = (HttpWebResponse)request1.GetResponse();
@@ -129,11 +130,8 @@ class VK
     {
         //Console.WriteLine(requesrControlCounter);
         TimeSpan lastRequestTimeSec = DateTime.UtcNow - lastRequestTime;
-        /*if (lastRequestTimeSec.TotalSeconds > 1)
-        {
-            lastRequestTime = DateTime.UtcNow;
+        if (lastRequestTimeSec.TotalSeconds > 1)
             requesrControlCounter = 0;
-        }*/
         if (requesrControlCounter > 2)
         {
             Thread.Sleep(1000);
@@ -151,7 +149,8 @@ class VK
         JObject json = JObject.Parse(respStream.ReadToEnd());
         respStream.Close();
 		apiRequest.Abort();
-        //Console.WriteLine(json);
+        Console.WriteLine(json);
+        lastRequestTime = DateTime.UtcNow;
         return json;
     }
 
@@ -164,6 +163,7 @@ class VK
         apiRequest = (HttpWebRequest)HttpWebRequest.Create(request);
         apiRespose = (HttpWebResponse)apiRequest.GetResponse();
         apiRequest.Abort();
+        lastRequestTime = DateTime.UtcNow;
     }
 
     static public void apiMethodEmpty(Dictionary<string,string> param, string method)
@@ -177,7 +177,7 @@ class VK
         string postParam = "";
         foreach (string key in param.Keys)
         {
-            //Console.WriteLine($"{key} : {param[key]}");
+            Console.WriteLine($"{key} : {param[key]}");
             postParam += $"{key}={param[key]}&";
         }
         byte[] postParamByte = Encoding.UTF8.GetBytes(postParam.Remove(postParam.Length-1,1));
@@ -186,5 +186,6 @@ class VK
 
         HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
         apiRequest.Abort();
+        lastRequestTime = DateTime.UtcNow;
     }
 }

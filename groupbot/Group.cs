@@ -15,6 +15,7 @@ public class Group
     public bool posteponedOn; //автоматическая выгрузка и оповещение
 	public int limit;
     public string text = "";
+    public int offset;
     public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста]
 
 	public Group(string name, string id, int limit)
@@ -61,7 +62,7 @@ public class Group
         //Console.WriteLine(json);
         jo = json["response"];
 		if (jo != null) {
-			PostTime = (int)jo [1] + 3600; //время последнего поста	
+			PostTime = (int)jo [1] + offset; //время последнего поста	
 			return (int)jo [0];
 		} else
 			return 100;
@@ -69,7 +70,7 @@ public class Group
         if (count > 0 && count<=limit)
         {
             jo = jo[count];
-            PostTime = Convert.ToInt32(jo["date"]) + 3600; //время последнего поста
+            PostTime = Convert.ToInt32(jo["date"]) + offset; //время последнего поста
         }*/
         //return count;
     }
@@ -121,7 +122,7 @@ public class Group
             string errorCode = "";
 
             if ((PostTime < (int)date.TotalSeconds)&&timefix)
-                PostTime = (int)date.TotalSeconds + 3600;
+                PostTime = (int)date.TotalSeconds + offset;
 
             json = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
             //Console.WriteLine(json);
@@ -136,7 +137,7 @@ public class Group
                     jo = json["response"];
                     log += $"post_id: {jo["post_id"]}\n";
                     Console.WriteLine($"post_id: {jo["post_id"]}");
-                    PostTime = PostTime + 3600;
+                    PostTime = PostTime + offset;
                     posts.RemoveAt(0);
                     break;
                 case "214":
@@ -216,9 +217,9 @@ public class Group
                 	        break;
 						else 
 						{
-							PostTime+=3600;
+							PostTime+=offset;
                     		sendPost(accessToken,false);
-							PostTime-=3600;
+							PostTime-=offset;
                     		postsCount++;
 						}
                 	}
