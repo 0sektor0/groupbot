@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI";
-            //string login = "+79645017794", password = "Ny_965211-sR";
+            //string login = "+79661963807 ", password = "Az_965211-gI";
+            string login = "+79645017794", password = "Ny_965211-sR";
             JObject json;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -243,14 +243,27 @@ namespace test
                     }
                     break;
 
+                case "offset":
+                    if (command.parametr == "")
+                        sendMessage($"{CurentGroup.offset}", command.uid);
+                    else
+                    {
+                        IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
+                        if (letters.Count<char>() == 0)
+                            CurentGroup.offset = Convert.ToInt32(command.parametr);
+                        else
+                            sendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
+                    }
+                    break;
+
                 case "group":
                     if (command.parametr == "")
-					sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}", command.uid);
+					sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}\n offset: {CurentGroup.offset}", command.uid);
                     else
                         if (groups.Keys.Contains<string>(command.parametr))
                     {
                         CurentGroup = groups[command.parametr];
-						sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}", command.uid);
+						sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}\n offset: {CurentGroup.offset}", command.uid);
                     }
                     else
                         sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
