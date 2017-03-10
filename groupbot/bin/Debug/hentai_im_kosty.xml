@@ -8,5 +8,6 @@
   <posteponedOn>true</posteponedOn>
   <limit>145</limit>
   <text>#loli_day</text>
+  <offset>3600</offset>
   <posts />
 </Group>
