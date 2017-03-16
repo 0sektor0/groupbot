@@ -116,15 +116,15 @@ public class Group
 
             if (!response.isCorrect)
             {
-                log += $"post_id: {response.tokens["post_id"]}\n";
-                Console.WriteLine($"post_id: {response.tokens["post_id"]}");
+                log += $"post_id: {response.tokens}\n";
+                Console.WriteLine($"post_id: {response.tokens}");
                 PostTime = PostTime + offset;
                 posts.RemoveAt(0);
             }
             else
             {
                     Console.WriteLine(response.tokens["error_msg"]);
-                    log += $"{response.tokens["error_msg"]}\n";
+                    log += $"{response.tokens["error_msg"]}_-_\n";
                     int count = postponedInf(accessToken);
             }
         }
