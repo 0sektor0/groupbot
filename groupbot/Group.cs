@@ -53,32 +53,21 @@ public class Group
         log += $"_{name}:saved\n";
     }
 
-    private int postponedInf(string accessToken)
+    private int postponedInf(string accessToken) //[изменял]
     {
-        JObject json;
-        JToken jo;
-        int count;
-		json = VK.apiMethod($"https://api.vk.com/method/execute.postponedInf?gid=-{id}&access_token={accessToken}&v=V5.53");
+        apiResponse response;
+		response = VK.apiMethod($"https://api.vk.com/method/execute.postponedInf?gid=-{id}&access_token={accessToken}&v=V5.53");
         //Console.WriteLine(json);
-        jo = json["response"];
-		if (jo != null) {
-			PostTime = (int)jo [1] + offset; //время последнего поста	
-			return (int)jo [0];
+		if (response.isCorrect) {
+			PostTime = (int)response.tokens[1] + offset; //время последнего поста	
+			return (int)response.tokens[0];
 		} else
 			return 100;
-        /*count = Convert.ToInt32(jo[0]);
-        if (count > 0 && count<=limit)
-        {
-            jo = jo[count];
-            PostTime = Convert.ToInt32(jo["date"]) + offset; //время последнего поста
-        }*/
-        //return count;
     }
 
-    public void createPost(List<string> photos, string message, string accessToken) //копировать фото в альбом бота, а также запись в список постов группы
+    public void createPost(List<string> photos, string message, string accessToken) //копировать фото в альбом бота, а также запись в список постов группы //[изменял]
     {
-        JObject json;
-        JToken jo=null;
+        apiResponse response=null;
         string[] param;
         string postPhotos = "";
 
@@ -89,15 +78,14 @@ public class Group
                 param = Convert.ToString(photo).Split('_');
                 for (int i = 0; i < 4; i++)
                 {
-                    json = VK.apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessToken}&v=V5.53");
-                    jo = json["response"];
-                    if (jo != null)
+                    response = VK.apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessToken}&v=V5.53");
+                    if (response.isCorrect)
                     {
-                        postPhotos += $",photo390383074_{(string)jo}";
+                        postPhotos += $",photo390383074_{(string)response.tokens}";
                         break;
                     }
                 }
-                if (jo == null)
+                if (!response.isCorrect)
                 {
                     Console.Write("_EICopy");
                     log += "_EICopy\n";
@@ -111,56 +99,33 @@ public class Group
         }
     }
 
-    private void sendPost(string accessToken, bool timefix)
+    private void sendPost(string accessToken, bool timefix) //[изменял]
     {
         if (posts.Count>0)
         {
             string[] post = posts[0];
-            JObject json;
-            JToken jo;
+            apiResponse response;
             TimeSpan date = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
-            string errorCode = "";
 
             if ((PostTime < (int)date.TotalSeconds)&&timefix)
                 PostTime = (int)date.TotalSeconds + offset;
 
-            json = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
+            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
             //Console.WriteLine(json);
-            jo = json["error"];
-            if (jo != null)
-                errorCode = Convert.ToString(jo["error_code"]);
             //Console.WriteLine(jo);
 
-            switch (errorCode)
+            if (!response.isCorrect)
             {
-                case "":
-                    jo = json["response"];
-                    log += $"post_id: {jo["post_id"]}\n";
-                    Console.WriteLine($"post_id: {jo["post_id"]}");
-                    PostTime = PostTime + offset;
-                    posts.RemoveAt(0);
-                    break;
-                case "214":
-                    Console.WriteLine("_214Error");
-                    log += "_214Error\n";
-                    Console.WriteLine(jo["error_msg"]);
-                    log += $"{jo["error_msg"]}\n";
+                log += $"post_id: {response.tokens["post_id"]}\n";
+                Console.WriteLine($"post_id: {response.tokens["post_id"]}");
+                PostTime = PostTime + offset;
+                posts.RemoveAt(0);
+            }
+            else
+            {
+                    Console.WriteLine(response.tokens["error_msg"]);
+                    log += $"{response.tokens["error_msg"]}\n";
                     int count = postponedInf(accessToken);
-                    if (count < limit) //проверка на лимит постов
-                    {
-                        Console.Write("_SS");
-                        log += "_SS\n";
-                    }
-                    else
-                    {
-                        Console.Write("_LIMIT");
-                        log += "_LIMIT\n";
-                    }
-                    break;
-                default:
-                    Console.Write("_UnError");
-                    log += "_UnError\n";
-                    break;
             }
         }
     }
@@ -191,12 +156,12 @@ public class Group
         }
     }
 
-    public int[] alignment(string accessToken, bool getInf)
+    public int[] alignment(string accessToken, bool getInf) //[изменял]
     {
-        JObject json = VK.apiMethod($"https://api.vk.com/method/execute.delaySearch?gid=-{id}&access_token={accessToken}&v=V5.53");
-        JToken jo = json["response"];
+        apiResponse response= VK.apiMethod($"https://api.vk.com/method/execute.delaySearch?gid=-{id}&access_token={accessToken}&v=V5.53");
+        JToken jo = response.tokens;
 
-        if (jo != null)
+        if (response.isCorrect)
         {
             Console.Write($"alignment started {DateTime.UtcNow}");
             log += $"alignment started {DateTime.UtcNow}\n";

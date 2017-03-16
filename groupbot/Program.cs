@@ -20,9 +20,9 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI";
-            //string login = "+79645017794", password = "Ny_965211-sR";
-            JObject json;
+            //string login = "+79661963807 ", password = "Az_965211-gI";
+            string login = "+79645017794", password = "Ny_965211-sR";
+            apiResponse response;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
             DateTime authtime = DateTime.UtcNow;
@@ -37,10 +37,11 @@ namespace test
                     authtime = DateTime.UtcNow;
                     Console.WriteLine("token updated");
                 }
-				json = VK.apiMethod($"https://api.vk.com/method/execute.messagesPull?access_token={accessTokenAndTime[0]}&v=V5.53");
-                messages = json["response"];
 
-                if (messages != null)
+				response = VK.apiMethod($"https://api.vk.com/method/execute.messagesPull?access_token={accessTokenAndTime[0]}&v=V5.53");
+                messages = response.tokens;
+
+                if (response.isCorrect)
                 {
                     //Console.WriteLine(messages);
                     if ((string)messages[0] != "0")
@@ -230,6 +231,17 @@ namespace test
                     fromAlbum(command.parametr, command.uid, "399761627");
                     break;
 
+                case "limit":
+                    if (command.parametr != "")
+                    {
+                        IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
+                        if (letters.Count<char>() == 0)
+                            CurentGroup.limit = Convert.ToInt32(command.parametr);
+                        else
+                            sendMessage("Семпай, вы настолько глупый, что даже предел не можете правильно указать, да?", command.uid);
+                    }
+                    break;
+
                 case "time":
                     if (command.parametr == "")
                         sendMessage($"{CurentGroup.PostTime}", command.uid);
@@ -323,18 +335,21 @@ namespace test
 
         static void fromAlbum(string parametr, string uid, string albumOwnerId)
         {
-            JObject json = VK.apiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
+            apiResponse response = VK.apiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
             JToken albums = null;
             string aid = "";
             string[] parametrs=null;
+
             if (parametr.Contains('/'))
             {
                 parametrs = parametr.Split('/');
                 parametr = parametrs[0];
             }
-            if (json["response"] != null)
+
+            if (response.isCorrect)
             {
-                albums = json["response"];
+                albums = response.tokens;
+
                 foreach (JToken album in albums)
                     if ((string)album["title"] == parametr)
                     {
@@ -343,13 +358,14 @@ namespace test
                             dictionary[aid] = "0";
                         break;
                     }
+
                 if (aid == "")
                     sendMessage("Семпай, нету такого альбома, хватит меня уже заставлять делать бессмысленную работу", uid);
                 else
                 {
                     sendMessage("Семпай, я начала работу, может вы хоть раз попробуете сделать все сами, и тогда-то вы поймете, какого это, когда тебя напрягают по всякой ерунде, ААААН?", uid);
-                    json = VK.apiMethod($"https://api.vk.com/method/photos.get?owner_id={albumOwnerId}&album_id={aid}&access_token={accessTokenAndTime[0]}&v=V5.53");
-                    JToken photos = json["response"];
+                    response = VK.apiMethod($"https://api.vk.com/method/photos.get?owner_id={albumOwnerId}&album_id={aid}&access_token={accessTokenAndTime[0]}&v=V5.53");
+                    JToken photos = response.tokens;
                     int counter = photos.Count<JToken>(), i = Convert.ToInt32(dictionary[aid]);
                     try
                     {
@@ -392,7 +408,7 @@ namespace test
 		static void sendMessage(string message, string uid)
         {
                 //VK.apiMethodEmpty($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
-                VK.apiMethodEmpty(new Dictionary<string, string>()
+                VK.apiMethodPostEmpty(new Dictionary<string, string>()
                 {
                     { "message",message},
                     { "uid",uid},

@@ -6,6 +6,24 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using System.Threading;
+
+class apiResponse
+{
+    public string request;
+    public bool isCorrect;
+    public JToken tokens;
+
+    public apiResponse(bool isCorrect, JObject response, string request)
+    {
+        this.request = request;
+        this.isCorrect = isCorrect;
+        if (isCorrect)
+            this.tokens = response["response"];
+        else
+            this.tokens = response["error"];
+    }
+}
+
 class VK
 {
     private static int requesrControlCounter = 0;
@@ -139,7 +157,15 @@ class VK
         }
     }
 
-    static public JObject apiMethod(string request)
+    private static bool responseChecking(JObject json)
+    {
+        if (json["error"] != null)
+            return false;
+        else
+            return true;
+    }
+
+    static public apiResponse apiMethod(string request)
     {
         requestAcceptionCheck();
         requesrControlCounter++;
@@ -147,11 +173,41 @@ class VK
         HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
         StreamReader respStream = new StreamReader(apiRespose.GetResponseStream());
         JObject json = JObject.Parse(respStream.ReadToEnd());
+
         respStream.Close();
-		apiRequest.Abort();
+        apiRequest.Abort();
         Console.WriteLine(json);
         lastRequestTime = DateTime.UtcNow;
-        return json;
+        return new apiResponse(responseChecking(json),json,request);
+    }
+
+    static public apiResponse apiMethodPost(Dictionary<string, string> param, string method)
+    {
+        requestAcceptionCheck();
+        requesrControlCounter++;
+
+        HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create(method);
+        apiRequest.Method = "POST";
+        Stream postWriter = apiRequest.GetRequestStream();
+        string postParam = "";
+        foreach (string key in param.Keys)
+        {
+            //Console.WriteLine($"{key} : {param[key]}");
+            postParam += $"{key}={param[key]}&";
+        }
+        byte[] postParamByte = Encoding.UTF8.GetBytes(postParam.Remove(postParam.Length - 1, 1));
+        postWriter.Write(postParamByte, 0, postParamByte.Length);
+        postWriter.Close();
+
+        HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
+        StreamReader respStream = new StreamReader(apiRespose.GetResponseStream());
+        JObject json = JObject.Parse(respStream.ReadToEnd());
+
+        respStream.Close();
+        apiRequest.Abort();
+        lastRequestTime = DateTime.UtcNow;
+        Console.WriteLine(json);
+        return new apiResponse(responseChecking(json), json, method);
     }
 
     static public void apiMethodEmpty(string request)
@@ -166,7 +222,7 @@ class VK
         lastRequestTime = DateTime.UtcNow;
     }
 
-    static public void apiMethodEmpty(Dictionary<string,string> param, string method)
+    static public void apiMethodPostEmpty(Dictionary<string, string> param, string method)
     {
         requestAcceptionCheck();
         requesrControlCounter++;
@@ -177,11 +233,11 @@ class VK
         string postParam = "";
         foreach (string key in param.Keys)
         {
-            Console.WriteLine($"{key} : {param[key]}");
+            //Console.WriteLine($"{key} : {param[key]}");
             postParam += $"{key}={param[key]}&";
         }
-        byte[] postParamByte = Encoding.UTF8.GetBytes(postParam.Remove(postParam.Length-1,1));
-        postWriter.Write(postParamByte,0,postParamByte.Length);
+        byte[] postParamByte = Encoding.UTF8.GetBytes(postParam.Remove(postParam.Length - 1, 1));
+        postWriter.Write(postParamByte, 0, postParamByte.Length);
         postWriter.Close();
 
         HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
