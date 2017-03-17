@@ -1,183 +1,107 @@
 <?xml version="1.0"?>
-<Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <name>hentai_im_kosty</name>
-  <PostTime>1489772700</PostTime>
+  <PostTime>1489808529</PostTime>
   <log>_message sent to 29334144
 message sent to 29334144
-_DeploymentStart 3/17/2017 5:58:43 AM
-_-_
-_-_
-_-_
-_-_
-_-_
-_-_
+_DeploymentStart 17.03.2017 12:12:09
 post_id: {
-  "error_code": 214,
-  "error_msg": "Access to adding post denied: a post is already scheduled for this time",
-  "request_params": [
-    {
-      "key": "oauth",
-      "value": "1"
-    },
-    {
-      "key": "method",
-      "value": "wall.post"
-    },
-    {
-      "key": "owner_id",
-      "value": "-121519170"
-    },
-    {
-      "key": "publish_date",
-      "value": "1489754700"
-    },
-    {
-      "key": "attachments",
-      "value": "photo390383074_456247329"
-    },
-    {
-      "key": "message",
-      "value": ""
-    },
-    {
-      "key": "v",
-      "value": "V5.53"
-    }
-  ]
+  "post_id": 5891
 }
-_-_
-_-_
-_-_
-_-_
-_-_
-_-_
-_-_
-_-_
-_-_
-_-_
+post_id: {
+  "post_id": 5892
+}
+post_id: {
+  "post_id": 5893
+}
+post_id: {
+  "post_id": 5894
+}
+post_id: {
+  "post_id": 5895
+}
+post_id: {
+  "post_id": 5896
+}
+post_id: {
+  "post_id": 5897
+}
+post_id: {
+  "post_id": 5898
+}
+post_id: {
+  "post_id": 5899
+}
+post_id: {
+  "post_id": 5900
+}
+post_id: {
+  "post_id": 5901
+}
+post_id: {
+  "post_id": 5902
+}
+post_id: {
+  "post_id": 5903
+}
+post_id: {
+  "post_id": 5904
+}
+post_id: {
+  "post_id": 5905
+}
+post_id: {
+  "post_id": 5906
+}
+post_id: {
+  "post_id": 5907
+}
+post_id: {
+  "post_id": 5908
+}
+post_id: {
+  "post_id": 5909
+}
+post_id: {
+  "post_id": 5910
+}
+Too many requests per second_-_
+post_id: {
+  "post_id": 5911
+}
+post_id: {
+  "post_id": 5912
+}
+post_id: {
+  "post_id": 5913
+}
+post_id: {
+  "post_id": 5914
+}
+post_id: {
+  "post_id": 5915
+}
+post_id: {
+  "post_id": 5916
+}
+post_id: {
+  "post_id": 5917
+}
+post_id: {
+  "post_id": 5918
+}
+post_id: {
+  "post_id": 5919
+}
 _DeploymentEnd
 message sent to 29334144
-message sent to 29334144
-message sent to 29334144
-message sent to 29334144
-_DeploymentOffline 3/17/2017 9:12:54 AM
-_hentai_im_kosty:saved
-dictionary saved
 </log>
   <id>121519170</id>
-  <posteponedOn>false</posteponedOn>
-  <limit>24</limit>
+  <posteponedOn>true</posteponedOn>
+  <limit>29</limit>
   <text />
   <offset>1800</offset>
   <posts>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247330</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247331</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247332</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247333</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247482</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247483</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247484</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247485</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247486</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247487</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247488</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247489</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247490</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247491</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247492</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247493</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247494</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247495</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247496</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247497</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247498</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247499</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247500</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247501</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247502</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247503</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247504</string>
-    </ArrayOfString>
     <ArrayOfString>
       <string />
       <string>photo390383074_456247505</string>
@@ -725,14 +649,6 @@ dictionary saved
     <ArrayOfString>
       <string>большой дымящейся пак артов </string>
       <string>photo390383074_456247708,photo390383074_456247709,photo390383074_456247710,photo390383074_456247711,photo390383074_456247712,photo390383074_456247713,photo390383074_456247714,photo390383074_456247715,photo390383074_456247716,photo390383074_456247717</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string> </string>
-      <string>photo390383074_456247786</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string> </string>
-      <string>photo390383074_456247798</string>
     </ArrayOfString>
   </posts>
 </Group>
