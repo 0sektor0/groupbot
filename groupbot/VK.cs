@@ -176,7 +176,7 @@ class VK
 
         respStream.Close();
         apiRequest.Abort();
-        Console.WriteLine(json);
+        //Console.WriteLine(json);
         lastRequestTime = DateTime.UtcNow;
         return new apiResponse(responseChecking(json),json,request);
     }

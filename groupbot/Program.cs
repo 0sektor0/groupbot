@@ -117,13 +117,13 @@ namespace test
                     {
                         //executer(commands[0]);
                         //commands.RemoveAt(0);
-                        try { executer(commands[0]);}
+                        try { executer(commands[0]); }
                         catch
                         {
                             Console.WriteLine("Error in method execution");
                             CurentGroup.log += "Error in method execution\n";
                         }
-                        finally { commands.RemoveAt(0);}
+                        finally { commands.RemoveAt(0); }
                     }
                 }
             }
@@ -270,12 +270,12 @@ namespace test
 
                 case "group":
                     if (command.parametr == "")
-					sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}\n offset: {CurentGroup.offset}", command.uid);
+					sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}\n offset: {CurentGroup.offset}\n deployment: {CurentGroup.posteponedOn}", command.uid);
                     else
                         if (groups.Keys.Contains<string>(command.parametr))
                     {
                         CurentGroup = groups[command.parametr];
-						sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}\n offset: {CurentGroup.offset}", command.uid);
+						sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}\n offset: {CurentGroup.offset}\n deployment: {CurentGroup.posteponedOn}", command.uid);
                     }
                     else
                         sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);

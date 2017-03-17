@@ -59,7 +59,10 @@ public class Group
 		response = VK.apiMethod($"https://api.vk.com/method/execute.postponedInf?gid=-{id}&access_token={accessToken}&v=V5.53");
         //Console.WriteLine(json);
 		if (response.isCorrect) {
-			PostTime = (int)response.tokens[1] + offset; //время последнего поста	
+            if (response.tokens[1] != null)
+                PostTime += offset;
+            else
+			    PostTime = (int)response.tokens[1] + offset; //время последнего поста	
 			return (int)response.tokens[0];
 		} else
 			return 100;
@@ -114,7 +117,7 @@ public class Group
             //Console.WriteLine(json);
             //Console.WriteLine(jo);
 
-            if (!response.isCorrect)
+            if (response.isCorrect)
             {
                 log += $"post_id: {response.tokens}\n";
                 Console.WriteLine($"post_id: {response.tokens}");
