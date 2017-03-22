@@ -1,78 +1,30 @@
 <?xml version="1.0"?>
-<Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <name>porno_im_kosty</name>
-  <PostTime>1491326100</PostTime>
+  <PostTime>1491333300</PostTime>
   <log>_message sent to 29334144
-alignment started 3/21/2017 3:06:14 PM
-alignment ended
-message sent to 29334144
-alignment started 3/21/2017 3:06:28 PM
-alignment ended
-message sent to 29334144
-alignment started 3/21/2017 3:07:02 PM
-alignment ended
 message sent to 29334144
 message sent to 29334144
 message sent to 29334144
-vulnerable:  уязвимый
-malicious:  злой, вредоносный
-utilized:  использовать, используемый
-exploit:  эксплуатировать
+message sent to 29334144
+Access to adding post denied: a post is already scheduled for this time_-_
+message sent to 29334144
+post_id: 2777
+message sent to 29334144
 _porno_im_kosty:saved
 message sent to 29334144
 dictionary saved
-snooping:  соваться
-permutations:  перестановка
-spoof:  спародировать
-in turn:  в свою очередь
-_DeploymentOffline 3/21/2017 6:12:41 PM
-_porno_im_kosty:saved
-_DeploymentOffline 3/21/2017 10:12:41 PM
-_porno_im_kosty:saved
-_DeploymentOffline 3/22/2017 2:12:41 AM
-_porno_im_kosty:saved
-_DeploymentOffline 3/22/2017 6:12:41 AM
-_porno_im_kosty:saved
-message sent to 70137831
-alignment started 3/22/2017 9:46:05 AM
-alignment ended
-message sent to 70137831
-message sent to 70137831
-message sent to 70137831
-alignment started 3/22/2017 9:55:04 AM
-alignment ended
 message sent to 29334144
-message sent to 70137831
-message sent to 70137831
-alignment started 3/22/2017 10:06:27 AM
-alignment ended
 message sent to 29334144
-alignment started 3/22/2017 10:06:45 AM
-alignment ended
-message sent to 70137831
 message sent to 29334144
-alignment started 3/22/2017 10:07:05 AM
-alignment ended
-alignment started 3/22/2017 10:07:32 AM
-alignment ended
-message sent to 29334144
-_DeploymentOffline 3/22/2017 10:12:42 AM
-_porno_im_kosty:saved
-dictionary saved
-_DeploymentOffline 3/22/2017 2:12:43 PM
-_porno_im_kosty:saved
-dictionary saved
 </log>
   <id>138077475</id>
-  <posteponedOn>false</posteponedOn>
-  <limit>20</limit>
+  <posteponedOn>true</posteponedOn>
+  <limit>100</limit>
   <text />
   <offset>3600</offset>
+  <autoPost>false</autoPost>
   <posts>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456247690</string>
-    </ArrayOfString>
     <ArrayOfString>
       <string />
       <string>photo390383074_456247691</string>
@@ -942,8 +894,28 @@ dictionary saved
       <string>photo390383074_456248313</string>
     </ArrayOfString>
     <ArrayOfString>
-      <string> </string>
+      <string />
       <string>photo390383074_456248402</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>test </string>
+      <string>photo390383074_456248779</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string> </string>
+      <string>photo390383074_456248780</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string> </string>
+      <string>photo390383074_456248781</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>бля, я еблан, забыл включить мгновенное выкладывание </string>
+      <string>photo390383074_456248782</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string> </string>
+      <string>photo390383074_456248783</string>
     </ArrayOfString>
   </posts>
 </Group>
