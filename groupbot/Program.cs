@@ -236,7 +236,15 @@ namespace test
                     {
                         IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
                         if (letters.Count<char>() == 0)
-                            CurentGroup.limit = Convert.ToInt32(command.parametr);
+                        {
+                            int limit = Convert.ToInt32(command.parametr);
+                            if (limit > 150)
+                                limit = 150;
+                            if (CurentGroup.offset < 3600)
+                                CurentGroup.limit = 25;
+                            else
+                                CurentGroup.limit = limit;
+                        }
                         else
                             sendMessage("Семпай, вы настолько глупый, что даже предел не можете правильно указать, да?", command.uid);
                     }
@@ -270,19 +278,32 @@ namespace test
 
                 case "group":
                     if (command.parametr == "")
-					sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}\n offset: {CurentGroup.offset}\n deployment: {CurentGroup.posteponedOn}", command.uid);
+					sendMessage(
+                        $"group: {CurentGroup.name}" +
+                        $"\n post time: {CurentGroup.PostTime}" +
+                        $"\n posts in memory: {CurentGroup.posts.Count}" +
+                        $"\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}" +
+                        $"\n offset: {CurentGroup.offset}" +
+                        $"\n deployment: {CurentGroup.posteponedOn}" +
+                        $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                     else
                         if (groups.Keys.Contains<string>(command.parametr))
-                    {
-                        CurentGroup = groups[command.parametr];
-						sendMessage($"group: {CurentGroup.name}\n post time: {CurentGroup.PostTime}\n posts in memory: {CurentGroup.posts.Count}\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}\n offset: {CurentGroup.offset}\n deployment: {CurentGroup.posteponedOn}", command.uid);
-                    }
-                    else
-                        sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
-					if(command.atachments.Count>0)
-					{
-					commands.Add(new Command("null",command.atachments,command.uid,""));
-					}
+                        {
+                            CurentGroup = groups[command.parametr];
+						    sendMessage(
+                                $"group: {CurentGroup.name}" +
+                                $"\n post time: {CurentGroup.PostTime}" +
+                                $"\n posts in memory: {CurentGroup.posts.Count}" +
+                                $"\n limit: {CurentGroup.limit}" +
+                                $"\n text: {CurentGroup.text}" +
+                                $"\n offset: {CurentGroup.offset}" +
+                                $"\n deployment: {CurentGroup.posteponedOn}" +
+                                $"\n auto posting: {CurentGroup.autoPost}", command.uid);
+                        }
+                        else
+                            sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
+                    if (command.atachments.Count>0)
+					    commands.Add(new Command("null",command.atachments,command.uid,""));
                     break;
 
                 case "deployment":
@@ -296,6 +317,13 @@ namespace test
                         CurentGroup.posteponedOn = false;
                     if (command.parametr == "on")
                         CurentGroup.posteponedOn = true;
+                    break;
+
+                case "auto":
+                    if (command.parametr == "on")
+                        CurentGroup.autoPost = true;
+                    if (command.parametr == "off")
+                        CurentGroup.autoPost = false;
                     break;
 
                 case "alignment":
@@ -322,6 +350,25 @@ namespace test
                     CurentGroup.text = command.parametr;
                     CurentGroup.log += $"\n{CurentGroup.name} text change to '{command.parametr}'";
                     Console.WriteLine($"{CurentGroup.name} text change to '{command.parametr}'");
+                    break;
+
+                case "help":
+                    sendMessage($"search# [слово] поиск слова в моем словаре\n\n" +
+                        $"save# сохранить результат групп\n\n" +
+                        $"save# ack сохранить с подтверждением\n\n" +
+                        $"remove# удалить слово\n\n" +
+                        $"post# выложить блок пикч\n\n" +
+                        $"album# [название/колличество] выкладывает пикчи из альбома, вот так мой создатель в основном и заполняет отложку\n\n" +
+                        $"limit# [число] задает макс число артов\n\n" +
+                        $"offset# [число] задает сдвиг между новыми артами\n\n" +
+                        $"time# [число] задает время следующего поста (рекомендуется использовать в крайних случаях)\n\n" +
+                        $"deployment# выгрузка артов\n\n" +
+                        $"deployment# on включить выгрузку артов на каждые 4 часа\n\n" +
+                        $"deployment# off выключить выгрузку артов\n\n" +
+                        $"auto# off все новые посты сразу попадают в память (вообще-то не совсем так, но моему создателю лень рассказывать вам, как это работает)\n\n" +
+                        $"alignment# исправление простоев (внимание не может закидать артов больше, чем 150)\n\n" +
+                        $"alignment# last оставшееся время отложки\n\n" +
+                        $"alignment# count число простоев и еще какое-то число", command.uid);
                     break;
 
                 default:

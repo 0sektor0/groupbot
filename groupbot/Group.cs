@@ -16,6 +16,7 @@ public class Group
 	public int limit;
     public string text = "";
     public int offset;
+    public bool autoPost;
     public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста]
 
 	public Group(string name, string id, int limit)
@@ -98,7 +99,8 @@ public class Group
             postPhotos = postPhotos.Remove(0, 1);
             string[] post = { $"{message} {text}", postPhotos };
             posts.Add(post);
-            sendPost(accessToken, true);
+            if (autoPost)
+                sendPost(accessToken, true);
         }
     }
 
@@ -119,8 +121,8 @@ public class Group
 
             if (response.isCorrect)
             {
-                log += $"post_id: {response.tokens}\n";
-                Console.WriteLine($"post_id: {response.tokens}");
+                log += $"post_id: {response.tokens["post_id"]}\n";
+                Console.WriteLine($"post_id: {response.tokens["post_id"]}");
                 PostTime = PostTime + offset;
                 posts.RemoveAt(0);
             }
@@ -161,7 +163,7 @@ public class Group
 
     public int[] alignment(string accessToken, bool getInf) //[изменял]
     {
-        apiResponse response= VK.apiMethod($"https://api.vk.com/method/execute.delaySearch?gid=-{id}&access_token={accessToken}&v=V5.53");
+        apiResponse response= VK.apiMethod($"https://api.vk.com/method/execute.delaySearch?gid=-{id}&offset={offset}&access_token={accessToken}&v=V5.53");
         JToken jo = response.tokens;
 
         if (response.isCorrect)
@@ -170,7 +172,7 @@ public class Group
             log += $"alignment started {DateTime.UtcNow}\n";
 
             int errorCount = (int)jo[0];
-            int postsCount = (int)jo[1];
+            int postsCount = (int)jo[1]-1;
             jo = jo[2];
             int tempPostTime = PostTime;
 
