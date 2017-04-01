@@ -20,8 +20,8 @@ namespace test
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI";
-            //string login = "+79645017794", password = "Ny_965211-sR";
+            //string login = "+79661963807 ", password = "Az_965211-gI";
+            string login = "+79645017794", password = "Ny_965211-sR";
             apiResponse response;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -141,6 +141,14 @@ namespace test
 
             switch (command.type)
             {
+                case "api":
+                    if (command.uid == "29334144")
+                    {
+                        string request = $"https://api.vk.com/method/{command.parametr}&access_token={accessTokenAndTime[0]}&v=V5.53";
+                        request=request.Replace("amp;","");
+                        sendMessage(Convert.ToString(VK.apiMethod(request).tokens), command.uid);
+                    }
+                    break;
                 case "search":
                     if (dictionary.ContainsKey(command.parametr) && command.parametr != "")
                         command.parametr = dictionary[command.parametr];
