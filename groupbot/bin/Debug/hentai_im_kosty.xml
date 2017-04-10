@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <name>hentai_im_kosty</name>
-  <PostTime>1491838929</PostTime>
+  <PostTime>1491853329</PostTime>
   <log>_message sent to 29334144
 alignment started 4/9/2017 8:19:41 PM
 alignment ended
@@ -29,6 +29,20 @@ post_id: 7109
 Access to adding post denied: can only schedule 25 posts on a day_-_
 _DeploymentEnd
 message sent to 70137831
+message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+_DeploymentStart 10.04.2017 4:49:53
+post_id: 7116
+post_id: 7117
+post_id: 7118
+post_id: 7119
+post_id: 7120
+post_id: 7121
+Access to adding post denied: can only schedule 25 posts on a day_-_
+_DeploymentEnd
+message sent to 70137831
 </log>
   <id>121519170</id>
   <posteponedOn>true</posteponedOn>
@@ -37,30 +51,6 @@ message sent to 70137831
   <offset>1800</offset>
   <autoPost>false</autoPost>
   <posts>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456249957</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456249958</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456249959</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456249960</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456249961</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456249962</string>
-    </ArrayOfString>
     <ArrayOfString>
       <string />
       <string>photo390383074_456249963</string>
