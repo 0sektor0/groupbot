@@ -38,17 +38,24 @@ namespace test
                     Console.WriteLine("token updated");
                 }
 
-				response = VK.apiMethod($"https://api.vk.com/method/execute.messagesPull?access_token={accessTokenAndTime[0]}&v=V5.53");
-                messages = response.tokens;
-
-                if (response.isCorrect)
+                try
                 {
-                    //Console.WriteLine(messages);
-                    if ((string)messages[0] != "0")
-                            for(int i=1; i<messages.Count(); i++)
+                    response = VK.apiMethod($"https://api.vk.com/method/execute.messagesPull?access_token={accessTokenAndTime[0]}&v=V5.53");
+                    messages = response.tokens;
+
+                    if (response.isCorrect)
+                    {
+                        //Console.WriteLine(messages);
+                        if ((string)messages[0] != "0")
+                            for (int i = 1; i < messages.Count(); i++)
                                 parseCommand(messages[i]);
+                    }
+                    Thread.Sleep(1000);
                 }
-                Thread.Sleep(1000);
+                catch
+                {
+                    Console.WriteLine("bad response");
+                    CurentGroup.log += "bad response\n"; }
             }
 
         }
