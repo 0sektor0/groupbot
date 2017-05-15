@@ -17,6 +17,7 @@ namespace test
         static Dictionary<string, Group> groups= new Dictionary<string, Group>();
         static Group CurentGroup;
         static DateTime lastCheckTime;
+        static Thread Analysator = new Thread(analysator);
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
@@ -251,15 +252,7 @@ namespace test
                     {
                         IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
                         if (letters.Count<char>() == 0)
-                        {
-                            int limit = Convert.ToInt32(command.parametr);
-                            if (limit > 150)
-                                limit = 150;
-                            if (CurentGroup.offset < 3600)
-                                CurentGroup.limit = 25;
-                            else
-                                CurentGroup.limit = limit;
-                        }
+                                CurentGroup.limit = Convert.ToInt32(command.parametr);
                         else
                             sendMessage("Семпай, вы настолько глупый, что даже предел не можете правильно указать, да?", command.uid);
                     }
@@ -517,7 +510,10 @@ namespace test
             CurentGroup = groups["2d"];
             dictionary = inizializeDictionary(adress);
             Task.Run(() => { reader(); });
+            //Reader.Start();
             analysator();
+            //Analysator.Start();
+            //reader();
         }
     }
 }
