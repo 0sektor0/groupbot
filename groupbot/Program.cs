@@ -53,9 +53,9 @@ namespace test
                     }
                     Thread.Sleep(1000);
                 }
-                catch
+                catch (Exception e)
                 {
-                    Console.WriteLine("bad response");
+                    Console.WriteLine(e.Message);
                     CurentGroup.log += "bad response\n"; }
             }
 
@@ -68,36 +68,46 @@ namespace test
             token = message;
             string uid = (string)token["uid"];
             List<string> photos = new List<string>();
-            int comType = (from num in Convert.ToString(token["body"]) where num == '#' select num).Count();
-            if(token["fwd_messages"]!=null)
-                foreach (JToken reMeessage in token["fwd_messages"])
-                    photos.AddRange(getAttachments(reMeessage, uid)); //photos in each fwd message
-            photos.AddRange(getAttachments(token, uid)); //photos in message
-            Command command = new Command(uid, photos);
+            int comType;
+            string[] inputCommands = Convert.ToString(token["body"]).Replace("<br>","").Split(';');
 
-            switch (comType)
+            for (int i = 0; i < inputCommands.Length; i++)
             {
-                case 2:
-                    parametrs = Convert.ToString(token["body"]).Split('#');
-                    command.type = parametrs[0];
-                    command.parametr = "#"+parametrs[2];
-                    commands.Add(command);
-                    break;
+                comType = (from num in Convert.ToString(inputCommands[i]) where num == '#' select num).Count();
 
-                case 1:
-                    parametrs = Convert.ToString(token["body"]).Split('#');
-                    command.type = parametrs[0];
-                    command.parametr = parametrs[1];
-                    commands.Add(command);
-                    break;
+                if (token["fwd_messages"] != null && i == 0)
+                    foreach (JToken reMeessage in token["fwd_messages"])
+                        photos.AddRange(getAttachments(reMeessage, uid)); //photos in each fwd message
+                else
+                    photos = new List<string>();
 
-                case 0:
-                    command.parametr = Convert.ToString(token["body"]);
-                    commands.Add(command);
-                    break;
+                photos.AddRange(getAttachments(token, uid)); //photos in message
+                Command command = new Command(uid, photos);
 
-                default:
-                    break;
+                switch (comType)
+                {
+                    case 2:
+                        parametrs = Convert.ToString(inputCommands[i]).Split('#');
+                        command.type = parametrs[0];
+                        command.parametr = "#" + parametrs[2];
+                        commands.Add(command);
+                        break;
+
+                    case 1:
+                        parametrs = Convert.ToString(inputCommands[i]).Split('#');
+                        command.type = parametrs[0];
+                        command.parametr = parametrs[1];
+                        commands.Add(command);
+                        break;
+
+                    case 0:
+                        command.parametr = Convert.ToString(token["body"]);
+                        commands.Add(command);
+                        break;
+
+                    default:
+                        break;
+                }
             }
         }
 
@@ -114,7 +124,7 @@ namespace test
                     commands.Add(new Command("save", "", "29334144", ""));
                     foreach (Group groupToSave in groups.Values)
                     {
-						if (groupToSave.deployment(accessTokenAndTime[0])<=24)
+						if (groupToSave.deployment(accessTokenAndTime[0])<=10)
 							sendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
                     }
                 }
