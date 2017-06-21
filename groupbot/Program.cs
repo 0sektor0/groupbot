@@ -6,7 +6,7 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 
-namespace test
+namespace photoBot
 {
     class Program
     {
@@ -14,7 +14,7 @@ namespace test
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
         static string adress = @"words.dat";
-        static Dictionary<string, Group> groups= new Dictionary<string, Group>();
+        static public Dictionary<string, Group> groups= new Dictionary<string, Group>();
         static Group CurentGroup;
         static DateTime lastCheckTime;
         static Thread Analysator = new Thread(analysator);
@@ -124,7 +124,7 @@ namespace test
                     commands.Add(new Command("save", "", "29334144", ""));
                     foreach (Group groupToSave in groups.Values)
                     {
-						if (groupToSave.deployment(accessTokenAndTime[0])<=10)
+						if (groupToSave.deployment(accessTokenAndTime[0])<=10 && groupToSave.alert)
 							sendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
                     }
                 }
@@ -303,6 +303,7 @@ namespace test
                         $"\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}" +
                         $"\n offset: {CurentGroup.offset}" +
                         $"\n deployment: {CurentGroup.posteponedOn}" +
+                        $"\n alert: {CurentGroup.alert}" +
                         $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                     else
                         if (groups.Keys.Contains<string>(command.parametr))
@@ -316,6 +317,7 @@ namespace test
                                 $"\n text: {CurentGroup.text}" +
                                 $"\n offset: {CurentGroup.offset}" +
                                 $"\n deployment: {CurentGroup.posteponedOn}" +
+                                $"\n alert: {CurentGroup.alert}" +
                                 $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                         }
                         else
@@ -370,6 +372,13 @@ namespace test
                     Console.WriteLine($"{CurentGroup.name} text change to '{command.parametr}'");
                     break;
 
+                case "alert":
+                    if (command.parametr == "off")
+                        CurentGroup.alert = false;
+                    if (command.parametr == "on")
+                        CurentGroup.alert = true;
+                    break;
+
                 case "help":
                     sendMessage($"search# [слово] поиск слова в моем словаре\n\n" +
                         $"save# сохранить результат групп\n\n" +
@@ -386,6 +395,7 @@ namespace test
                         $"auto# off все новые посты сразу попадают в память (вообще-то не совсем так, но моему создателю лень рассказывать вам, как это работает)\n\n" +
                         $"alignment# исправление простоев (внимание не может закидать артов больше, чем 150)\n\n" +
                         $"alignment# last оставшееся время отложки\n\n" +
+                        $"alert# on включить оповещения\n\n" +
                         $"alignment# count число простоев и еще какое-то число", command.uid);
                     break;
 
@@ -511,19 +521,27 @@ namespace test
         {
             Console.WriteLine("Welcome!");
             lastCheckTime = DateTime.UtcNow;
+
             //groups.Add("2d",new Group("hentai_im_kosty", "121519170"));
             //groups.Add("3d", new Group("porno_im_kosty", "138077475"));
+            //groups.Add("luke", new Group("luke_shelter", "129223693", 149));
+
             groups.Add("2d", Group.load("hentai_im_kosty.xml"));
             Console.WriteLine($"hentai_im_kosty.xml deserialization ended");
             groups.Add("3d", Group.load("porno_im_kosty.xml"));
             Console.WriteLine($"porno_im_kosty.xml deserialization ended");
+            groups.Add("luke", Group.load("luke_shelter.xml"));
+            Console.WriteLine($"luke_shelter.xml deserialization ended");
             CurentGroup = groups["2d"];
+
             dictionary = inizializeDictionary(adress);
+            //MobileServer mServer = new MobileServer();
+            //Task.Run(() => { mServer.Run();  });
             Task.Run(() => { reader(); });
-            //Reader.Start();
+            //string test = groups["2d"].Serialize();
+            //Group grp1 = Group.Deserilize(test);
+            //mServer.Run();
             analysator();
-            //Analysator.Start();
-            //reader();
         }
     }
 }

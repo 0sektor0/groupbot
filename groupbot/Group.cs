@@ -17,10 +17,12 @@ public class Group
     public string text = "";
     public int offset;
     public bool autoPost;
+    public bool alert;
     public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста]
 
 	public Group(string name, string id, int limit)
     {
+        alert = false;
 		this.limit = limit;
         this.name= name;
         this.id = id;
@@ -39,6 +41,13 @@ public class Group
             return (Group)formatter.Deserialize(fs);
     }
 
+    static public Group Deserilize(string str)
+    {
+        XmlSerializer formatter = new XmlSerializer(typeof(Group));
+        using (StringReader reader = new StringReader(str))
+            return (Group)formatter.Deserialize(reader);
+    }
+
     public void Save()
     {
         /*BinaryFormatter binFormat = new BinaryFormatter();
@@ -52,6 +61,17 @@ public class Group
             formatter.Serialize(fs, this);
         Console.WriteLine($"_{name}:saved");
         log += $"_{name}:saved\n";
+    }
+
+    public string Serialize()
+    {
+        XmlSerializer formatter = new XmlSerializer(typeof(Group));
+        StringWriter writer = new StringWriter();
+        formatter.Serialize(writer, this);
+
+        Console.WriteLine($"_{name}:serialized");
+        log += $"_{name}:serialized\n";
+        return writer.ToString();
     }
 
     private int postponedInf(string accessToken) //[изменял]
