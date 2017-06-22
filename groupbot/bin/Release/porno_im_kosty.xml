@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>porno_im_kosty</name>
-  <PostTime>1497965504</PostTime>
+  <PostTime>1497979904</PostTime>
   <log>_message sent to 29334144
 _DeploymentStart 5/23/2017 9:57:17 PM
 _DeploymentEnd
@@ -917,6 +917,21 @@ _porno_im_kosty:saved
 _DeploymentStart 6/21/2017 10:31:40 PM
 _DeploymentEnd
 _porno_im_kosty:saved
+_DeploymentStart 6/22/2017 3:54:51 AM
+_DeploymentEnd
+_porno_im_kosty:saved
+_DeploymentStart 6/22/2017 7:54:51 AM
+_DeploymentEnd
+_porno_im_kosty:saved
+_DeploymentStart 6/22/2017 11:54:51 AM
+_DeploymentEnd
+_porno_im_kosty:saved
+_DeploymentStart 6/22/2017 3:54:51 PM
+_DeploymentEnd
+_porno_im_kosty:saved
+_DeploymentStart 6/22/2017 7:54:51 PM
+_DeploymentEnd
+_porno_im_kosty:saved
 </log>
   <id>138077475</id>
   <posteponedOn>true</posteponedOn>
@@ -924,5 +939,6 @@ _porno_im_kosty:saved
   <text />
   <offset>3600</offset>
   <autoPost>false</autoPost>
+  <alert>false</alert>
   <posts />
 </Group>
