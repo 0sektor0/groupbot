@@ -304,6 +304,7 @@ namespace photoBot
                         $"\n offset: {CurentGroup.offset}" +
                         $"\n deployment: {CurentGroup.posteponedOn}" +
                         $"\n alert: {CurentGroup.alert}" +
+                        $"\n signed: {CurentGroup.signed}" +
                         $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                     else
                         if (groups.Keys.Contains<string>(command.parametr))
@@ -318,6 +319,7 @@ namespace photoBot
                                 $"\n offset: {CurentGroup.offset}" +
                                 $"\n deployment: {CurentGroup.posteponedOn}" +
                                 $"\n alert: {CurentGroup.alert}" +
+                                $"\n signed: {CurentGroup.signed}" +
                                 $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                         }
                         else
@@ -337,6 +339,13 @@ namespace photoBot
                         CurentGroup.posteponedOn = false;
                     if (command.parametr == "on")
                         CurentGroup.posteponedOn = true;
+                    break;
+
+                case "signed":
+                    if (command.parametr == "on")
+                        CurentGroup.signed = 1;
+                    if (command.parametr == "off")
+                        CurentGroup.signed = 0;
                     break;
 
                 case "auto":
@@ -530,8 +539,8 @@ namespace photoBot
             Console.WriteLine($"hentai_im_kosty.xml deserialization ended");
             groups.Add("3d", Group.load("porno_im_kosty.xml"));
             Console.WriteLine($"porno_im_kosty.xml deserialization ended");
-            groups.Add("luke", Group.load("luke_shelter.xml"));
-            Console.WriteLine($"luke_shelter.xml deserialization ended");
+            groups.Add("luke", Group.load("lukesshelter.xml"));
+            Console.WriteLine($"lukesshelter.xml deserialization ended");
             CurentGroup = groups["2d"];
 
             dictionary = inizializeDictionary(adress);

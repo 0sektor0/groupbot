@@ -18,6 +18,7 @@ public class Group
     public int offset;
     public bool autoPost;
     public bool alert;
+    public int signed;
     public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста]
 
 	public Group(string name, string id, int limit)
@@ -81,9 +82,9 @@ public class Group
         //Console.WriteLine(json);
 		if (response.isCorrect) {
             if (response.tokens[1] != null)
-                PostTime += offset;
+                PostTime = (int)response.tokens[1] + offset; //время последнего поста
             else
-			    PostTime = (int)response.tokens[1] + offset; //время последнего поста	
+                PostTime += offset;	
 			return (int)response.tokens[0];
 		} else
 			return 100;
@@ -135,7 +136,7 @@ public class Group
             if ((PostTime < (int)date.TotalSeconds)&&timefix)
                 PostTime = (int)date.TotalSeconds + offset;
 
-            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
+            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}$publish_date={PostTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
             //Console.WriteLine(json);
             //Console.WriteLine(jo);
 
