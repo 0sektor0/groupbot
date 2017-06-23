@@ -18,6 +18,7 @@ namespace photoBot
         static Group CurentGroup;
         static DateTime lastCheckTime;
         static Thread Analysator = new Thread(analysator);
+        static int saveDelay=14400;
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
@@ -118,7 +119,7 @@ namespace photoBot
             while (true)
             {
                 timeFromLastCheck = DateTime.UtcNow - lastCheckTime;
-				if ((int)timeFromLastCheck.TotalSeconds >= 14400) //автоматическое сохранение групп
+				if ((int)timeFromLastCheck.TotalSeconds >= saveDelay) //автоматическое сохранение групп
                 {
                     lastCheckTime = DateTime.UtcNow;
                     commands.Add(new Command("save", "", "29334144", ""));
@@ -281,6 +282,19 @@ namespace photoBot
                     }
                     break;
 
+                case "delay":
+                    if (command.parametr == "")
+                        sendMessage($"{saveDelay}", command.uid);
+                    else
+                    {
+                        IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
+                        if (letters.Count<char>() == 0)
+                            saveDelay = Convert.ToInt32(command.parametr);
+                        else
+                            sendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
+                    }
+                    break;
+
                 case "offset":
                     if (command.parametr == "")
                         sendMessage($"{CurentGroup.offset}", command.uid);
@@ -295,9 +309,28 @@ namespace photoBot
                     break;
 
                 case "group":
+                    if (command.parametr == "all")
+                    {
+                        string info = "";
+                        foreach (Group group in groups.Values)
+                            info+= $"group: {group.name}" +
+                                $"\n save delay: {saveDelay}" +
+                                $"\n post time: {group.PostTime}" +
+                                $"\n posts in memory: {group.posts.Count}" +
+                                $"\n limit: {group.limit}" +
+                                $"\n text: {group.text}" +
+                                $"\n offset: {group.offset}" +
+                                $"\n deployment: {group.posteponedOn}" +
+                                $"\n alert: {group.alert}" +
+                                $"\n signed: {group.signed}" +
+                                $"\n auto posting: {group.autoPost}" +
+                                $"\n\n";
+                        sendMessage(info, command.uid);
+                    }
                     if (command.parametr == "")
 					sendMessage(
                         $"group: {CurentGroup.name}" +
+                        $"\n save delay: {saveDelay}" +
                         $"\n post time: {CurentGroup.PostTime}" +
                         $"\n posts in memory: {CurentGroup.posts.Count}" +
                         $"\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}" +
@@ -307,11 +340,12 @@ namespace photoBot
                         $"\n signed: {CurentGroup.signed}" +
                         $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                     else
-                        if (groups.Keys.Contains<string>(command.parametr))
+                        if (groups.Keys.Contains<string>(command.parametr) || command.parametr=="all")
                         {
                             CurentGroup = groups[command.parametr];
 						    sendMessage(
                                 $"group: {CurentGroup.name}" +
+                                $"\n save delay: {saveDelay}" +
                                 $"\n post time: {CurentGroup.PostTime}" +
                                 $"\n posts in memory: {CurentGroup.posts.Count}" +
                                 $"\n limit: {CurentGroup.limit}" +
@@ -544,8 +578,8 @@ namespace photoBot
             CurentGroup = groups["2d"];
 
             dictionary = inizializeDictionary(adress);
-            //MobileServer mServer = new MobileServer();
-            //Task.Run(() => { mServer.Run();  });
+            MobileServer mServer = new MobileServer();
+            Task.Run(() => { mServer.Run();  });
             Task.Run(() => { reader(); });
             //string test = groups["2d"].Serialize();
             //Group grp1 = Group.Deserilize(test);

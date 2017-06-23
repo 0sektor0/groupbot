@@ -45,6 +45,7 @@
     <Compile Include="Group.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Session.cs" />
+    <Compile Include="MobileServer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
