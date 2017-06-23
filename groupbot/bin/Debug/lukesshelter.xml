@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>lukesshelter</name>
-  <PostTime>1498790100</PostTime>
+  <PostTime>1498768500</PostTime>
   <log>_message sent to 29334144
 _DeploymentStart 6/22/2017 3:54:51 PM
 post_id: 2524
@@ -84,25 +84,6 @@ One of the parameters specified was missing or invalid: owner_id not integer_-_
 _DeploymentEnd
 message sent to 29334144
 message sent to 29334144
-message sent to 29334144
-message sent to 29334144
-_DeploymentStart 23.06.2017 7:02:37
-post_id: 2550
-post_id: 2551
-post_id: 2552
-post_id: 2553
-post_id: 2554
-post_id: 2555
-post_id: 2556
-post_id: 2557
-post_id: 2558
-post_id: 2559
-post_id: 2560
-post_id: 2561
-_DeploymentEnd
-message sent to 29334144
-message sent to 29334144
-message sent to 29334144
 </log>
   <id>129223693</id>
   <posteponedOn>true</posteponedOn>
@@ -113,6 +94,54 @@ message sent to 29334144
   <alert>false</alert>
   <signed>0</signed>
   <posts>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258445</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258446</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258447</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258448</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258449</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258450</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258451</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258452</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258453</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258454</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258455</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>#anthropomorphization@luke_shelter </string>
+      <string>photo390383074_456258456</string>
+    </ArrayOfString>
     <ArrayOfString>
       <string>#anthropomorphization@luke_shelter </string>
       <string>photo390383074_456258457</string>
