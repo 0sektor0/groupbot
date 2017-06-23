@@ -1,9 +1,36 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>lukesshelter</name>
-  <PostTime>1498790100</PostTime>
+  <PostTime>1498818900</PostTime>
   <log>_message sent to 29334144
 message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+_DeploymentStart 6/23/2017 1:09:56 PM
+post_id: 2566
+post_id: 2567
+post_id: 2568
+post_id: 2569
+_DeploymentEnd
+message sent to 29334144
+_lukesshelter:saved
+message sent to 29334144
+dictionary saved
+message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+_DeploymentStart 6/23/2017 5:09:31 PM
+post_id: 2574
+post_id: 2575
+post_id: 2576
+post_id: 2577
+_DeploymentEnd
+_lukesshelter:saved
+dictionary saved
 message sent to 29334144
 message sent to 29334144
 </log>
@@ -16,38 +43,6 @@ message sent to 29334144
   <alert>false</alert>
   <signed>0</signed>
   <posts>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258457</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258458</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258459</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258460</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258461</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258462</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258463</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258464</string>
-    </ArrayOfString>
     <ArrayOfString>
       <string>#anthropomorphization@luke_shelter </string>
       <string>photo390383074_456258465</string>
