@@ -136,7 +136,7 @@ public class Group
             if ((PostTime < (int)date.TotalSeconds)&&timefix)
                 PostTime = (int)date.TotalSeconds + offset;
 
-            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}$publish_date={PostTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
+            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
             //Console.WriteLine(json);
             //Console.WriteLine(jo);
 
