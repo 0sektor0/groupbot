@@ -19,7 +19,7 @@ public class Group
     public bool autoPost;
     public bool alert;
     public int signed;
-    public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста]
+    public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста/ адрес пикчи]
 
 	public Group(string name, string id, int limit)
     {
@@ -82,12 +82,18 @@ public class Group
         //Console.WriteLine(json);
 		if (response.isCorrect) {
             if (response.tokens[1] != null)
-                PostTime = (int)response.tokens[1] + offset; //время последнего поста
+            {
+                PostTime = (int)response.tokens[1] + offset; //время последнего 
+                return (int)response.tokens[0];
+            }
             else
-                PostTime += offset;	
-			return (int)response.tokens[0];
-		} else
-			return 100;
+            {
+                PostTime += offset;
+                return 0;
+            }
+		}
+        else
+			return limit;
     }
 
     public void createPost(List<string> photos, string message, string accessToken) //копировать фото в альбом бота, а также запись в список постов группы //[изменял]
@@ -95,6 +101,7 @@ public class Group
         apiResponse response=null;
         string[] param;
         string postPhotos = "";
+        string photoSrc = "";
 
         if (photos.Count != 0)
         {
@@ -103,10 +110,12 @@ public class Group
                 param = Convert.ToString(photo).Split('_');
                 for (int i = 0; i < 4; i++)
                 {
-                    response = VK.apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessToken}&v=V5.53");
+                    //response = VK.apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessToken}&v=V5.53");
+                    response = VK.apiMethod($"https://api.vk.com/method/execute.CopyPhoto?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessToken}");
                     if (response.isCorrect)
                     {
-                        postPhotos += $",photo390383074_{(string)response.tokens}";
+                        postPhotos += $",photo390383074_{(string)response.tokens[0]["pid"]}";
+                        photoSrc += $",{(string)response.tokens[0]["src"]}";
                         break;
                     }
                 }
@@ -118,7 +127,8 @@ public class Group
                 }
             }
             postPhotos = postPhotos.Remove(0, 1);
-            string[] post = { $"{message} {text}", postPhotos };
+            photoSrc = photoSrc.Remove(0, 1);
+            string[] post = { $"{message} {text}", postPhotos, photoSrc };
             posts.Add(post);
             if (autoPost)
                 sendPost(accessToken, true);

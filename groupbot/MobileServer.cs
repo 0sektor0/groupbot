@@ -15,6 +15,7 @@ namespace photoBot
         public MobileServer()
         {
             IPAddress ipAdr = IPAddress.Parse(Dns.GetHostByName(Dns.GetHostName()).AddressList[0].ToString());
+            //IPAddress ipAdr = IPAddress.Parse("194.87.144.249");
             IPEndPoint endPoint = new IPEndPoint(ipAdr, 1488);
             Listener = new Socket(ipAdr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             Listener.Bind(endPoint);
@@ -27,7 +28,8 @@ namespace photoBot
             while (true)
             {
                 Console.WriteLine("waiting request");
-                Handle(Listener.Accept());
+                try { Handle(Listener.Accept()); }
+                catch { }
             }
         }
 
@@ -35,27 +37,38 @@ namespace photoBot
         {
             byte[] data = new byte[1024];
             byte[] response;
+
+            Console.Write("incomig req ");
+
             socket.Receive(data,0);
             string request = Encoding.UTF8.GetString(data);
             string[] reqParams = request.Split(',');
 
             switch (reqParams[0])
             {
-                case "P":
-                    string group = Program.groups["2d"].Serialize()+"<*E>";
-                    response = Encoding.UTF8.GetBytes(group);
-                    socket.Send(Encoding.UTF8.GetBytes($"L,{response.Length},"));
-                    Console.WriteLine($"group sended {response.Length}");
-                    socket.Receive(data, 0);
+                case "G":
+                    if (Program.groups.ContainsKey(reqParams[1]))
+                    {
+                        string group = Program.groups[reqParams[1]].Serialize() + "<*E>";
+                        response = Encoding.UTF8.GetBytes(group);
+                        socket.Send(Encoding.UTF8.GetBytes($"L,{response.Length},"));
+                        Console.WriteLine($"group sended {response.Length}");
+                        socket.Receive(data, 0);
+                    }
+                    else
+                        response = Encoding.UTF8.GetBytes("E,404,,,,,,,,");
                     socket.Send(response);
                     socket.Dispose();
+                    break;
+
+                case "U":
                     break;
 
                 default:
                     break;
             }
 
-            Console.WriteLine($"incoming request: {reqParams[0]},{reqParams[1]};");
+            Console.Write($"incoming request: {reqParams[0]},{reqParams[1]};\n");
         }
     }
 }
