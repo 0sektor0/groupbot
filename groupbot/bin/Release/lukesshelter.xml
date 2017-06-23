@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>lukesshelter</name>
-  <PostTime>1498890944</PostTime>
+  <PostTime>1498595700</PostTime>
   <log>_message sent to 29334144
 _DeploymentStart 6/22/2017 3:54:51 PM
 post_id: 2524
@@ -67,6 +67,23 @@ Access to adding post denied: cannot schedule more than 150 posts_-_
 _DeploymentEnd
 _luke_shelter:saved
 dictionary saved
+message sent to 29334144
+message sent to 29334144
+_DeploymentStart 6/23/2017 8:06:52 AM
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+One of the parameters specified was missing or invalid: owner_id not integer_-_
+_DeploymentEnd
+message sent to 29334144
+message sent to 29334144
 </log>
   <id>129223693</id>
   <posteponedOn>true</posteponedOn>
@@ -75,6 +92,7 @@ dictionary saved
   <offset>3600</offset>
   <autoPost>false</autoPost>
   <alert>false</alert>
+  <signed>0</signed>
   <posts>
     <ArrayOfString>
       <string>#anthropomorphization@luke_shelter </string>
