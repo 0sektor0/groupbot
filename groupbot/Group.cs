@@ -101,7 +101,8 @@ public class Group
         apiResponse response=null;
         string[] param;
         string postPhotos = "";
-        string photoSrc = "";
+        string photoSrc_big = "";
+        string photoSrc_xbig = "";
 
         if (photos.Count != 0)
         {
@@ -111,11 +112,12 @@ public class Group
                 for (int i = 0; i < 4; i++)
                 {
                     //response = VK.apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessToken}&v=V5.53");
-                    response = VK.apiMethod($"https://api.vk.com/method/execute.CopyPhoto?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessToken}");
+                    response = VK.apiMethod($"https://api.vk.com/method/execute.CopyPhoto?owner_id={param[0]}&photo_id={param[1]}&access_token={accessToken}&access_key={param[2]}");
                     if (response.isCorrect)
                     {
                         postPhotos += $",photo390383074_{(string)response.tokens[0]["pid"]}";
-                        photoSrc += $",{(string)response.tokens[0]["src"]}";
+                        photoSrc_big += $",{(string)response.tokens[0]["src_big"]}";
+                        photoSrc_xbig += $",{(string)response.tokens[0]["src_xbig"]}";
                         break;
                     }
                 }
@@ -127,8 +129,9 @@ public class Group
                 }
             }
             postPhotos = postPhotos.Remove(0, 1);
-            photoSrc = photoSrc.Remove(0, 1);
-            string[] post = { $"{message} {text}", postPhotos, photoSrc };
+            photoSrc_big = photoSrc_big.Remove(0, 1);
+            photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
+            string[] post = { $"{message} {text}", postPhotos, photoSrc_big, photoSrc_xbig };
             posts.Add(post);
             if (autoPost)
                 sendPost(accessToken, true);
