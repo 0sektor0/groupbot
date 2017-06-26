@@ -58,7 +58,6 @@ namespace photoBot
                     else
                         response = Encoding.UTF8.GetBytes("E,404,,,,,,,,");
                     socket.Send(response);
-                    socket.Dispose();
                     break;
 
                 case "U":
@@ -68,6 +67,7 @@ namespace photoBot
                     break;
             }
 
+            socket.Close();
             Console.Write($"incoming request: {reqParams[0]},{reqParams[1]};\n");
         }
     }
