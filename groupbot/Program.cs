@@ -271,12 +271,12 @@ namespace photoBot
 
                 case "time":
                     if (command.parametr == "")
-                        sendMessage($"{CurentGroup.PostTime}", command.uid);
+                        sendMessage($"{CurentGroup.postTime}", command.uid);
                     else
                     {
                         IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
                         if (letters.Count<char>() == 0)
-                            CurentGroup.PostTime = Convert.ToInt32(command.parametr);
+                            CurentGroup.postTime = Convert.ToInt32(command.parametr);
                         else
                             sendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
                     }
@@ -315,7 +315,7 @@ namespace photoBot
                         foreach (Group group in groups.Values)
                             info+= $"group: {group.name}" +
                                 $"\n save delay: {saveDelay}" +
-                                $"\n post time: {group.PostTime}" +
+                                $"\n post time: {group.postTime}" +
                                 $"\n posts in memory: {group.posts.Count}" +
                                 $"\n limit: {group.limit}" +
                                 $"\n text: {group.text}" +
@@ -331,7 +331,7 @@ namespace photoBot
 					sendMessage(
                         $"group: {CurentGroup.name}" +
                         $"\n save delay: {saveDelay}" +
-                        $"\n post time: {CurentGroup.PostTime}" +
+                        $"\n post time: {CurentGroup.postTime}" +
                         $"\n posts in memory: {CurentGroup.posts.Count}" +
                         $"\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}" +
                         $"\n offset: {CurentGroup.offset}" +
@@ -346,7 +346,7 @@ namespace photoBot
 						    sendMessage(
                                 $"group: {CurentGroup.name}" +
                                 $"\n save delay: {saveDelay}" +
-                                $"\n post time: {CurentGroup.PostTime}" +
+                                $"\n post time: {CurentGroup.postTime}" +
                                 $"\n posts in memory: {CurentGroup.posts.Count}" +
                                 $"\n limit: {CurentGroup.limit}" +
                                 $"\n text: {CurentGroup.text}" +
@@ -402,7 +402,7 @@ namespace photoBot
                     if (command.parametr == "last")
                     {
                         TimeSpan unixTime= DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
-                        double lastPostTime = (CurentGroup.PostTime- unixTime.TotalSeconds- CurentGroup.offset + CurentGroup.posts.Count*CurentGroup.offset)/3600;
+                        double lastPostTime = (CurentGroup.postTime- unixTime.TotalSeconds- CurentGroup.offset + CurentGroup.posts.Count*CurentGroup.offset)/3600;
                         if (lastPostTime < 0)
                             lastPostTime = 0;
                         sendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {CurentGroup.offset} секунд вам осталось \n{(int)lastPostTime/24}д:{(int)(lastPostTime- ((int)lastPostTime / 24)*24)}ч",command.uid);

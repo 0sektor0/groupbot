@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 public class Group
 {
     public string name;
-    public int PostTime = 0;
+    public int postTime = 0;
     public string log = "_";
     public string id;
     public bool posteponedOn; //автоматическая выгрузка и оповещение
@@ -79,16 +79,16 @@ public class Group
     {
         apiResponse response;
 		response = VK.apiMethod($"https://api.vk.com/method/execute.postponedInf?gid=-{id}&access_token={accessToken}&v=V5.53");
-        //Console.WriteLine(json);
+        string asd= Convert.ToString(response.tokens[1]);
 		if (response.isCorrect) {
-            if (response.tokens[1] != null)
+            if (Convert.ToString(response.tokens[1]) != "")
             {
-                PostTime = (int)response.tokens[1] + offset; //время последнего 
+                postTime = (int)response.tokens[1] + offset; //время последнего 
                 return (int)response.tokens[0];
             }
             else
             {
-                PostTime += offset;
+                postTime += offset;
                 return 0;
             }
 		}
@@ -146,10 +146,10 @@ public class Group
             apiResponse response;
             TimeSpan date = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
 
-            if ((PostTime < (int)date.TotalSeconds)&&timefix)
-                PostTime = (int)date.TotalSeconds + offset;
+            if ((postTime < (int)date.TotalSeconds)&&timefix)
+                postTime = (int)date.TotalSeconds + offset;
 
-            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={PostTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
+            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={postTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
             //Console.WriteLine(json);
             //Console.WriteLine(jo);
 
@@ -157,7 +157,7 @@ public class Group
             {
                 log += $"post_id: {response.tokens["post_id"]}\n";
                 Console.WriteLine($"post_id: {response.tokens["post_id"]}");
-                PostTime = PostTime + offset;
+                postTime = postTime + offset;
                 posts.RemoveAt(0);
             }
             else
@@ -208,22 +208,22 @@ public class Group
             int errorCount = (int)jo[0];
             int postsCount = (int)jo[1]-1;
             jo = jo[2];
-            int tempPostTime = PostTime;
+            int temppostTime = postTime;
 
 			if (!getInf)
 			{
             	foreach (JToken delay in jo)
             	{
-                	PostTime = (int)delay["start"];
+                	postTime = (int)delay["start"];
                 	for (int i = 0; i < (int)delay["count"]; i++)
                 	{
                 	    if (postsCount >= limit)
                 	        break;
 						else 
 						{
-							PostTime+=offset;
+							postTime+=offset;
                     		sendPost(accessToken,false);
-							PostTime-=offset;
+							postTime-=offset;
                     		postsCount++;
 						}
                 	}
@@ -231,7 +231,7 @@ public class Group
 
 				Console.Write("alignment ended");
 				log += "alignment ended\n";
-				PostTime = tempPostTime;
+				postTime = temppostTime;
 				return new int[] { 0 };
 			}				
 			Console.Write("alignment ended");
