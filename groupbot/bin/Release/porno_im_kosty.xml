@@ -1,12 +1,24 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>porno_im_kosty</name>
-  <PostTime>1497979904</PostTime>
+  <postTime>1498661820</postTime>
   <log>_message sent to 29334144
 message sent to 29334144
 message sent to 29334144
 _DeploymentStart 6/28/2017 10:09:51 AM
 Error in method execution
+message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+_DeploymentStart 28.06.2017 8:57:05
+One of the parameters specified was missing or invalid: invalid publish_date param_-_
+post_id: 5453
+post_id: 5454
+post_id: 5455
+Too many requests per second_-_
+post_id: 5456
+_DeploymentEnd
+message sent to 29334144
 message sent to 29334144
 </log>
   <id>138077475</id>
@@ -17,30 +29,5 @@ message sent to 29334144
   <autoPost>false</autoPost>
   <alert>false</alert>
   <signed>0</signed>
-  <posts>
-    <ArrayOfString>
-      <string> </string>
-      <string>photo390383074_456258942</string>
-      <string>https://pp.userapi.com/c637129/v637129110/51d0f/KB1kBTYEOzU.jpg</string>
-      <string>https://pp.userapi.com/c637129/v637129110/51d10/ejPeLO4Y-zw.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string> </string>
-      <string>photo390383074_456258943</string>
-      <string>https://pp.userapi.com/c637129/v637129110/525ed/MLAUcuIMLPQ.jpg</string>
-      <string>https://pp.userapi.com/c637129/v637129110/525ee/fBnN7PCMhxQ.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string> </string>
-      <string>photo390383074_456258944</string>
-      <string>https://pp.userapi.com/c639728/v639728110/23373/PapgXazdQkA.jpg</string>
-      <string />
-    </ArrayOfString>
-    <ArrayOfString>
-      <string> </string>
-      <string>photo390383074_456258945</string>
-      <string>https://pp.userapi.com/c840238/v840238110/92e3/khvlTEesm6Q.jpg</string>
-      <string>https://pp.userapi.com/c840238/v840238110/92e4/vZDP4bd03bw.jpg</string>
-    </ArrayOfString>
-  </posts>
+  <posts />
 </Group>
