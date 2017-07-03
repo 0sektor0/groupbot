@@ -1,71 +1,121 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>lukesshelter</name>
-  <postTime>0</postTime>
+  <postTime>1499603700</postTime>
   <log>_message sent to 29334144
-_DeploymentStart 6/27/2017 2:16:29 AM
-post_id: 2719
-_DeploymentEnd
-_lukesshelter:saved
 message sent to 29334144
-_DeploymentStart 6/27/2017 6:16:22 AM
-post_id: 2725
-post_id: 2726
-post_id: 2727
-post_id: 2728
-post_id: 2729
-post_id: 2730
-post_id: 2731
-post_id: 2732
-post_id: 2733
-_DeploymentEnd
-_lukesshelter:saved
-dictionary saved
-_DeploymentStart 6/27/2017 10:16:39 AM
-post_id: 2738
-post_id: 2739
-post_id: 2740
-post_id: 2741
+message sent to 29334144
+message sent to 29334144
+_DeploymentStart 7/1/2017 9:44:51 AM
+post_id: 2925
+post_id: 2926
+post_id: 2927
+post_id: 2928
+post_id: 2929
+post_id: 2930
 _DeploymentEnd
 _lukesshelter:saved
 dictionary saved
 message sent to 29334144
-_DeploymentStart 6/27/2017 2:16:27 PM
-post_id: 2746
+Error in method execution
+message sent to 29334144
+Error in method execution
+_DeploymentStart 7/1/2017 1:44:16 PM
+post_id: 2935
+post_id: 2936
+post_id: 2937
+post_id: 2938
 _DeploymentEnd
 _lukesshelter:saved
 dictionary saved
-_DeploymentStart 6/27/2017 6:18:03 PM
-post_id: 2751
-post_id: 2752
-post_id: 2753
-post_id: 2754
-post_id: 2755
-post_id: 2756
-post_id: 2757
+_DeploymentStart 7/1/2017 5:44:14 PM
+post_id: 2943
+post_id: 2944
+post_id: 2945
+post_id: 2946
 _DeploymentEnd
 _lukesshelter:saved
 dictionary saved
-_lukesshelter:saved
-_DeploymentStart 6/27/2017 10:16:24 PM
-post_id: 2762
-post_id: 2763
-post_id: 2764
-post_id: 2765
+message sent to 29334144
+message sent to 29334144
+Error in method execution
+_DeploymentStart 7/1/2017 9:44:14 PM
+post_id: 2951
+post_id: 2952
+post_id: 2953
+post_id: 2954
 _DeploymentEnd
 _lukesshelter:saved
-_DeploymentStart 6/28/2017 2:14:55 AM
-post_id: 2770
-post_id: 2771
-post_id: 2772
-post_id: 2773
+dictionary saved
+message sent to 29334144
+Error in method execution
+message sent to 29334144
+Error in method execution
+_DeploymentStart 7/2/2017 1:44:14 AM
+post_id: 2959
+post_id: 2960
+post_id: 2961
+post_id: 2962
 _DeploymentEnd
 _lukesshelter:saved
-_DeploymentStart 6/28/2017 6:14:55 AM
-post_id: 2778
-post_id: 2779
-post_id: 2780
-post_id: 2781
+dictionary saved
+_DeploymentStart 7/2/2017 5:44:14 AM
+post_id: 2967
+post_id: 2968
+post_id: 2969
+post_id: 2970
+_DeploymentEnd
+_lukesshelter:saved
+dictionary saved
+_DeploymentStart 7/2/2017 9:44:14 AM
+post_id: 2975
+post_id: 2976
+post_id: 2977
+post_id: 2978
+_DeploymentEnd
+_lukesshelter:saved
+dictionary saved
+message sent to 29334144
+_DeploymentStart 7/2/2017 1:44:14 PM
+post_id: 2984
+post_id: 2985
+post_id: 2986
+post_id: 2987
+_DeploymentEnd
+_lukesshelter:saved
+dictionary saved
+_DeploymentStart 7/2/2017 5:44:15 PM
+post_id: 2992
+post_id: 2993
+post_id: 2994
+post_id: 2995
+_DeploymentEnd
+_lukesshelter:saved
+_DeploymentStart 7/2/2017 9:44:15 PM
+post_id: 3000
+post_id: 3001
+post_id: 3002
+post_id: 3003
+_DeploymentEnd
+_lukesshelter:saved
+_DeploymentStart 7/3/2017 1:44:15 AM
+post_id: 3009
+post_id: 3010
+post_id: 3011
+post_id: 3012
+_DeploymentEnd
+_lukesshelter:saved
+_DeploymentStart 7/3/2017 5:44:16 AM
+post_id: 3017
+post_id: 3018
+post_id: 3019
+post_id: 3020
+_DeploymentEnd
+_lukesshelter:saved
+_DeploymentStart 7/3/2017 9:44:16 AM
+_DeploymentEnd
+_lukesshelter:saved
+_DeploymentStart 7/3/2017 1:44:16 PM
 _DeploymentEnd
 _lukesshelter:saved
 </log>
@@ -77,246 +127,5 @@ _lukesshelter:saved
   <autoPost>false</autoPost>
   <alert>false</alert>
   <signed>0</signed>
-  <posts>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258619</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258620</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258621</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258622</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258623</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258624</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258625</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258626</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258627</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258628</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258629</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258630</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258631</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258632</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258633</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258634</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258635</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258636</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258637</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258638</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258639</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258640</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258641</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258642</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258643</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258644</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258645</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258646</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258647</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258648</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258649</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258650</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258651</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258652</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258653</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258654</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258655</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258656</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258657</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258658</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258659</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258660</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258661</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258662</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258663</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258664</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258665</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258666</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258667</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258668</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258669</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258670</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258671</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258672</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258673</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258674</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258675</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258676</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258677</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@luke_shelter </string>
-      <string>photo390383074_456258678</string>
-    </ArrayOfString>
-  </posts>
+  <posts />
 </Group>
