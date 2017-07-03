@@ -20,6 +20,7 @@ public class Group
     public bool alert;
     public int signed;
     public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста/ адрес пикчи]
+    //public Dictionary<string, string[]> albums;
 
 	public Group(string name, string id, int limit)
     {

@@ -309,41 +309,24 @@ namespace photoBot
                     break;
 
                 case "group":
-                    if (command.parametr == "all")
-                    {
-                        string info = "";
-                        foreach (Group group in groups.Values)
-                            info+= $"group: {group.name}" +
-                                $"\n save delay: {saveDelay}" +
-                                $"\n post time: {group.postTime}" +
-                                $"\n posts in memory: {group.posts.Count}" +
-                                $"\n limit: {group.limit}" +
-                                $"\n text: {group.text}" +
-                                $"\n offset: {group.offset}" +
-                                $"\n deployment: {group.posteponedOn}" +
-                                $"\n alert: {group.alert}" +
-                                $"\n signed: {group.signed}" +
-                                $"\n auto posting: {group.autoPost}" +
-                                $"\n\n";
-                        sendMessage(info, command.uid);
-                    }
                     if (command.parametr == "")
-					sendMessage(
-                        $"group: {CurentGroup.name}" +
-                        $"\n save delay: {saveDelay}" +
-                        $"\n post time: {CurentGroup.postTime}" +
-                        $"\n posts in memory: {CurentGroup.posts.Count}" +
-                        $"\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}" +
-                        $"\n offset: {CurentGroup.offset}" +
-                        $"\n deployment: {CurentGroup.posteponedOn}" +
-                        $"\n alert: {CurentGroup.alert}" +
-                        $"\n signed: {CurentGroup.signed}" +
-                        $"\n auto posting: {CurentGroup.autoPost}", command.uid);
+                        sendMessage(
+                            $"group: {CurentGroup.name}" +
+                            $"\n save delay: {saveDelay}" +
+                            $"\n post time: {CurentGroup.postTime}" +
+                            $"\n posts in memory: {CurentGroup.posts.Count}" +
+                            $"\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}" +
+                            $"\n offset: {CurentGroup.offset}" +
+                            $"\n deployment: {CurentGroup.posteponedOn}" +
+                            $"\n alert: {CurentGroup.alert}" +
+                            $"\n signed: {CurentGroup.signed}" +
+                            $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                     else
-                        if (groups.Keys.Contains<string>(command.parametr) || command.parametr=="all")
+                    {
+                        if (groups.Keys.Contains(command.parametr) && command.parametr != "all")
                         {
                             CurentGroup = groups[command.parametr];
-						    sendMessage(
+                            sendMessage(
                                 $"group: {CurentGroup.name}" +
                                 $"\n save delay: {saveDelay}" +
                                 $"\n post time: {CurentGroup.postTime}" +
@@ -356,8 +339,27 @@ namespace photoBot
                                 $"\n signed: {CurentGroup.signed}" +
                                 $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                         }
-                        else
+                        if (!groups.Keys.Contains(command.parametr) && command.parametr == "all")
+                        {
+                            string info = "";
+                            foreach (Group group in groups.Values)
+                                info += $"group: {group.name}" +
+                                    $"\n save delay: {saveDelay}" +
+                                    $"\n post time: {group.postTime}" +
+                                    $"\n posts in memory: {group.posts.Count}" +
+                                    $"\n limit: {group.limit}" +
+                                    $"\n text: {group.text}" +
+                                    $"\n offset: {group.offset}" +
+                                    $"\n deployment: {group.posteponedOn}" +
+                                    $"\n alert: {group.alert}" +
+                                    $"\n signed: {group.signed}" +
+                                    $"\n auto posting: {group.autoPost}" +
+                                    $"\n\n";
+                            sendMessage(info, command.uid);
+                        }
+                        if (!groups.Keys.Contains(command.parametr) && command.parametr != "all")
                             sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
+                    }
                     if (command.atachments.Count>0)
 					    commands.Add(new Command("null",command.atachments,command.uid,""));
                     break;
@@ -567,7 +569,8 @@ namespace photoBot
 
             //groups.Add("2d",new Group("hentai_im_kosty", "121519170"));
             //groups.Add("3d", new Group("porno_im_kosty", "138077475"));
-            //groups.Add("luke", new Group("luke_shelter", "129223693", 149));
+            //groups.Add("luk", new Group("luke_shelter", "129223693", 149));
+            //groups["luk"].Save();
 
             groups.Add("2d", Group.load("hentai_im_kosty.xml"));
             Console.WriteLine($"hentai_im_kosty.xml deserialization ended");
