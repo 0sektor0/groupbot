@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <name>hentai_im_kosty</name>
-  <postTime>1499179860</postTime>
+  <postTime>1499212260</postTime>
   <log>_message sent to 29334144
 message sent to 29334144
 _DeploymentStart 7/1/2017 1:27:04 AM
@@ -226,6 +226,14 @@ dictionary saved
 message sent to 29334144
 Error in method execution
 _hentai_im_kosty:saved
+message sent to 29334144
+message sent to 29334144
+message sent to 29334144
+_DeploymentStart 03.07.2017 22:46:31
+post_id: 13235
+_DeploymentEnd
+message sent to 29334144
+message sent to 29334144
 </log>
   <id>121519170</id>
   <posteponedOn>true</posteponedOn>
@@ -236,12 +244,6 @@ _hentai_im_kosty:saved
   <alert>false</alert>
   <signed>0</signed>
   <posts>
-    <ArrayOfString>
-      <string />
-      <string>photo390383074_456259533</string>
-      <string>https://pp.userapi.com/c840220/v840220937/1388d/hIylZUGEkpg.jpg</string>
-      <string />
-    </ArrayOfString>
     <ArrayOfString>
       <string />
       <string>photo390383074_456259534</string>

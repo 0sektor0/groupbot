@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <name>lukesshelter</name>
-  <postTime>1499603700</postTime>
+  <postTime>1499675700</postTime>
   <log>_message sent to 29334144
 message sent to 29334144
 message sent to 29334144
@@ -153,6 +153,31 @@ _lukesshelter:serialized
 _lukesshelter:serialized
 _lukesshelter:serialized
 _lukesshelter:serialized
+message sent to 29334144
+message sent to 29334144
+_DeploymentStart 03.07.2017 23:00:51
+post_id: 3038
+post_id: 3039
+post_id: 3040
+post_id: 3041
+post_id: 3042
+post_id: 3043
+post_id: 3044
+post_id: 3045
+post_id: 3046
+post_id: 3047
+post_id: 3048
+post_id: 3049
+post_id: 3050
+post_id: 3051
+post_id: 3052
+post_id: 3053
+post_id: 3054
+post_id: 3055
+post_id: 3056
+post_id: 3057
+_DeploymentEnd
+message sent to 29334144
 </log>
   <id>129223693</id>
   <posteponedOn>true</posteponedOn>
@@ -163,126 +188,6 @@ _lukesshelter:serialized
   <alert>false</alert>
   <signed>0</signed>
   <posts>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259897</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea35/WbIek6YpgiU.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea36/zwLBcko5MfA.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259898</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea3e/m-dKyp_ky0c.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea3f/Og83mIodTUg.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259899</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea47/vzqRAGVe7FM.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea48/-7lh-2OSIh8.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259900</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea50/qP7nt191lSY.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea51/IoxTNWw2-MI.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259901</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea5a/xVWzc6NA18g.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea5b/6vtPiaasM00.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259902</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea64/41wUtQ08Cu8.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea65/JXQbGGTXBw4.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259903</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea6e/28GTMZkyiuc.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea6f/7Ms_RBvxUOA.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259904</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea78/rKwz6IBlt4A.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea79/qcg7Wo7GxVA.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259905</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea82/Tn0xqS99ANI.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea83/smY9zXQaYGk.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259906</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea8c/i3AWX8wDMOg.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea8d/o2BMBBMA3CI.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259907</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea96/VhbvCkmzc7k.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ea97/fMENhxOIvnA.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259908</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eaa0/I0oZ-oVZHu4.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eaa1/yJZ00r_9Cvg.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259909</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eaaa/dm0jzQJSm88.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eaab/W_y9YweMCxA.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259910</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eab4/gqNsQ5KCAg4.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eab5/Tx4x19tJjAM.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259911</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eabe/d7eiEX44pME.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eabf/dCSotMKZ2kE.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259912</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eac7/S7_o05lQyAU.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eac8/LL9BH9wB86w.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259913</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ead0/s-G3-tDyN2o.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4ead1/qVNrgP8qemY.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259914</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eada/XeWpjj0DlxE.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eadb/qkwv-RzyJQM.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259915</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eae3/e_OTdjpA9_E.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eae4/n8FJOVb8jNk.jpg</string>
-    </ArrayOfString>
-    <ArrayOfString>
-      <string>#anthropomorphization@lukesshelter </string>
-      <string>photo390383074_456259916</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eaed/DOTY1UMcnQ8.jpg</string>
-      <string>https://pp.userapi.com/c638825/v638825627/4eaee/6s-xUyEIfaY.jpg</string>
-    </ArrayOfString>
     <ArrayOfString>
       <string>#anthropomorphization@lukesshelter </string>
       <string>photo390383074_456259917</string>
