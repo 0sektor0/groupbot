@@ -48,6 +48,8 @@ namespace photoBot
 			int length;
 			Group groupUpd;
 
+			Console.Write($"incoming request: {reqParams[0]},{reqParams[1]};\n");
+
 			switch (reqParams[0])
 			{
 			case "G":
@@ -90,6 +92,7 @@ namespace photoBot
 				foreach (string key in Program.groups.Keys)
 					str += $"{key},";
 				response = Encoding.UTF8.GetBytes (str);
+				socket.Send (response);
 				Console.WriteLine (str);
 				break;
 
@@ -98,8 +101,7 @@ namespace photoBot
 			}
 
 			socket.Shutdown(SocketShutdown.Both);
-			socket.Close();
-			Console.Write($"incoming request: {reqParams[0]},{reqParams[1]};\n");
+			socket.Disconnect(false);
 		}
 	}
 }
