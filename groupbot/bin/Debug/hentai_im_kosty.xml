@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>hentai_im_kosty</name>
-  <PostTime>1491853329</PostTime>
+  <postTime>0</postTime>
   <log>_message sent to 29334144
 alignment started 4/9/2017 8:19:41 PM
 alignment ended
@@ -43,6 +43,9 @@ post_id: 7121
 Access to adding post denied: can only schedule 25 posts on a day_-_
 _DeploymentEnd
 message sent to 70137831
+245093776:  350
+238916795:  168
+239408191:  84
 </log>
   <id>121519170</id>
   <posteponedOn>true</posteponedOn>
@@ -50,6 +53,8 @@ message sent to 70137831
   <text />
   <offset>1800</offset>
   <autoPost>false</autoPost>
+  <alert>false</alert>
+  <signed>0</signed>
   <posts>
     <ArrayOfString>
       <string />

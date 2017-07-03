@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>porno_im_kosty</name>
-  <PostTime>1492011962</PostTime>
+  <postTime>0</postTime>
   <log>_message sent to 29334144
 message sent to 29334144
 message sent to 29334144
@@ -206,5 +206,7 @@ _DeploymentEnd
   <text />
   <offset>3600</offset>
   <autoPost>false</autoPost>
+  <alert>false</alert>
+  <signed>0</signed>
   <posts />
 </Group>
