@@ -16,9 +16,9 @@ namespace photoBot
         static string adress = @"words.dat";
         static public Dictionary<string, Group> groups= new Dictionary<string, Group>();
         static Group CurentGroup;
-        static DateTime lastCheckTime;
+        static public DateTime lastCheckTime;
         static Thread Analysator = new Thread(analysator);
-        static int saveDelay=14400;
+        static public int saveDelay=14400;
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
