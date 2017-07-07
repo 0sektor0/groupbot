@@ -570,6 +570,7 @@ namespace photoBot
             //groups.Add("3d", new Group("porno_im_kosty", "138077475"));
             //groups.Add("luk", new Group("luke_shelter", "129223693", 149));
             //groups["luk"].Save();
+            //CurentGroup = groups["luk"];
 
             groups.Add("2d", Group.load("hentai_im_kosty.xml"));
             Console.WriteLine($"hentai_im_kosty.xml deserialization ended");
@@ -578,6 +579,9 @@ namespace photoBot
             groups.Add("luke", Group.load("lukesshelter.xml"));
             Console.WriteLine($"lukesshelter.xml deserialization ended");
             CurentGroup = groups["2d"];
+            //groups.Add("luk", Group.load("luke_shelter.xml"));
+            //Console.WriteLine($"luke_shelter.xml deserialization ended");
+            //CurentGroup = groups["luk"];
 
             dictionary = inizializeDictionary(adress);
             MobileServer mServer = new MobileServer();

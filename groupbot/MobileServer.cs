@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Net.Sockets;
@@ -82,7 +82,18 @@ namespace photoBot
                     }
                     str = str.Replace("<*E>", "");
                     groupUpd = Group.Deserilize(str);
-                    Program.groups[name] = groupUpd;
+
+                    if (Program.groups[name].posts.Count > 0)
+                    {
+                        Console.WriteLine("Updating started");
+                        int counterOffset = (int)Program.groups[name].posts[0][0];
+
+                        foreach (ArrayList post in groupUpd.posts)
+                            if ((int)post[0] >= counterOffset)
+                                Program.groups[name].posts[(int)post[0] - counterOffset] = post;
+                        Program.groups[name] = groupUpd;
+                    }
+                    Console.WriteLine("Updating ended");
                     break;
 
                 case "I":

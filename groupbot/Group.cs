@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using Newtonsoft.Json.Linq;
 using System.IO;
 //using System.Runtime.Serialization.Formatters.Binary;
@@ -19,7 +20,8 @@ public class Group
     public bool autoPost;
     public bool alert;
     public int signed;
-    public List<string[]> posts= new List<string[]>(); // [текст поста, картинка для поста/ адрес пикчи]
+    public int postCounter;
+    public List<ArrayList> posts= new List<ArrayList>(); // [текст поста, картинка для поста/ адрес пикчи]
     //public Dictionary<string, string[]> albums;
 
 	public Group(string name, string id, int limit)
@@ -28,6 +30,7 @@ public class Group
 		this.limit = limit;
         this.name= name;
         this.id = id;
+        postCounter = 0;
     }
 
     public Group(){}
@@ -132,7 +135,11 @@ public class Group
             postPhotos = postPhotos.Remove(0, 1);
             photoSrc_big = photoSrc_big.Remove(0, 1);
             photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
-            string[] post = { $"{message} {text}", postPhotos, photoSrc_big, photoSrc_xbig };
+            string[] postParams = { $"{message} {text}", postPhotos, photoSrc_big, photoSrc_xbig };
+            ArrayList post = new ArrayList();
+            post.Add(postCounter);
+            postCounter++;
+            post.AddRange(postParams);
             posts.Add(post);
             if (autoPost)
                 sendPost(accessToken, true);
@@ -143,14 +150,14 @@ public class Group
     {
         if (posts.Count>0)
         {
-            string[] post = posts[0];
+            ArrayList post = posts[0];
             apiResponse response;
             TimeSpan date = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
 
             if ((postTime < (int)date.TotalSeconds)&&timefix)
                 postTime = (int)date.TotalSeconds + offset;
 
-            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={postTime}&attachments={Convert.ToString(post[1])}&message={System.Web.HttpUtility.UrlEncode(post[0])}&access_token={accessToken}&v=V5.53");
+            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={postTime}&attachments={Convert.ToString(post[2])}&message={System.Web.HttpUtility.UrlEncode((string)post[1])}&access_token={accessToken}&v=V5.53"); // check
             //Console.WriteLine(json);
             //Console.WriteLine(jo);
 
