@@ -122,12 +122,8 @@ namespace photoBot
 				if ((int)timeFromLastCheck.TotalSeconds >= saveDelay) //автоматическое сохранение групп
                 {
                     lastCheckTime = DateTime.UtcNow;
+                    commands.Add(new Command("deployment", "", "29334144", "all"));
                     commands.Add(new Command("save", "", "29334144", ""));
-                    foreach (Group groupToSave in groups.Values)
-                    {
-						if (groupToSave.deployment(accessTokenAndTime[0])<=10 && groupToSave.alert)
-							sendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
-                    }
                 }
 
                 if (commands.Count != 0) //обработка комманд из буффера
@@ -137,10 +133,10 @@ namespace photoBot
                         //executer(commands[0]);
                         //commands.RemoveAt(0);
                         try { executer(commands[0]); }
-                        catch
+                        catch (Exception e)
                         {
-                            Console.WriteLine("Error in method execution");
-                            CurentGroup.log += "Error in method execution\n";
+                            Console.WriteLine($"Error in method execution {e.Message}");
+                            CurentGroup.log += $"Error in method execution {e.Message}\n";
                         }
                         finally { commands.RemoveAt(0); }
                     }
@@ -368,9 +364,12 @@ namespace photoBot
                     if (command.parametr == "")
                     {
                         sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
-                        int nullCounter = CurentGroup.deployment(accessTokenAndTime[0]);
-                        sendMessage("я закончила, но не гарантирую, что все прошло успешно", command.uid);
+                            CurentGroup.deployment(accessTokenAndTime[0]);
                     }
+                    if (command.parametr == "all")
+                        foreach (Group groupToDeploy in groups.Values)
+                            if (groupToDeploy.deployment(accessTokenAndTime[0]) <= 10 && groupToDeploy.alert)
+                                sendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
                     if (command.parametr == "off")
                         CurentGroup.posteponedOn = false;
                     if (command.parametr == "on")
