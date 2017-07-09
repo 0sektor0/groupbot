@@ -14,16 +14,16 @@ namespace photoBot
         static string[] accessTokenAndTime; //информация для доступа
         static Dictionary<string, string> dictionary;
         static string adress = @"words.dat";
-        static public Dictionary<string, Group> groups= new Dictionary<string, Group>();
+        static public Dictionary<string, Group> groups = new Dictionary<string, Group>();
         static Group CurentGroup;
         static public DateTime lastCheckTime;
         static Thread Analysator = new Thread(analysator);
-        static public int saveDelay=14400;
+        static public int saveDelay = 14400;
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            //string login = "+79661963807 ", password = "Az_965211-gI";
-            string login = "+79645017794", password = "Ny_965211-sR";
+            string login = "+79661963807 ", password = "Az_965211-gI";
+            //string login = "+79645017794", password = "Ny_965211-sR";
             apiResponse response;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -57,12 +57,13 @@ namespace photoBot
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
-                    CurentGroup.log += "bad response\n"; }
+                    CurentGroup.log += "bad response\n";
+                }
             }
 
         }
-        
-		static void parseCommand(JToken message)
+
+        static void parseCommand(JToken message)
         {
             JToken token;
             string[] parametrs;
@@ -70,7 +71,7 @@ namespace photoBot
             string uid = (string)token["uid"];
             List<string> photos = new List<string>();
             int comType;
-            string[] inputCommands = Convert.ToString(token["body"]).Replace("<br>","").Split(';');
+            string[] inputCommands = Convert.ToString(token["body"]).Replace("<br>", "").Split(';');
 
             for (int i = 0; i < inputCommands.Length; i++)
             {
@@ -112,14 +113,14 @@ namespace photoBot
             }
         }
 
-        
-		public static void analysator()
+
+        public static void analysator()
         {
             TimeSpan timeFromLastCheck;
             while (true)
             {
                 timeFromLastCheck = DateTime.UtcNow - lastCheckTime;
-				if ((int)timeFromLastCheck.TotalSeconds >= saveDelay) //автоматическое сохранение групп
+                if ((int)timeFromLastCheck.TotalSeconds >= saveDelay) //автоматическое сохранение групп
                 {
                     lastCheckTime = DateTime.UtcNow;
                     commands.Add(new Command("deployment", "", "29334144", "all"));
@@ -143,10 +144,10 @@ namespace photoBot
                 }
             }
         }
-        
-		public static void executer(Command command)
-		{
-			//Console.WriteLine("analis started");
+
+        public static void executer(Command command)
+        {
+            //Console.WriteLine("analis started");
             if (command.parametr != "")
             {
                 command.parametr = command.parametr.ToLower();
@@ -160,7 +161,7 @@ namespace photoBot
                     if (command.uid == "29334144")
                     {
                         string request = $"https://api.vk.com/method/{command.parametr}&access_token={accessTokenAndTime[0]}&v=V5.53";
-                        request=request.Replace("amp;","");
+                        request = request.Replace("amp;", "");
                         sendMessage(Convert.ToString(VK.apiMethod(request).tokens), command.uid);
                     }
                     break;
@@ -175,11 +176,11 @@ namespace photoBot
                 case "save":
                     if (command.uid == "29334144")
                     {
-					saveDictionary(adress);
-					foreach (Group groupToSave in groups.Values)
-						groupToSave.Save();
-                    if (command.parametr == "ack")
-                        sendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", command.uid);
+                        saveDictionary(adress);
+                        foreach (Group groupToSave in groups.Values)
+                            groupToSave.Save();
+                        if (command.parametr == "ack")
+                            sendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", command.uid);
                     }
                     Console.WriteLine("dictionary saved");
                     CurentGroup.log += "dictionary saved\n";
@@ -242,7 +243,7 @@ namespace photoBot
                     else
                     {
                         foreach (string atachment in command.atachments)
-                            commands.Add(new Command("post", atachment, command.uid,""));
+                            commands.Add(new Command("post", atachment, command.uid, ""));
                     }
                     break;
 
@@ -259,7 +260,7 @@ namespace photoBot
                     {
                         IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
                         if (letters.Count<char>() == 0)
-                                CurentGroup.limit = Convert.ToInt32(command.parametr);
+                            CurentGroup.limit = Convert.ToInt32(command.parametr);
                         else
                             sendMessage("Семпай, вы настолько глупый, что даже предел не можете правильно указать, да?", command.uid);
                     }
@@ -356,15 +357,15 @@ namespace photoBot
                         if (!groups.Keys.Contains(command.parametr) && command.parametr != "all")
                             sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
                     }
-                    if (command.atachments.Count>0)
-					    commands.Add(new Command("null",command.atachments,command.uid,""));
+                    if (command.atachments.Count > 0)
+                        commands.Add(new Command("null", command.atachments, command.uid, ""));
                     break;
 
                 case "deployment":
                     if (command.parametr == "")
                     {
                         sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
-                            CurentGroup.deployment(accessTokenAndTime[0]);
+                        CurentGroup.deployment(accessTokenAndTime[0]);
                     }
                     if (command.parametr == "all")
                         foreach (Group groupToDeploy in groups.Values)
@@ -392,21 +393,21 @@ namespace photoBot
 
                 case "alignment":
                     int[] res;
-					if (command.parametr=="")
-                        res=CurentGroup.alignment(accessTokenAndTime[0], false);
-					if (command.parametr=="count")
-					{
-                        res=CurentGroup.alignment(accessTokenAndTime[0], true);
-							if (res.Length==2)
-							sendMessage($"{res[0]} {res[1]}", command.uid);
-					}
+                    if (command.parametr == "")
+                        res = CurentGroup.alignment(accessTokenAndTime[0], false);
+                    if (command.parametr == "count")
+                    {
+                        res = CurentGroup.alignment(accessTokenAndTime[0], true);
+                        if (res.Length == 2)
+                            sendMessage($"{res[0]} {res[1]}", command.uid);
+                    }
                     if (command.parametr == "last")
                     {
-                        TimeSpan unixTime= DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
-                        double lastPostTime = (CurentGroup.postTime- unixTime.TotalSeconds- CurentGroup.offset + CurentGroup.posts.Count*CurentGroup.offset)/3600;
+                        TimeSpan unixTime = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
+                        double lastPostTime = (CurentGroup.postTime - unixTime.TotalSeconds - CurentGroup.offset + CurentGroup.posts.Count * CurentGroup.offset) / 3600;
                         if (lastPostTime < 0)
                             lastPostTime = 0;
-                        sendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {CurentGroup.offset} секунд вам осталось \n{(int)lastPostTime/24}д:{(int)(lastPostTime- ((int)lastPostTime / 24)*24)}ч",command.uid);
+                        sendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {CurentGroup.offset} секунд вам осталось \n{(int)lastPostTime / 24}д:{(int)(lastPostTime - ((int)lastPostTime / 24) * 24)}ч", command.uid);
                     }
                     break;
 
@@ -447,8 +448,8 @@ namespace photoBot
                     Console.WriteLine("wrong command");
                     CurentGroup.log += "wrong command\n";
                     break;
-			}
-			//Console.WriteLine("analis endeded");
+            }
+            //Console.WriteLine("analis endeded");
         }
 
 
@@ -457,7 +458,7 @@ namespace photoBot
             apiResponse response = VK.apiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
             JToken albums = null;
             string aid = "";
-            string[] parametrs=null;
+            string[] parametrs = null;
 
             if (parametr.Contains('/'))
             {
@@ -491,8 +492,8 @@ namespace photoBot
                         if (parametrs.Length == 2)
                             counter = Convert.ToInt32(parametrs[1]);
                     }
-                    catch { }               
-                    while (counter>0 && i!=photos.Count<JToken>())
+                    catch { }
+                    while (counter > 0 && i != photos.Count<JToken>())
                     {
                         //Thread.Sleep(1000);
                         commands.Add(new Command("post", $"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", uid, $"#{parametr}@{CurentGroup.name}"));
@@ -507,8 +508,8 @@ namespace photoBot
                 }
             }
         }
-        
-		static List<string> getAttachments(JToken message, string uid) // берем фото
+
+        static List<string> getAttachments(JToken message, string uid) // берем фото
         {
             List<string> photos = new List<string>();
             if (message["attachments"] != null)
@@ -523,25 +524,25 @@ namespace photoBot
             }
             return photos;
         }
-        
-		static void sendMessage(string message, string uid)
+
+        static void sendMessage(string message, string uid)
         {
-                //VK.apiMethodEmpty($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
-                VK.apiMethodPostEmpty(new Dictionary<string, string>()
+            //VK.apiMethodEmpty($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
+            VK.apiMethodPostEmpty(new Dictionary<string, string>()
                 {
                     { "message",message},
                     { "uid",uid},
                     { "access_token",accessTokenAndTime[0]},
                     { "v","V5.53"}
                 },
-                "https://api.vk.com/method/messages.send");
+            "https://api.vk.com/method/messages.send");
 
-                Console.WriteLine($"message sent to {uid}");
-                CurentGroup.log += $"message sent to {uid}\n";
+            Console.WriteLine($"message sent to {uid}");
+            CurentGroup.log += $"message sent to {uid}\n";
         }
 
-        
-		public static Dictionary<string, string> inizializeDictionary(string path) //+
+
+        public static Dictionary<string, string> inizializeDictionary(string path) //+
         {
             string[] buffer;
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
@@ -553,8 +554,8 @@ namespace photoBot
                 }
             return dictionary;
         }
-        
-		public static void saveDictionary(string path)
+
+        public static void saveDictionary(string path)
         {
             using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.OpenOrCreate)))
                 foreach (string key in dictionary.Keys)
@@ -585,10 +586,10 @@ namespace photoBot
 
             dictionary = inizializeDictionary(adress);
             MobileServer mServer = new MobileServer();
-            //Task.Run(() => { mServer.Run();  });
-            //Task.Run(() => { reader(); });
-			//analysator();
-			mServer.Run();
+            Task.Run(() => { mServer.Run(); });
+            Task.Run(() => { reader(); });
+            analysator();
+            //mServer.Run();
         }
     }
 }
