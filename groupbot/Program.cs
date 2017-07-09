@@ -22,8 +22,8 @@ namespace photoBot
 
         public static void reader() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI";
-            //string login = "+79645017794", password = "Ny_965211-sR";
+            //string login = "+79661963807 ", password = "Az_965211-gI";
+            string login = "+79645017794", password = "Ny_965211-sR";
             apiResponse response;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -585,12 +585,10 @@ namespace photoBot
 
             dictionary = inizializeDictionary(adress);
             MobileServer mServer = new MobileServer();
-            Task.Run(() => { mServer.Run();  });
-            Task.Run(() => { reader(); });
-            //string test = groups["2d"].Serialize();
-            //Group grp1 = Group.Deserilize(test);
-            //mServer.Run();
-            analysator();
+            //Task.Run(() => { mServer.Run();  });
+            //Task.Run(() => { reader(); });
+			//analysator();
+			mServer.Run();
         }
     }
 }
