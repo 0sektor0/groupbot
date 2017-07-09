@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>lukesshelter</name>
-<<<<<<< HEAD
   <postTime>1499949300</postTime>
   <log>_lukesshelter:saved
 _lukesshelter:saved
@@ -64,11 +63,6 @@ _lukesshelter:saved
 _DeploymentStart 7/9/2017 7:57:28 PM
 _DeploymentEnd
 _lukesshelter:saved
-=======
-  <postTime>1499891700</postTime>
-  <log>_lukesshelter:saved
-_lukesshelter:saved
->>>>>>> 0a1be4537e07c20ee8abcee0cf5317adb048633e
 </log>
   <id>129223693</id>
   <posteponedOn>true</posteponedOn>
@@ -79,122 +73,5 @@ _lukesshelter:saved
   <alert>false</alert>
   <signed>0</signed>
   <postCounter>1</postCounter>
-<<<<<<< HEAD
   <posts />
-=======
-  <posts>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260194</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ecf2/8qxSpF960NY.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ecf3/4EfXHKxPptU.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260195</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ecfb/mgi_-x1YsUw.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ecfc/iOWpyENWO4I.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260196</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed04/aB0q2fgC8c4.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed05/3gSxxdYfeMc.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260197</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed0e/GjTt3SAyNjQ.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed0f/XPbeVdGk6jg.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260198</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed17/TysEuzpXz2c.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed18/g6vxa5lGuR4.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260199</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed20/KEdz0SpQ_gc.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed21/e2ZAQPnJH8Y.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260200</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed29/Cyp9fOCGEf8.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed2a/KwGrUvcPWL0.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260201</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed33/zwnVZNej784.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed34/7S2HXQVkTSY.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260202</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed3d/5CZiSJyRpes.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed3e/3Sad80lmdjY.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260203</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed47/Ta4Tlful700.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed48/YsS2NgVCKvM.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260204</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed4f/nj2sIGZmCek.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed50/5sNznvoD78M.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260205</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed59/H_9KKDa8fwM.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed5a/JbxzA8dnW_4.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260206</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed63/a7xkK_62mZE.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed64/TKzd7WrCoT0.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260207</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed6d/LH_L3M_mv8E.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed6e/oOtWv5pvlo4.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260208</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed76/q8MlMWMUc2I.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed77/VKtwWwq_4x8.jpg</anyType>
-    </ArrayOfAnyType>
-    <ArrayOfAnyType>
-      <anyType xsi:type="xsd:int">0</anyType>
-      <anyType xsi:type="xsd:string">#anthropomorphization@lukesshelter </anyType>
-      <anyType xsi:type="xsd:string">photo390383074_456260209</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed80/IJrBNmnHhAM.jpg</anyType>
-      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638825/v638825627/4ed81/XRkU2Id8KoQ.jpg</anyType>
-    </ArrayOfAnyType>
-  </posts>
->>>>>>> 0a1be4537e07c20ee8abcee0cf5317adb048633e
 </Group>
