@@ -455,7 +455,7 @@ namespace photoBot
 
         static void fromAlbum(string parametr, string uid, string albumOwnerId)
         {
-            apiResponse response = VK.apiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
+            apiResponse response;
             JToken albums = null;
             string aid = "";
             string[] parametrs = null;
@@ -466,6 +466,10 @@ namespace photoBot
                 parametr = parametrs[0];
             }
 
+            if (parametrs.Length == 3)
+                albumOwnerId = parametrs[2];
+
+            response = VK.apiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
             if (response.isCorrect)
             {
                 albums = response.tokens;
