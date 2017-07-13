@@ -495,7 +495,7 @@ namespace photoBot
                     int counter = photos.Count<JToken>(), i = Convert.ToInt32(dictionary[aid]);
                     try
                     {
-                        if (parametrs.Length == 2)
+                        if (parametrs.Length >= 2)
                             counter = Convert.ToInt32(parametrs[1]);
                     }
                     catch { }
