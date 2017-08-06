@@ -372,7 +372,5 @@ _lukesshelter:saved
   <signed>0</signed>
   <postCounter>222</postCounter>
   <posts />
-  <delayedRequests>
-      <ArrayOfString />
-  </delayedRequests>
+  <delayedRequests />
 </Group>
