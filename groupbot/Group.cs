@@ -22,6 +22,7 @@ public class Group
     public int signed;
     public int postCounter;
     public List<ArrayList> posts= new List<ArrayList>(); // [текст поста, картинка для поста/ адрес пикчи]
+    public List<string> delayedRequests = new List<string>();
     //public Dictionary<string, string[]> albums;
 
 	public Group(string name, string id, int limit)
@@ -113,37 +114,82 @@ public class Group
             foreach (string photo in photos)
             {
                 param = Convert.ToString(photo).Split('_');
-                for (int i = 0; i < 4; i++)
+                response = VK.apiMethod($"https://api.vk.com/method/execute.CopyPhoto?owner_id={param[0]}&photo_id={param[1]}&access_token={accessToken}&access_key={param[2]}");
+                if (response.isCorrect)
                 {
-                    //response = VK.apiMethod($"https://api.vk.com/method/photos.copy?owner_id={param[0]}&photo_id={param[1]}&access_key={param[2]}&access_token={accessToken}&v=V5.53");
-                    response = VK.apiMethod($"https://api.vk.com/method/execute.CopyPhoto?owner_id={param[0]}&photo_id={param[1]}&access_token={accessToken}&access_key={param[2]}");
-                    if (response.isCorrect)
-                    {
-                        postPhotos += $",photo390383074_{(string)response.tokens[0]["pid"]}";
-                        photoSrc_big += $",{(string)response.tokens[0]["src_big"]}";
-                        photoSrc_xbig += $",{(string)response.tokens[0]["src_xbig"]}";
-                        break;
-                    }
+                    postPhotos += $",photo390383074_{(string)response.tokens[0]["pid"]}";
+                    photoSrc_big += $",{(string)response.tokens[0]["src_big"]}";
+                    photoSrc_xbig += $",{(string)response.tokens[0]["src_xbig"]}";
                 }
-                if (!response.isCorrect)
+                else
                 {
                     Console.Write("_EICopy");
                     log += "_EICopy\n";
-                    return;
+                    delayedRequests.Add(response.request.Replace(accessToken, "}|{}|{04"));
                 }
             }
+
+            if (postPhotos.Length > 1)
+            {
+                postPhotos = postPhotos.Remove(0, 1);
+                photoSrc_big = photoSrc_big.Remove(0, 1);
+                photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
+
+                string[] postParams = { $"{message} {text}", postPhotos, photoSrc_big, photoSrc_xbig };
+                ArrayList post = new ArrayList();
+                post.Add(postCounter);
+                postCounter++;
+                post.AddRange(postParams);
+                posts.Add(post);
+
+                if (autoPost)
+                    sendPost(accessToken, true);
+            }
+        }
+    }
+
+    public void repeatOfFailedRequests(string accessToken)
+    {
+        apiResponse response = null;
+        string postPhotos = "";
+        string photoSrc_big = "";
+        string photoSrc_xbig = "";
+
+        while (delayedRequests.Count > 0)
+        {
+            response = VK.apiMethod(delayedRequests[0].Replace("}|{}|{04", accessToken));
+            if (response.isCorrect)
+            {
+                postPhotos += $",photo390383074_{(string)response.tokens[0]["pid"]}";
+                photoSrc_big += $",{(string)response.tokens[0]["src_big"]}";
+                photoSrc_xbig += $",{(string)response.tokens[0]["src_xbig"]}";
+                delayedRequests.RemoveAt(0);
+            }
+            else
+            {
+                Console.Write("_EIRepeat");
+                log += "_EIRepeat\n";
+                break;
+            }
+        }
+
+        if (postPhotos.Length > 1)
+        {
             postPhotos = postPhotos.Remove(0, 1);
             photoSrc_big = photoSrc_big.Remove(0, 1);
             photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
-            string[] postParams = { $"{message} {text}", postPhotos, photoSrc_big, photoSrc_xbig };
+
+            string[] postParams = { $"{text}", postPhotos, photoSrc_big, photoSrc_xbig };
             ArrayList post = new ArrayList();
             post.Add(postCounter);
             postCounter++;
             post.AddRange(postParams);
             posts.Add(post);
+
             if (autoPost)
                 sendPost(accessToken, true);
         }
+
     }
 
     private void sendPost(string accessToken, bool timefix) //[изменял]

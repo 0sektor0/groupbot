@@ -17,22 +17,32 @@ namespace photoBot
         static public Dictionary<string, Group> groups = new Dictionary<string, Group>();
         static Group CurentGroup;
         static public DateTime lastCheckTime;
-        static Thread Analysator = new Thread(analysator);
+        static Thread Analysator = new Thread(Analyse);
         static public int saveDelay = 14400;
+        static bool speedLock = true;
 
-        public static void reader() //считывание сообщений и запись их в буффер +
+        public static void Reade() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI";
-            //string login = "+79645017794", password = "Ny_965211-sR";
+            //string login = "+79661963807 ", password = "Az_965211-gI";
+            string login = "+79645017794", password = "Ny_965211-sR";
             apiResponse response;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
             DateTime authtime = DateTime.UtcNow;
+            TimeSpan timeFromLastCheck;
 
             Console.WriteLine("Acces granted");
             Console.WriteLine("Login: " + login);
             while (true)
             {
+                timeFromLastCheck = DateTime.UtcNow - lastCheckTime;
+                if ((int)timeFromLastCheck.TotalSeconds >= saveDelay) //автоматическое сохранение групп
+                {
+                    lastCheckTime = DateTime.UtcNow;
+                    commands.Add(new Command("deployment", "", "29334144", "all"));
+                    commands.Add(new Command("save", "", "29334144", ""));
+                }
+
                 if ((DateTime.UtcNow - authtime).TotalSeconds > 86400)
                 {
                     accessTokenAndTime = VK.auth(login, password, "274556");
@@ -50,9 +60,11 @@ namespace photoBot
                         //Console.WriteLine(messages);
                         if ((string)messages[0] != "0")
                             for (int i = 1; i < messages.Count(); i++)
-                                parseCommand(messages[i]);
+                                ParseCommand(messages[i]);
+                        if (commands.Count > 0)
+                            Analysator.Resume();
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                 }
                 catch (Exception e)
                 {
@@ -63,7 +75,7 @@ namespace photoBot
 
         }
 
-        static void parseCommand(JToken message)
+        static void ParseCommand(JToken message)
         {
             JToken token;
             string[] parametrs;
@@ -79,11 +91,11 @@ namespace photoBot
 
                 if (token["fwd_messages"] != null && i == 0)
                     foreach (JToken reMeessage in token["fwd_messages"])
-                        photos.AddRange(getAttachments(reMeessage, uid)); //photos in each fwd message
+                        photos.AddRange(GetAttachments(reMeessage, uid)); //photos in each fwd message
                 else
                     photos = new List<string>();
 
-                photos.AddRange(getAttachments(token, uid)); //photos in message
+                photos.AddRange(GetAttachments(token, uid)); //photos in message
                 Command command = new Command(uid, photos);
 
                 switch (comType)
@@ -114,26 +126,15 @@ namespace photoBot
         }
 
 
-        public static void analysator()
+        public static void Analyse()
         {
-            TimeSpan timeFromLastCheck;
             while (true)
             {
-                timeFromLastCheck = DateTime.UtcNow - lastCheckTime;
-                if ((int)timeFromLastCheck.TotalSeconds >= saveDelay) //автоматическое сохранение групп
-                {
-                    lastCheckTime = DateTime.UtcNow;
-                    commands.Add(new Command("deployment", "", "29334144", "all"));
-                    commands.Add(new Command("save", "", "29334144", ""));
-                }
-
                 if (commands.Count != 0) //обработка комманд из буффера
                 {
                     if (commands[0] != null)
                     {
-                        //executer(commands[0]);
-                        //commands.RemoveAt(0);
-                        try { executer(commands[0]); }
+                        try { Execute(commands[0]); }
                         catch (Exception e)
                         {
                             Console.WriteLine($"Error in method execution {e.Message}");
@@ -142,10 +143,12 @@ namespace photoBot
                         finally { commands.RemoveAt(0); }
                     }
                 }
+                if (speedLock)
+                    Analysator.Suspend();
             }
         }
 
-        public static void executer(Command command)
+        public static void Execute(Command command)
         {
             //Console.WriteLine("analis started");
             if (command.parametr != "")
@@ -162,25 +165,26 @@ namespace photoBot
                     {
                         string request = $"https://api.vk.com/method/{command.parametr}&access_token={accessTokenAndTime[0]}&v=V5.53";
                         request = request.Replace("amp;", "");
-                        sendMessage(Convert.ToString(VK.apiMethod(request).tokens), command.uid);
+                        SendMessage(Convert.ToString(VK.apiMethod(request).tokens), command.uid);
                     }
                     break;
+
                 case "search":
                     if (dictionary.ContainsKey(command.parametr) && command.parametr != "")
                         command.parametr = dictionary[command.parametr];
                     else
                         command.parametr = $"я не знаю слова {command.parametr}. Неужели, xоть что-то из ваших скудных знаний может мне пригодиться? я приятно удивлена, научите меня семпай";
-                    sendMessage(command.parametr, command.uid);
+                    SendMessage(command.parametr, command.uid);
                     break;
 
                 case "save":
                     if (command.uid == "29334144")
                     {
-                        saveDictionary(adress);
+                        SaveDictionary(adress);
                         foreach (Group groupToSave in groups.Values)
                             groupToSave.Save();
                         if (command.parametr == "ack")
-                            sendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", command.uid);
+                            SendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", command.uid);
                     }
                     Console.WriteLine("dictionary saved");
                     CurentGroup.log += "dictionary saved\n";
@@ -200,12 +204,12 @@ namespace photoBot
                         if (command.parametr == "clr")
                         {
                             CurentGroup.log = "_";
-                            sendMessage("Семпай, я решила все забыть", command.uid);
+                            SendMessage("Семпай, я решила все забыть", command.uid);
                         }
                         if (command.parametr == "count")
-                            sendMessage($"{dictionary.Keys.Count}", command.uid);
+                            SendMessage($"{dictionary.Keys.Count}", command.uid);
                         if (command.parametr == "")
-                            sendMessage(CurentGroup.log, command.uid);
+                            SendMessage(CurentGroup.log, command.uid);
                     }
                     break;
 
@@ -251,8 +255,12 @@ namespace photoBot
                     CurentGroup.createPost(command.atachments, command.parametr, accessTokenAndTime[0]); //изначально вместо параметра передавалась пустая строка
                     break;
 
+                case "repeat_copying":
+                    CurentGroup.repeatOfFailedRequests(accessTokenAndTime[0]);
+                    break;
+
                 case "album":
-                    fromAlbum(command.parametr, command.uid, "399761627");
+                    GetFromAlbum(command.parametr, command.uid, "399761627");
                     break;
 
                 case "limit":
@@ -262,78 +270,82 @@ namespace photoBot
                         if (letters.Count<char>() == 0)
                             CurentGroup.limit = Convert.ToInt32(command.parametr);
                         else
-                            sendMessage("Семпай, вы настолько глупый, что даже предел не можете правильно указать, да?", command.uid);
+                            SendMessage("Семпай, вы настолько глупый, что даже предел не можете правильно указать, да?", command.uid);
                     }
                     break;
 
                 case "time":
                     if (command.parametr == "")
-                        sendMessage($"{CurentGroup.postTime}", command.uid);
+                        SendMessage($"{CurentGroup.postTime}", command.uid);
                     else
                     {
                         IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
                         if (letters.Count<char>() == 0)
                             CurentGroup.postTime = Convert.ToInt32(command.parametr);
                         else
-                            sendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
+                            SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
                     }
                     break;
 
                 case "delay":
                     if (command.parametr == "")
-                        sendMessage($"{saveDelay}", command.uid);
+                        SendMessage($"{saveDelay}", command.uid);
                     else
                     {
                         IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
                         if (letters.Count<char>() == 0)
                             saveDelay = Convert.ToInt32(command.parametr);
                         else
-                            sendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
+                            SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
                     }
                     break;
 
                 case "offset":
                     if (command.parametr == "")
-                        sendMessage($"{CurentGroup.offset}", command.uid);
+                        SendMessage($"{CurentGroup.offset}", command.uid);
                     else
                     {
                         IEnumerable<char> letters = from char ch in command.parametr where (ch < 48 || ch > 57) select ch;
                         if (letters.Count<char>() == 0)
                             CurentGroup.offset = Convert.ToInt32(command.parametr);
                         else
-                            sendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
+                            SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
                     }
                     break;
 
                 case "group":
                     if (command.parametr == "")
-                        sendMessage(
+                        SendMessage(
                             $"group: {CurentGroup.name}" +
                             $"\n save delay: {saveDelay}" +
                             $"\n post time: {CurentGroup.postTime}" +
                             $"\n posts in memory: {CurentGroup.posts.Count}" +
+                            $"\n failed copying: {CurentGroup.delayedRequests.Count}" +
                             $"\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}" +
                             $"\n offset: {CurentGroup.offset}" +
                             $"\n deployment: {CurentGroup.posteponedOn}" +
                             $"\n alert: {CurentGroup.alert}" +
                             $"\n signed: {CurentGroup.signed}" +
+                            $"\n speed lock: {speedLock}" +
                             $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                     else
                     {
                         if (groups.Keys.Contains(command.parametr) && command.parametr != "all")
                         {
                             CurentGroup = groups[command.parametr];
-                            sendMessage(
+                            SendMessage(
                                 $"group: {CurentGroup.name}" +
                                 $"\n save delay: {saveDelay}" +
                                 $"\n post time: {CurentGroup.postTime}" +
                                 $"\n posts in memory: {CurentGroup.posts.Count}" +
+                                $"\n failed copying: {CurentGroup.delayedRequests.Count}" +
                                 $"\n limit: {CurentGroup.limit}" +
                                 $"\n text: {CurentGroup.text}" +
                                 $"\n offset: {CurentGroup.offset}" +
                                 $"\n deployment: {CurentGroup.posteponedOn}" +
                                 $"\n alert: {CurentGroup.alert}" +
                                 $"\n signed: {CurentGroup.signed}" +
+                                $"\n speed lock: {speedLock}" +
                                 $"\n auto posting: {CurentGroup.autoPost}", command.uid);
                         }
                         if (!groups.Keys.Contains(command.parametr) && command.parametr == "all")
@@ -344,18 +356,20 @@ namespace photoBot
                                     $"\n save delay: {saveDelay}" +
                                     $"\n post time: {group.postTime}" +
                                     $"\n posts in memory: {group.posts.Count}" +
+                                    $"\n failed copying: {CurentGroup.delayedRequests.Count}" +
                                     $"\n limit: {group.limit}" +
                                     $"\n text: {group.text}" +
                                     $"\n offset: {group.offset}" +
                                     $"\n deployment: {group.posteponedOn}" +
                                     $"\n alert: {group.alert}" +
                                     $"\n signed: {group.signed}" +
+                                    $"\n speed lock: {speedLock}" +
                                     $"\n auto posting: {group.autoPost}" +
                                     $"\n\n";
-                            sendMessage(info, command.uid);
+                            SendMessage(info, command.uid);
                         }
                         if (!groups.Keys.Contains(command.parametr) && command.parametr != "all")
-                            sendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
+                            SendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
                     }
                     if (command.atachments.Count > 0)
                         commands.Add(new Command("null", command.atachments, command.uid, ""));
@@ -364,13 +378,13 @@ namespace photoBot
                 case "deployment":
                     if (command.parametr == "")
                     {
-                        sendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
+                        SendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
                         CurentGroup.deployment(accessTokenAndTime[0]);
                     }
                     if (command.parametr == "all")
                         foreach (Group groupToDeploy in groups.Values)
                             if (groupToDeploy.deployment(accessTokenAndTime[0]) <= 10 && groupToDeploy.alert)
-                                sendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
+                                SendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
                     if (command.parametr == "off")
                         CurentGroup.posteponedOn = false;
                     if (command.parametr == "on")
@@ -399,7 +413,7 @@ namespace photoBot
                     {
                         res = CurentGroup.alignment(accessTokenAndTime[0], true);
                         if (res.Length == 2)
-                            sendMessage($"{res[0]} {res[1]}", command.uid);
+                            SendMessage($"{res[0]} {res[1]}", command.uid);
                     }
                     if (command.parametr == "last")
                     {
@@ -407,7 +421,7 @@ namespace photoBot
                         double lastPostTime = (CurentGroup.postTime - unixTime.TotalSeconds - CurentGroup.offset + CurentGroup.posts.Count * CurentGroup.offset) / 3600;
                         if (lastPostTime < 0)
                             lastPostTime = 0;
-                        sendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {CurentGroup.offset} секунд вам осталось \n{(int)lastPostTime / 24}д:{(int)(lastPostTime - ((int)lastPostTime / 24) * 24)}ч", command.uid);
+                        SendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {CurentGroup.offset} секунд вам осталось \n{(int)lastPostTime / 24}д:{(int)(lastPostTime - ((int)lastPostTime / 24) * 24)}ч", command.uid);
                     }
                     break;
 
@@ -424,8 +438,15 @@ namespace photoBot
                         CurentGroup.alert = true;
                     break;
 
+                case "speedLock":
+                    if (command.parametr == "off")
+                        speedLock = false;
+                    if (command.parametr == "on")
+                        speedLock = true;
+                    break;
+
                 case "help":
-                    sendMessage($"search# [слово] поиск слова в моем словаре\n\n" +
+                    SendMessage($"search# [слово] поиск слова в моем словаре\n\n" +
                         $"save# сохранить результат групп\n\n" +
                         $"save# ack сохранить с подтверждением\n\n" +
                         $"remove# удалить слово\n\n" +
@@ -453,7 +474,7 @@ namespace photoBot
         }
 
 
-        static void fromAlbum(string parametr, string uid, string albumOwnerId)
+        static void GetFromAlbum(string parametr, string uid, string albumOwnerId)
         {
             apiResponse response;
             JToken albums = null;
@@ -466,10 +487,8 @@ namespace photoBot
                 parametr = parametrs[0];
             }
 
-			if (parametrs.Length == 3)
-			{
+            if (parametrs.Length == 3)
                 albumOwnerId = parametrs[2];
-			}
 
             response = VK.apiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
             if (response.isCorrect)
@@ -486,16 +505,16 @@ namespace photoBot
                     }
 
                 if (aid == "")
-                    sendMessage("Семпай, нету такого альбома, хватит меня уже заставлять делать бессмысленную работу", uid);
+                    SendMessage("Семпай, нету такого альбома, хватит меня уже заставлять делать бессмысленную работу", uid);
                 else
                 {
-                    sendMessage("Семпай, я начала работу, может вы хоть раз попробуете сделать все сами, и тогда-то вы поймете, какого это, когда тебя напрягают по всякой ерунде, ААААН?", uid);
+                    SendMessage("Семпай, я начала работу, может вы хоть раз попробуете сделать все сами, и тогда-то вы поймете, какого это, когда тебя напрягают по всякой ерунде, ААААН?", uid);
                     response = VK.apiMethod($"https://api.vk.com/method/photos.get?owner_id={albumOwnerId}&album_id={aid}&access_token={accessTokenAndTime[0]}&v=V5.53");
                     JToken photos = response.tokens;
                     int counter = photos.Count<JToken>(), i = Convert.ToInt32(dictionary[aid]);
                     try
                     {
-                        if (parametrs.Length >= 2)
+                        if (parametrs.Length == 2)
                             counter = Convert.ToInt32(parametrs[1]);
                     }
                     catch { }
@@ -510,12 +529,12 @@ namespace photoBot
                         i++;
                     }
                     dictionary[aid] = Convert.ToString(i);
-                    sendMessage("Семпай, все готово", uid);
+                    SendMessage("Семпай, все готово", uid);
                 }
             }
         }
 
-        static List<string> getAttachments(JToken message, string uid) // берем фото
+        static List<string> GetAttachments(JToken message, string uid) // берем фото
         {
             List<string> photos = new List<string>();
             if (message["attachments"] != null)
@@ -531,7 +550,7 @@ namespace photoBot
             return photos;
         }
 
-        static void sendMessage(string message, string uid)
+        static void SendMessage(string message, string uid)
         {
             //VK.apiMethodEmpty($"https://api.vk.com/method/messages.send?message={message}&uid={uid}&access_token={accessTokenAndTime[0]}&v=V5.53");
             VK.apiMethodPostEmpty(new Dictionary<string, string>()
@@ -548,7 +567,7 @@ namespace photoBot
         }
 
 
-        public static Dictionary<string, string> inizializeDictionary(string path) //+
+        public static Dictionary<string, string> InizializeDictionary(string path) //+
         {
             string[] buffer;
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
@@ -561,7 +580,7 @@ namespace photoBot
             return dictionary;
         }
 
-        public static void saveDictionary(string path)
+        public static void SaveDictionary(string path)
         {
             using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.OpenOrCreate)))
                 foreach (string key in dictionary.Keys)
@@ -590,11 +609,11 @@ namespace photoBot
             //Console.WriteLine($"luke_shelter.xml deserialization ended");
             //CurentGroup = groups["luk"];
 
-            dictionary = inizializeDictionary(adress);
+            dictionary = InizializeDictionary(adress);
             MobileServer mServer = new MobileServer();
             Task.Run(() => { mServer.Run(); });
-            Task.Run(() => { reader(); });
-            analysator();
+            Analysator.Start();
+            Reade();
             //mServer.Run();
         }
     }

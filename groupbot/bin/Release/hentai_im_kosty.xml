@@ -473,4 +473,7 @@ message sent to 29334144
       <anyType xsi:type="xsd:string">https://pp.userapi.com/c638627/v638627720/58668/nwVElLoSook.jpg</anyType>
     </ArrayOfAnyType>
   </posts>
+  <delayedRequests>
+      <ArrayOfString />
+  </delayedRequests>
 </Group>

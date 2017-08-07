@@ -603,4 +603,7 @@ _porno_im_kosty:saved
   <signed>0</signed>
   <postCounter>58</postCounter>
   <posts />
+  <delayedRequests>
+      <ArrayOfString />
+  </delayedRequests>
 </Group>
