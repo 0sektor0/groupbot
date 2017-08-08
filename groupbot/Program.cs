@@ -61,7 +61,7 @@ namespace photoBot
                         if ((string)messages[0] != "0")
                             for (int i = 1; i < messages.Count(); i++)
                                 ParseCommand(messages[i]);
-                        if (commands.Count > 0)
+						if (commands.Count > 0 && Analysator.ThreadState == ThreadState.Suspended)
                             Analysator.Resume();
                     }
                     Thread.Sleep(500);
@@ -127,25 +127,25 @@ namespace photoBot
 
 
         public static void Analyse()
-        {
-            while (true)
-            {
-                if (commands.Count != 0) //обработка комманд из буффера
-                {
-                    if (commands[0] != null)
-                    {
-                        try { Execute(commands[0]); }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine($"Error in method execution {e.Message}");
-                            CurentGroup.log += $"Error in method execution {e.Message}\n";
-                        }
-                        finally { commands.RemoveAt(0); }
-                    }
-                }
-                if (speedLock)
-                    Analysator.Suspend();
-            }
+		{
+			Analysator.Suspend ();
+
+			while (true)
+			{
+				if (commands.Count > 0)
+				if (commands[0] != null)
+				{
+					try { Execute(commands[0]); }
+					catch (Exception e)
+					{
+						Console.WriteLine($"Error in method execution {e.Message}");
+						CurentGroup.log += $"Error in method execution {e.Message}\n";
+					}
+					finally { commands.RemoveAt(0); }
+				}
+				if (speedLock && commands.Count==0)
+					Analysator.Suspend();
+			}
         }
 
         public static void Execute(Command command)
@@ -439,10 +439,18 @@ namespace photoBot
                     break;
 
                 case "speedLock":
-                    if (command.parametr == "off")
-                        speedLock = false;
-                    if (command.parametr == "on")
-                        speedLock = true;
+				if (command.parametr == "off")
+				{
+					speedLock = false;
+					Console.WriteLine("speed lock off");
+					CurentGroup.log += $"\nspeed lock off";
+				}
+				if (command.parametr == "on")
+				{
+					speedLock = true;
+					Console.WriteLine("speed lock on");
+					CurentGroup.log += $"\nspeed lock on";
+				}
                     break;
 
                 case "help":

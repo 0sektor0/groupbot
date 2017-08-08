@@ -3,17 +3,6 @@
   <name>hentai_im_kosty</name>
   <postTime>1502153460</postTime>
   <log>_message sent to 29334144
-_DeploymentStart 8/6/2017 11:27:25 PM
-post_id: 14863
-post_id: 14864
-post_id: 14865
-post_id: 14866
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-message sent to 29334144
-message sent to 29334144
-message sent to 29334144
 </log>
   <id>121519170</id>
   <posteponedOn>true</posteponedOn>
@@ -475,7 +464,7 @@ message sent to 29334144
     </ArrayOfAnyType>
     <ArrayOfAnyType>
       <anyType xsi:type="xsd:int">737</anyType>
-      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string" />
       <anyType xsi:type="xsd:string">photo390383074_456262427</anyType>
       <anyType xsi:type="xsd:string">https://pp.userapi.com/c639621/v639621580/47eef/dr3Yz1QyZcQ.jpg</anyType>
       <anyType xsi:type="xsd:string">https://pp.userapi.com/c639621/v639621580/47ef0/aqWMC1SgikU.jpg</anyType>
