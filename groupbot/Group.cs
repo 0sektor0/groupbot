@@ -171,25 +171,24 @@ public class Group
                 log += "_EIRepeat\n";
                 break;
             }
+
+            if (postPhotos.Length > 1)
+            {
+                postPhotos = postPhotos.Remove(0, 1);
+                photoSrc_big = photoSrc_big.Remove(0, 1);
+                photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
+
+                string[] postParams = { $"{text}", postPhotos, photoSrc_big, photoSrc_xbig };
+                ArrayList post = new ArrayList();
+                post.Add(postCounter);
+                postCounter++;
+                post.AddRange(postParams);
+                posts.Add(post);
+
+                if (autoPost)
+                    sendPost(accessToken, true);
+            }
         }
-
-        if (postPhotos.Length > 1)
-        {
-            postPhotos = postPhotos.Remove(0, 1);
-            photoSrc_big = photoSrc_big.Remove(0, 1);
-            photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
-
-            string[] postParams = { $"{text}", postPhotos, photoSrc_big, photoSrc_xbig };
-            ArrayList post = new ArrayList();
-            post.Add(postCounter);
-            postCounter++;
-            post.AddRange(postParams);
-            posts.Add(post);
-
-            if (autoPost)
-                sendPost(accessToken, true);
-        }
-
     }
 
     private void sendPost(string accessToken, bool timefix) //[изменял]
