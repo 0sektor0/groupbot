@@ -255,7 +255,7 @@ namespace photoBot
                     CurentGroup.createPost(command.atachments, command.parametr, accessTokenAndTime[0]); //изначально вместо параметра передавалась пустая строка
                     break;
 
-                case "repeat_copying":
+                case "repeat":
                     CurentGroup.repeatOfFailedRequests(accessTokenAndTime[0]);
                     break;
 

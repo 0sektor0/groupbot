@@ -1,135 +1,8 @@
 <?xml version="1.0"?>
-<Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <name>hentai_im_kosty</name>
-  <postTime>1503731280</postTime>
-  <log>_message sent to 29334144
-message sent to 29334144
-message sent to 29334144
-_DeploymentStart 8/23/2017 1:58:01 PM
-post_id: 15608
-post_id: 15609
-post_id: 15610
-post_id: 15611
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-message sent to 29334144
-bad response
-_DeploymentStart 8/23/2017 5:58:03 PM
-post_id: 15616
-post_id: 15617
-post_id: 15618
-post_id: 15619
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-bad response
-_DeploymentStart 8/23/2017 9:58:04 PM
-post_id: 15624
-post_id: 15625
-post_id: 15626
-post_id: 15627
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-bad response
-_DeploymentStart 8/24/2017 1:58:04 AM
-post_id: 15632
-post_id: 15633
-post_id: 15634
-post_id: 15635
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-bad response
-_DeploymentStart 8/24/2017 5:58:05 AM
-post_id: 15640
-post_id: 15641
-post_id: 15642
-post_id: 15643
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-_DeploymentStart 8/24/2017 9:58:05 AM
-post_id: 15648
-post_id: 15649
-post_id: 15650
-post_id: 15651
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-bad response
-bad response
-_DeploymentStart 8/24/2017 1:58:05 PM
-post_id: 15656
-post_id: 15657
-post_id: 15658
-post_id: 15659
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-message sent to 29334144
-bad response
-_DeploymentStart 8/24/2017 5:58:05 PM
-post_id: 15664
-post_id: 15665
-post_id: 15666
-post_id: 15667
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-bad response
-_DeploymentStart 8/24/2017 9:58:06 PM
-post_id: 15672
-post_id: 15673
-post_id: 15674
-post_id: 15675
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-message sent to 29334144
-_DeploymentStart 8/25/2017 1:58:06 AM
-post_id: 15680
-post_id: 15681
-post_id: 15682
-post_id: 15683
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-_DeploymentStart 8/25/2017 5:58:06 AM
-post_id: 15688
-post_id: 15689
-post_id: 15690
-post_id: 15691
-_DeploymentEnd
-_hentai_im_kosty:saved
-dictionary saved
-bad response
-bad response
-bad response
-bad response
-bad response
-bad response
-_DeploymentStart 8/25/2017 9:58:07 AM
-_DeploymentEnd
-</log>
+  <postTime>1503464880</postTime>
+  <log />
   <id>121519170</id>
   <posteponedOn>true</posteponedOn>
   <limit>24</limit>
@@ -138,7 +11,7 @@ _DeploymentEnd
   <autoPost>false</autoPost>
   <alert>false</alert>
   <signed>0</signed>
-  <postCounter>1157</postCounter>
+  <postCounter>1169</postCounter>
   <posts />
   <delayedRequests />
 </Group>

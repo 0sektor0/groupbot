@@ -152,18 +152,22 @@ public class Group
     public void repeatOfFailedRequests(string accessToken)
     {
         apiResponse response = null;
-        string postPhotos = "";
-        string photoSrc_big = "";
-        string photoSrc_xbig = "";
+        string postPhotos;
+        string photoSrc_big;
+        string photoSrc_xbig;
 
         while (delayedRequests.Count > 0)
         {
+            postPhotos = "";
+            photoSrc_big = "";
+            photoSrc_xbig = "";
+
             response = VK.apiMethod(delayedRequests[0].Replace("}|{}|{04", accessToken));
             if (response.isCorrect)
             {
-                postPhotos += $",photo390383074_{(string)response.tokens[0]["pid"]}";
-                photoSrc_big += $",{(string)response.tokens[0]["src_big"]}";
-                photoSrc_xbig += $",{(string)response.tokens[0]["src_xbig"]}";
+                postPhotos = $"photo390383074_{(string)response.tokens[0]["pid"]}";
+                photoSrc_big = $"{(string)response.tokens[0]["src_big"]}";
+                photoSrc_xbig = $"{(string)response.tokens[0]["src_xbig"]}";
                 delayedRequests.RemoveAt(0);
             }
             else
@@ -175,10 +179,6 @@ public class Group
 
             if (postPhotos.Length > 1)
             {
-                postPhotos = postPhotos.Remove(0, 1);
-                photoSrc_big = photoSrc_big.Remove(0, 1);
-                photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
-
                 string[] postParams = { $"{text}", postPhotos, photoSrc_big, photoSrc_xbig };
                 ArrayList post = new ArrayList();
                 post.Add(postCounter);
