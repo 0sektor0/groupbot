@@ -6,6 +6,8 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 
+
+
 namespace photoBot
 {
     class Program
@@ -20,8 +22,10 @@ namespace photoBot
         static Thread Analysator = new Thread(Analyse);
         static public int saveDelay = 14400;
         static bool speedLock = true;
+        static public string pass = "konegd";
 
-        public static void Reade() //считывание сообщений и запись их в буффер +
+
+        public static void Read() //считывание сообщений и запись их в буффер +
         {
             string login = "+79661963807 ", password = "Az_965211-gI";
             //string login = "+79645017794", password = "Ny_965211-sR";
@@ -579,10 +583,10 @@ namespace photoBot
         {
             string[] buffer;
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.OpenOrCreate)))
-                while (reader.PeekChar() > -1)
+            using (BinaryReader Reader = new BinaryReader(File.Open(path, FileMode.OpenOrCreate)))
+                while (Reader.PeekChar() > -1)
                 {
-                    buffer = reader.ReadString().Split(':');
+                    buffer = Reader.ReadString().Split(':');
                     dictionary.Add(buffer[0], buffer[1]);
                 }
             return dictionary;
@@ -613,15 +617,12 @@ namespace photoBot
             groups.Add("luke", Group.load("lukesshelter.xml"));
             Console.WriteLine($"lukesshelter.xml deserialization ended");
             CurentGroup = groups["2d"];
-            //groups.Add("luk", Group.load("luke_shelter.xml"));
-            //Console.WriteLine($"luke_shelter.xml deserialization ended");
-            //CurentGroup = groups["luk"];
 
             dictionary = InizializeDictionary(adress);
             MobileServer mServer = new MobileServer();
             Task.Run(() => { mServer.Run(); });
             Analysator.Start();
-            Reade();
+            Read();
             //mServer.Run();
         }
     }
