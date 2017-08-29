@@ -45,8 +45,8 @@ namespace photoBot
 			byte[] response_data;
 			Stream output;
 
-			Console.WriteLine (request.RawUrl);
-            log += $"date: {DateTime.UtcNow}\r\nremote ep: {request.RemoteEndPoint}\r\nrequest: {request.RawUrl}\r\n";
+			Console.WriteLine ($"remote ep: {request.RemoteEndPoint}\r\nrequest: {request.RawUrl}");
+            log += $"remote ep: {request.RemoteEndPoint}\r\nrequest: {request.RawUrl}\r\n";
 
 			if (args["pass"] == Program.pass)
 				switch (args["type"])
