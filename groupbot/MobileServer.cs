@@ -16,7 +16,7 @@ namespace photoBot
         public MobileServer()
 		{
 			IPAddress ipAdr = IPAddress.Parse(Dns.GetHostByName(Dns.GetHostName()).AddressList[0].ToString());
-            log = "_";
+            log = "logs:\r\n";
             listener = new HttpListener();
 			listener.Prefixes.Add($"http://{ipAdr}:1488/");
 			Console.WriteLine($"http://{ipAdr}:1488/");
@@ -45,8 +45,8 @@ namespace photoBot
 			byte[] response_data;
 			Stream output;
 
-			Console.WriteLine ($"remote ep: {request.RemoteEndPoint}\r\nrequest: {request.RawUrl}");
-            log += $"remote ep: {request.RemoteEndPoint}\r\nrequest: {request.RawUrl}\r\n";
+			Console.WriteLine (request.RawUrl);
+            log += $"date: {DateTime.UtcNow}\r\nremote ep: {request.RemoteEndPoint}\r\nrequest: {request.RawUrl}\r\n";
 
 			if (args["pass"] == Program.pass)
 				switch (args["type"])
@@ -117,7 +117,7 @@ namespace photoBot
 			else
 				Console.WriteLine("E04");
 
-            //log += $"response: {response_string.Substring(0,3)}\r\n\r\n";
+            log += $"response: {response_string.Substring(0,3)}\r\n\r\n";
 			response_data = System.Text.Encoding.UTF8.GetBytes(response_string);
 			response.ContentLength64 = response_data.Length;
 
@@ -129,13 +129,13 @@ namespace photoBot
 
         public void Clear_logs()
         {
-            log = "_";
+            log = "logs:\r\n";
         }
 
 
         public string Get_logs()
         {
-            return log;
+            return System.Web.HttpUtility.UrlEncode(log);
         }
 	}
 }
