@@ -217,7 +217,10 @@ namespace photoBot
 						SendMessage("Семпай, я решила все забыть", command.uid);
 					}
 					if (command.parametr == "http")
+					{
+						Console.WriteLine(mServer.Get_logs());
 						SendMessage(mServer.Get_logs(), command.uid);
+					}
 					if (command.parametr == "count")
 						SendMessage($"{dictionary.Keys.Count}", command.uid);
 					if (command.parametr == "")
