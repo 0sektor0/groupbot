@@ -117,7 +117,7 @@ namespace photoBot
 			else
 				Console.WriteLine("E04");
 
-            log += $"response: {response_string.Substring(0,3)}\r\n\r\n";
+            //log += $"response: {response_string.Substring(0,3)}\r\n\r\n";
 			response_data = System.Text.Encoding.UTF8.GetBytes(response_string);
 			response.ContentLength64 = response_data.Length;
 
