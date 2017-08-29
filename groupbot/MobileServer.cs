@@ -10,12 +10,14 @@ namespace photoBot
 	class MobileServer
 	{
 		public HttpListener listener;
+        string log;
 
 
-		public MobileServer()
+        public MobileServer()
 		{
 			IPAddress ipAdr = IPAddress.Parse(Dns.GetHostByName(Dns.GetHostName()).AddressList[0].ToString());
-			listener = new HttpListener();
+            log = "_";
+            listener = new HttpListener();
 			listener.Prefixes.Add($"http://{ipAdr}:1488/");
 			Console.WriteLine($"http://{ipAdr}:1488/");
 		}
@@ -44,6 +46,8 @@ namespace photoBot
 			Stream output;
 
 			Console.WriteLine (request.RawUrl);
+            log += $"date: {DateTime.UtcNow}\r\nremote ep: {request.RemoteEndPoint}\r\nrequest: {request.RawUrl}\r\n";
+
 			if (args["pass"] == Program.pass)
 				switch (args["type"])
 			{
@@ -113,6 +117,7 @@ namespace photoBot
 			else
 				Console.WriteLine("E04");
 
+            log += $"response: {response_string.Substring(0,3)}\r\n\r\n";
 			response_data = System.Text.Encoding.UTF8.GetBytes(response_string);
 			response.ContentLength64 = response_data.Length;
 
@@ -120,5 +125,17 @@ namespace photoBot
 			output.Write(response_data, 0, response_data.Length);
 			output.Close();
 		}
+
+
+        public void Clear_logs()
+        {
+            log = "_";
+        }
+
+
+        public string Get_logs()
+        {
+            return log;
+        }
 	}
 }

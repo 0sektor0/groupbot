@@ -23,6 +23,7 @@ namespace photoBot
         static public int saveDelay = 14400;
         static bool speedLock = true;
         static public string pass = "konegd";
+        static MobileServer mServer;
 
 
         public static void Read() //считывание сообщений и запись их в буффер +
@@ -209,6 +210,11 @@ namespace photoBot
                         {
                             CurentGroup.log = "_";
                             SendMessage("Семпай, я решила все забыть", command.uid);
+                        }
+                        if (command.parametr == "http")
+                        {
+                            SendMessage(mServer.Get_logs(), command.uid);
+                            mServer.Clear_logs();
                         }
                         if (command.parametr == "count")
                             SendMessage($"{dictionary.Keys.Count}", command.uid);
@@ -619,7 +625,7 @@ namespace photoBot
             CurentGroup = groups["2d"];
 
             dictionary = InizializeDictionary(adress);
-            MobileServer mServer = new MobileServer();
+            mServer = new MobileServer();
             Task.Run(() => { mServer.Run(); });
             Analysator.Start();
             Read();
