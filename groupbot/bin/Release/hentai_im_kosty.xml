@@ -1,17 +1,124 @@
 <?xml version="1.0"?>
-<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<Group xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <name>hentai_im_kosty</name>
-  <postTime>1503464880</postTime>
-  <log />
+  <postTime>1504212635</postTime>
+  <log>_message sent to 29334144
+message sent to 29334144
+_hentai_im_kosty:serialized
+_hentai_im_kosty:serialized
+_hentai_im_kosty:serialized
+_hentai_im_kosty:serialized
+_hentai_im_kosty:serialized
+_hentai_im_kosty:serialized
+_hentai_im_kosty:serialized
+_hentai_im_kosty:serialized
+_DeploymentOffline 9/2/2017 11:50:48 AM
+_hentai_im_kosty:saved
+_hentai_im_kosty:serialized
+</log>
   <id>121519170</id>
-  <posteponedOn>true</posteponedOn>
+  <posteponedOn>false</posteponedOn>
   <limit>24</limit>
   <text />
   <offset>3600</offset>
   <autoPost>false</autoPost>
   <alert>false</alert>
   <signed>0</signed>
-  <postCounter>1171</postCounter>
-  <posts />
-  <delayedRequests />
+  <postCounter>1217</postCounter>
+  <posts>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1204</anyType>
+      <anyType xsi:type="xsd:string" />
+      <anyType xsi:type="xsd:string">photo390383074_456263611</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9d4/OsIDP9b3e0g.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9d5/FOZ_H_SZF0k.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1205</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263612</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9dd/vslq8XgjrJg.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9de/J0NW5zdgGfE.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1206</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263613</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9e6/Jkq7jZRmp5Q.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9e7/V_jZGpCMgXA.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1207</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263614</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9f0/wSaBq9ezatI.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9f1/CWI0-cBcbRY.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1208</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263615</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9f9/sdAoNxLowNE.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5a9fa/PjP87aANGdU.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1209</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263616</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa03/kfjlFABUAX4.jpg</anyType>
+      <anyType xsi:type="xsd:string" />
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1210</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263617</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa19/QjD-qkGADmU.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa1a/HIgCsBvrKIc.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1211</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263618</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa22/USNfj1xGP24.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa23/c-ibUkCUxkQ.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1212</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263619</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa2b/SBkOuFie7eQ.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa2c/sVjFJh5jVD4.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1213</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263620</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa33/EcX97nw9m-A.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa34/MpDU_MXFRs0.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1214</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263621</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa3c/D2pmpTh69ak.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa3d/mEBwyTXE25Y.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1215</anyType>
+      <anyType xsi:type="xsd:string" />
+      <anyType xsi:type="xsd:string">photo390383074_456263623</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c638521/v638521202/5aa12/svLK_FYYI0I.jpg</anyType>
+      <anyType xsi:type="xsd:string" />
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1216</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456263624</anyType>
+      <anyType xsi:type="xsd:string">https://cs7066.userapi.com/c638521/v638521636/a1e77/HDAgSCKRz5c.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://cs7066.userapi.com/c638521/v638521636/a1e78/2R-kQl2H82c.jpg</anyType>
+    </ArrayOfAnyType>
+  </posts>
+  <delayedRequests>
+    <string>https://api.vk.com/method/execute.CopyPhoto?owner_id=399761627&amp;photo_id=456245640&amp;access_token=}|{}|{04&amp;access_key=168f708aa35de9713b</string>
+  </delayedRequests>
 </Group>
