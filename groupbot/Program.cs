@@ -74,7 +74,7 @@ namespace photoBot
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
-                    CurentGroup.log += "bad response\n";
+                    CurentGroup.log += $"{e.Message}\n";
                 }
             }
 
@@ -182,8 +182,8 @@ namespace photoBot
                     if (command.uid == "29334144")
                     {
                         SaveDictionary(adress);
-                        foreach (Group groupToSave in groups.Values)
-                            groupToSave.Save();
+                        foreach (string key in groups.Keys)
+                            groups[key].Save(key);
                         if (command.parametrs[0] == "ack")
                             SendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", command.uid);
                     }

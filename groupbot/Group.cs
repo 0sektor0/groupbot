@@ -55,16 +55,18 @@ public class Group
             return (Group)formatter.Deserialize(reader);
     }
 
-    public void Save()
+    public void Save(string key)
     {
         /*BinaryFormatter binFormat = new BinaryFormatter();
         using (Stream fStream = new FileStream($"{name}.grp", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
             binFormat.Serialize(fStream, this);
         Console.WriteLine($"_{name}:saved");
         log += $"_{name}:saved\n";*/
-        File.Delete($"Groups/{name}.xml");
+        File.Delete($"Groups/{key}.xml");
+        //File.Delete($"Groups\{key}.xml");
         XmlSerializer formatter = new XmlSerializer(typeof(Group));
-        using (FileStream fs = new FileStream($"{name}.xml", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+        using (FileStream fs = new FileStream($"Groups/{key}.xml", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+        //using (FileStream fs = new FileStream($"Groups\\{key}.xml", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
             formatter.Serialize(fs, this);
         Console.WriteLine($"_{name}:saved");
         log += $"_{name}:saved\n";
