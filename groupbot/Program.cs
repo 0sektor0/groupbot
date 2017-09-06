@@ -28,8 +28,8 @@ namespace photoBot
 
         public static void Read() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI";
-            //string login = "+79645017794", password = "Ny_965211-sR";
+            //string login = "+79661963807 ", password = "Az_965211-gI";
+            string login = "+79645017794", password = "Ny_965211-sR";
             apiResponse response;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -626,25 +626,47 @@ namespace photoBot
                     writer.Write(key + ": " + dictionary[key]);
         }
 
+
+        public static void LoadGrours()
+        {
+            if (Directory.Exists("Groups"))
+            {
+                string[] groups_names = null;
+                string chosen_group;
+                groups_names = Directory.GetFiles("Groups", "*.xml");
+
+                foreach (string group_name in groups_names)
+                    try
+                    {
+                        chosen_group = group_name.Replace("Groups\\", "");
+                        chosen_group = chosen_group.Replace("Groups//", "");
+                        chosen_group = chosen_group.Split('.')[0];
+
+                        groups.Add(chosen_group, Group.load(group_name));
+                        Console.WriteLine($"{group_name} deserialization endeed");
+                        CurentGroup = groups[chosen_group];
+                    }
+                    catch
+                    {
+                        Console.WriteLine($"{group_name} deserialization failed");
+                    }
+            }
+            else
+                throw new Exception("cant find groups directory");
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome!");
             lastCheckTime = DateTime.UtcNow;
 
-            //groups.Add("2d",new Group("hentai_im_kosty", "121519170"));
-            //groups.Add("3d", new Group("porno_im_kosty", "138077475"));
+            //groups.Add("2d",new Group("hentai_im_kosty", "121519170", 24));
+            //groups.Add("3d", new Group("porno_im_kosty", "138077475", 24));
             //groups.Add("luk", new Group("luke_shelter", "129223693", 149));
             //groups["luk"].Save();
             //CurentGroup = groups["luk"];
 
-            groups.Add("2d", Group.load("hentai_im_kosty.xml"));
-            Console.WriteLine($"hentai_im_kosty.xml deserialization ended");
-            groups.Add("3d", Group.load("porno_im_kosty.xml"));
-            Console.WriteLine($"porno_im_kosty.xml deserialization ended");
-            groups.Add("luke", Group.load("lukesshelter.xml"));
-            Console.WriteLine($"lukesshelter.xml deserialization ended");
-            CurentGroup = groups["2d"];
-
+            LoadGrours();
             dictionary = InizializeDictionary(adress);
             mServer = new MobileServer();
             Task.Run(() => { mServer.Run(); });

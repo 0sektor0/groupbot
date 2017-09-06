@@ -22,7 +22,7 @@ public class Group
     public bool alert;
     public int signed;
     public int postCounter;
-    public List<ArrayList> posts= new List<ArrayList>(); // [текст поста, картинка для поста/ адрес пикчи]
+    public List<ArrayList> posts= new List<ArrayList>(); // [id, текст поста, картинка для поста, адрес пикчи, адрес пикчи]
     public List<string> delayedRequests = new List<string>();
     //public Dictionary<string, string[]> albums;
 
@@ -62,7 +62,7 @@ public class Group
             binFormat.Serialize(fStream, this);
         Console.WriteLine($"_{name}:saved");
         log += $"_{name}:saved\n";*/
-        File.Delete($"{name}.xml");
+        File.Delete($"Groups/{name}.xml");
         XmlSerializer formatter = new XmlSerializer(typeof(Group));
         using (FileStream fs = new FileStream($"{name}.xml", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
             formatter.Serialize(fs, this);

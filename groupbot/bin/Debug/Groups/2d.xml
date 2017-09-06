@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <name>hentai_im_kosty</name>
+  <postTime>1503464880</postTime>
+  <log />
+  <id>121519170</id>
+  <posteponedOn>true</posteponedOn>
+  <limit>24</limit>
+  <text />
+  <offset>3600</offset>
+  <autoPost>false</autoPost>
+  <alert>false</alert>
+  <signed>0</signed>
+  <postCounter>1171</postCounter>
+  <posts>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1169</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456246338</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c841131/v841131327/17bf7/EKnqs-ZrAtA.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c841131/v841131327/17bf8/tojMnJlEzfI.jpg</anyType>
+    </ArrayOfAnyType>
+    <ArrayOfAnyType>
+      <anyType xsi:type="xsd:int">1170</anyType>
+      <anyType xsi:type="xsd:string"> </anyType>
+      <anyType xsi:type="xsd:string">photo390383074_456246339</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c639823/v639823254/4ebe9/6x0c-hjs0T4.jpg</anyType>
+      <anyType xsi:type="xsd:string">https://pp.userapi.com/c639823/v639823254/4ebea/HCkxcL3-1Mk.jpg</anyType>
+    </ArrayOfAnyType>
+  </posts>
+  <delayedRequests />
+</Group>
