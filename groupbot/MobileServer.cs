@@ -76,7 +76,7 @@ namespace photoBot
                         if (Program.groups.ContainsKey(args["group"]))
                             using (StreamReader post_reader = new StreamReader(request.InputStream))
                             {
-                                int post_ind = -1;
+                                int post_ind = 0;
                                 string str = post_reader.ReadToEnd();
                                 Group groupUpd = Group.Deserilize(str);
                                 Console.WriteLine("group recieved");
@@ -102,7 +102,7 @@ namespace photoBot
                                                 if ((int)Program.groups[args["group"]].posts[j][0] == (int)groupUpd.posts[i][0])
                                                     post_ind = j;
 
-                                        if ((int)groupUpd.posts[i][0] == (int)Program.groups[args["group"]].posts[post_ind][0] && post_ind > 0)
+                                        if ((int)groupUpd.posts[i][0] == (int)Program.groups[args["group"]].posts[post_ind][0])
                                             if (groupUpd.posts[i].Count > 5)
                                                 Program.groups[args["group"]].posts.RemoveAt(post_ind);
                                             else

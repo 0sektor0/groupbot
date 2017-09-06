@@ -28,8 +28,8 @@ namespace photoBot
 
         public static void Read() //считывание сообщений и запись их в буффер +
         {
-            //string login = "+79661963807 ", password = "Az_965211-gI";
-            string login = "+79645017794", password = "Ny_965211-sR";
+            string login = "+79661963807 ", password = "Az_965211-gI";
+            //string login = "+79645017794", password = "Ny_965211-sR";
             apiResponse response;
             JToken messages;
             accessTokenAndTime = VK.auth(login, password, "274556");
@@ -638,12 +638,9 @@ namespace photoBot
                 foreach (string group_name in groups_names)
                     try
                     {
-                        chosen_group = group_name.Replace("Groups\\", "");
-                        chosen_group = chosen_group.Replace("Groups//", "");
-                        chosen_group = chosen_group.Split('.')[0];
-
+						chosen_group = Path.GetFileNameWithoutExtension(group_name);
                         groups.Add(chosen_group, Group.load(group_name));
-                        Console.WriteLine($"{group_name} deserialization endeed");
+                        Console.WriteLine($"{chosen_group} deserialization endeed");
                         CurentGroup = groups[chosen_group];
                     }
                     catch
