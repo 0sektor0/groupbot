@@ -26,6 +26,8 @@ public class Group
     public List<string> delayedRequests = new List<string>();
     //public Dictionary<string, string[]> albums;
 
+
+
 	public Group(string name, string id, int limit)
     {
         alert = false;
@@ -35,7 +37,9 @@ public class Group
         postCounter = 0;
     }
 
+
     public Group(){}
+
 
     static public Group load(string groupAdress)
     {
@@ -48,12 +52,14 @@ public class Group
             return (Group)formatter.Deserialize(fs);
     }
 
+
     static public Group Deserilize(string str)
     {
         XmlSerializer formatter = new XmlSerializer(typeof(Group));
         using (StringReader reader = new StringReader(str))
             return (Group)formatter.Deserialize(reader);
     }
+
 
     public void Save(string key)
     {
@@ -72,6 +78,7 @@ public class Group
         log += $"_{name}:saved\n";
     }
 
+
     public string Serialize()
     {
         XmlSerializer formatter = new XmlSerializer(typeof(Group));
@@ -82,6 +89,8 @@ public class Group
         log += $"_{name}:serialized\n";
         return writer.ToString();
     }
+
+
 
     private int postponedInf(string accessToken) //[изменял]
     {
@@ -104,51 +113,58 @@ public class Group
 			return limit;
     }
 
-    public void createPost(List<string> photos, string message, string accessToken) //копировать фото в альбом бота, а также запись в список постов группы //[изменял]
+
+    public void createPost(List<string> photos, string message, string accessToken, bool from_zero) //копировать фото в альбом бота, а также запись в список постов группы
     {
         apiResponse response=null;
         string[] param;
         string postPhotos = "";
         string photoSrc_big = "";
         string photoSrc_xbig = "";
+        string[] postParams;
 
-        if (photos.Count != 0)
+
+        foreach (string photo in photos)
         {
-            foreach (string photo in photos)
+            param = Convert.ToString(photo).Split('_');
+            response = VK.apiMethod($"https://api.vk.com/method/execute.CopyPhoto?owner_id={param[0]}&photo_id={param[1]}&access_token={accessToken}&access_key={param[2]}");
+            if (response.isCorrect)
             {
-                param = Convert.ToString(photo).Split('_');
-                response = VK.apiMethod($"https://api.vk.com/method/execute.CopyPhoto?owner_id={param[0]}&photo_id={param[1]}&access_token={accessToken}&access_key={param[2]}");
-                if (response.isCorrect)
-                {
-                    postPhotos += $",photo390383074_{(string)response.tokens[0]["pid"]}";
-                    photoSrc_big += $",{(string)response.tokens[0]["src_big"]}";
-                    photoSrc_xbig += $",{(string)response.tokens[0]["src_xbig"]}";
-                }
-                else
-                {
-                    Console.Write("_EICopy");
-                    log += "_EICopy\n";
-                    delayedRequests.Add(response.request.Replace(accessToken, "}|{}|{04"));
-                }
+                postPhotos += $",photo390383074_{(string)response.tokens[0]["pid"]}";
+                photoSrc_big += $",{(string)response.tokens[0]["src_big"]}";
+                photoSrc_xbig += $",{(string)response.tokens[0]["src_xbig"]}";
             }
-
-            if (postPhotos.Length > 1)
+            else
             {
-                postPhotos = postPhotos.Remove(0, 1);
-                photoSrc_big = photoSrc_big.Remove(0, 1);
-                photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
-
-                string[] postParams = { $"{message} {text}", postPhotos, photoSrc_big, photoSrc_xbig };
-                ArrayList post = new ArrayList();
-                post.Add(postCounter);
-                postCounter++;
-                post.AddRange(postParams);
-                posts.Add(post);
-
-                if (autoPost)
-                    sendPost(accessToken, true);
+                Console.Write("_EICopy");
+                log += "_EICopy\n";
+                delayedRequests.Add(response.request.Replace(accessToken, "}|{}|{04"));
             }
         }
+
+        if (postPhotos.Length > 1)
+        {
+            postPhotos = postPhotos.Remove(0, 1);
+            photoSrc_big = photoSrc_big.Remove(0, 1);
+            photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
+
+            postParams = new string[] { $"{message} {text}", postPhotos, photoSrc_big, photoSrc_xbig };
+        }
+        else
+            postParams = new string[] { $"{message} {text}" };
+
+        ArrayList post = new ArrayList();
+        post.Add(postCounter);
+        postCounter++;
+        post.AddRange(postParams);
+        posts.Add(post);
+
+        if (autoPost)
+            if (from_zero)
+                sendPost(accessToken, true, 0);
+            else
+                sendPost(accessToken, true, posts.Count - 1);
+
     }
 
     public void repeatOfFailedRequests(string accessToken)
@@ -189,23 +205,27 @@ public class Group
                 posts.Add(post);
 
                 if (autoPost)
-                    sendPost(accessToken, true);
+                    sendPost(accessToken, true, 0);
             }
         }
     }
 
-    private void sendPost(string accessToken, bool timefix) //[изменял]
+
+    private void sendPost(string accessToken, bool timefix, int num) 
     {
         if (posts.Count>0)
         {
-            ArrayList post = posts[0];
+            ArrayList post = posts[num];
             apiResponse response;
             TimeSpan date = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
 
             if ((postTime < (int)date.TotalSeconds)&&timefix)
                 postTime = (int)date.TotalSeconds + offset;
 
-            response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={postTime}&attachments={Convert.ToString(post[2])}&message={System.Web.HttpUtility.UrlEncode((string)post[1])}&access_token={accessToken}&v=V5.53"); // check
+            if (post.Count > 2)
+                response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={postTime}&attachments={Convert.ToString(post[2])}&message={System.Web.HttpUtility.UrlEncode((string)post[1])}&access_token={accessToken}&v=V5.53"); // check
+            else
+                response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&message={System.Web.HttpUtility.UrlEncode((string)post[1])}&access_token={accessToken}&v=V5.53"); // check
             //Console.WriteLine(json);
             //Console.WriteLine(jo);
 
@@ -225,6 +245,7 @@ public class Group
         }
     }
 
+
     public int deployment(string accessToken)
     {
         if (posteponedOn) //если оповещение разрещенно
@@ -235,7 +256,7 @@ public class Group
             for (int i = postsCounter; i <= limit; i++)
             {
                 if (posts.Count > 0)
-                    sendPost(accessToken, true);
+                    sendPost(accessToken, true, 0);
                 else
                     break;
             }
@@ -250,6 +271,7 @@ public class Group
             return 150;
         }
     }
+
 
     public int[] alignment(string accessToken, bool getInf) //[изменял]
     {
@@ -278,7 +300,7 @@ public class Group
 						else 
 						{
 							postTime+=offset;
-                    		sendPost(accessToken,false);
+                    		sendPost(accessToken,false,0);
 							postTime-=offset;
                     		postsCount++;
 						}

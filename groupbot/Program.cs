@@ -26,9 +26,10 @@ namespace photoBot
         static MobileServer mServer;
 
 
+
         public static void Read() //считывание сообщений и запись их в буффер +
         {
-            string login = "+79661963807 ", password = "Az_965211-gI";
+            string login = "+79165058832", password = "Az_965211-gI";
             //string login = "+79645017794", password = "Ny_965211-sR";
             apiResponse response;
             JToken messages;
@@ -144,6 +145,8 @@ namespace photoBot
                 if (commands.Count > 0)
                     if (commands[0] != null)
                     {
+                        //Execute(commands[0]);
+                        //commands.RemoveAt(0);
                         try { Execute(commands[0]); }
                         catch (Exception e)
                         {
@@ -161,6 +164,27 @@ namespace photoBot
         {
             switch (command.type)
             {
+                case "stpost":
+                    if (command.parametrs.Count > 0 && command.uid[0]=='-')
+                    {
+                        command.uid = command.uid.Remove(0, 1);
+                        Group group = null;
+                        bool buf;
+
+                        group = groups.Values.Where(g => g.id == command.uid).FirstOrDefault();
+
+                        if (group != null)
+                        {
+                            buf = group.autoPost;
+                            group.autoPost = true;
+                            group.createPost(new List<string>(), command.parametrs[0].Replace("|","/").Replace("@","\r\n"), accessTokenAndTime[0], false);
+                            SendMessage(command.parametrs[0], $"-{command.uid}");
+                        }
+                        else
+                            SendMessage("Неужели ты и правда настолько глупый, я была о тебе ьолее высокого мнения, как я могу выложить что-то в эту группу, если ее нет у меня в памяти?", $"-{command.uid}");
+                    }
+                    break;
+
                 case "api":
                     if (command.uid == "29334144")
                     {
@@ -264,7 +288,7 @@ namespace photoBot
                 case "post":
                     //все пикчи, как один пост с тектом в текущую группу
                     if (command.parametrs.Count <= 1)
-                        CurentGroup.createPost(command.atachments, command.parametrs[0], accessTokenAndTime[0]);
+                        CurentGroup.createPost(command.atachments, command.parametrs[0], accessTokenAndTime[0], true);
 
                     //все пикчи в указанную группу, как один или несколько постов без подписи
                     if (command.parametrs.Count == 2 && groups.Keys.Contains(command.parametrs[0]))
@@ -275,7 +299,7 @@ namespace photoBot
                                 commands.Add(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/s"));
                         //как один пост
                         if (command.parametrs[1] == "s")
-                            groups[command.parametrs[0]].createPost(command.atachments, "", accessTokenAndTime[0]);
+                            groups[command.parametrs[0]].createPost(command.atachments, "", accessTokenAndTime[0], true);
                     }
                     
                     //все пикчи с текстом, в указанную группу, как один или несколько постов
@@ -287,7 +311,7 @@ namespace photoBot
                                 commands.Add(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/{command.parametrs[1]}/s"));
                         //как один пост
                         if (command.parametrs[2] == "s")
-                            groups[command.parametrs[1]].createPost(command.atachments, command.parametrs[0], accessTokenAndTime[0]);
+                            groups[command.parametrs[1]].createPost(command.atachments, command.parametrs[0], accessTokenAndTime[0],true);
                     }
                     break;
 

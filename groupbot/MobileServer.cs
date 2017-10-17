@@ -108,27 +108,7 @@ namespace photoBot
                                             else
                                                 Program.groups[args["group"]].posts[post_ind] = groupUpd.posts[i];
                                     }
-                                    //int counterOffset = (int)Program.groups[args["group"]].posts[0][0];
-
-                                    //for (int i = groupUpd.posts.Count - 1; i >= 0; i--)
-                                    //    if ((int)groupUpd.posts[i][0] >= counterOffset)
-                                    //        if (groupUpd.posts[i].Count > 5)
-                                    //            Program.groups[args["group"]].posts.RemoveAt((int)groupUpd.posts[i][0] - counterOffset);
-                                    //        else
-                                    //            Program.groups[args["group"]].posts[(int)groupUpd.posts[i][0] - counterOffset] = groupUpd.posts[i];
-
                                 }
-
-                                //выравнивание номеров
-                                //if (Program.groups[args["group"]].posts.Count > 1)
-                                //{
-                                //    int count = Program.groups[args["group"]].posts.Count;
-
-                                //    for (int i = 1; i < count; i++)
-                                //        if ((int)Program.groups[args["group"]].posts[i][0] - (int)Program.groups[args["group"]].posts[i - 1][0] > 1)
-                                //            Program.groups[args["group"]].posts[i][0] = (int)Program.groups[args["group"]].posts[i - 1][0] + 1;
-                                //    Program.groups[args["group"]].postCounter = (int)Program.groups[args["group"]].posts[count - 1][0] + 1;
-                                //}
 
                                 response_string = "S03";
                                 Console.WriteLine($"{args["group"]} Updating ended");

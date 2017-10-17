@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -15,14 +17,29 @@ class apiResponse
     public bool isCorrect;
     public JToken tokens;
 
+
+
+    public apiResponse()
+    {
+
+    }
+
+
     public apiResponse(bool isCorrect, JObject response, string request)
     {
         this.request = request;
         this.isCorrect = isCorrect;
         if (isCorrect)
+        {
             this.tokens = response["response"];
+            if (tokens.First != tokens.Last)
+                Console.WriteLine(response);
+        }
         else
+        {
             this.tokens = response["error"];
+            Console.WriteLine(response);
+        }
     }
 }
 
@@ -33,6 +50,7 @@ class VK
     private static DateTime lastRequestTime;
 
 
+
     static string cookiestring(List<string> list)
     {
         string cookiestr = "";
@@ -40,6 +58,7 @@ class VK
             cookiestr = cookiestr + str + ";";
         return cookiestr;
     }
+    
 
     static public string[] auth(string login, string password, string scope)
     {
@@ -76,12 +95,11 @@ class VK
         postData = postData + "email=" + login + "&pass=" + password;
         if (html.Contains("sid"))
         {
-            Console.WriteLine("enter token");
             string str = Console.ReadLine();
             return (new string[] { str, "none", login, password, scope });
         }
+        
 
-        //Console.WriteLine(postData);
         //--------------------------------------------------------------------отправка формы с паролем--------------------------------------------------------------------------------------------------------------
         request1 = (HttpWebRequest)HttpWebRequest.Create("https://login.vk.com/?act=login&soft=1");
         request1.AllowAutoRedirect = false;
@@ -100,7 +118,6 @@ class VK
 
         response1 = (HttpWebResponse)request1.GetResponse();
         location = response1.Headers["Location"];
-        //Console.WriteLine(location);
         //--------------------------------------------------------------------переход по locations------------------------------------------------------------------------------------------------------------------
         request1 = (HttpWebRequest)HttpWebRequest.Create(location);
         request1.AllowAutoRedirect = false;
@@ -121,7 +138,6 @@ class VK
 
         if (html == "")//если не неужно подтверждение, то продолжаем стандартную авторизацию
         {
-            //Console.WriteLine(location);
             request1 = (HttpWebRequest)HttpWebRequest.Create(location);
             request1.AllowAutoRedirect = false;
 
@@ -135,7 +151,6 @@ class VK
 
             response1 = (HttpWebResponse)request1.GetResponse();
             location = response1.Headers["Location"];
-            //Console.WriteLine(location);
             string[] Temp = location.Split('=', '&');
 
             return (new string[] { Temp[1], Temp[3], login, password, scope });
@@ -156,9 +171,7 @@ class VK
 
             response1 = (HttpWebResponse)request1.GetResponse();
             location = response1.Headers["Location"];
-            //Console.WriteLine(location);
             string[] Temp = location.Split('=', '&');
-            //Console.WriteLine(Temp[1]);
 
             StreamWriter fileDic = new StreamWriter("D:\\token.txt");
             fileDic.WriteLine(Temp[1] + " ");
@@ -168,9 +181,10 @@ class VK
         }
     }
 
+
+
     static private void requestAcceptionCheck()
     {
-        //Console.WriteLine(requesrControlCounter);
         TimeSpan lastRequestTimeSec = DateTime.UtcNow - lastRequestTime;
         if (lastRequestTimeSec.TotalSeconds > 1)
             requesrControlCounter = 0;
@@ -181,6 +195,7 @@ class VK
         }
     }
 
+
     private static bool responseChecking(JObject json)
     {
         if (json["error"] != null)
@@ -188,6 +203,8 @@ class VK
         else
             return true;
     }
+
+
 
     static public apiResponse apiMethod(string request)
     {
@@ -200,10 +217,10 @@ class VK
 
         respStream.Close();
         apiRequest.Abort();
-        Console.WriteLine(json);
         lastRequestTime = DateTime.UtcNow;
         return new apiResponse(responseChecking(json),json,request);
     }
+
 
     static public apiResponse apiMethodPost(Dictionary<string, string> param, string method)
     {
@@ -214,11 +231,10 @@ class VK
         apiRequest.Method = "POST";
         Stream postWriter = apiRequest.GetRequestStream();
         string postParam = "";
+
         foreach (string key in param.Keys)
-        {
-            //Console.WriteLine($"{key} : {param[key]}");
             postParam += $"{key}={param[key]}&";
-        }
+
         byte[] postParamByte = Encoding.UTF8.GetBytes(postParam.Remove(postParam.Length - 1, 1));
         postWriter.Write(postParamByte, 0, postParamByte.Length);
         postWriter.Close();
@@ -229,11 +245,11 @@ class VK
 
         respStream.Close();
         apiRequest.Abort();
-        Console.WriteLine(json);
 
         lastRequestTime = DateTime.UtcNow;
         return new apiResponse(responseChecking(json), json, method);
     }
+
 
     static public void apiMethodEmpty(string request)
     {
@@ -247,6 +263,7 @@ class VK
         lastRequestTime = DateTime.UtcNow;
     }
 
+
     static public void apiMethodPostEmpty(Dictionary<string, string> param, string method)
     {
         requestAcceptionCheck();
@@ -257,22 +274,86 @@ class VK
         Stream postWriter = apiRequest.GetRequestStream();
         string postParam = "";
         foreach (string key in param.Keys)
-        {
-            //Console.WriteLine($"{key} : {param[key]}");
             postParam += $"{key}={param[key]}&";
-        }
+
         byte[] postParamByte = Encoding.UTF8.GetBytes(postParam.Remove(postParam.Length - 1, 1));
         postWriter.Write(postParamByte, 0, postParamByte.Length);
         postWriter.Close();
 
         HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
-        //StreamReader respStream = new StreamReader(apiRespose.GetResponseStream());
-        //JObject json = JObject.Parse(respStream.ReadToEnd());
-
-        //respStream.Close();
-        //Console.WriteLine(json);
-
         apiRequest.Abort();
         lastRequestTime = DateTime.UtcNow;
+    }
+
+
+
+    static public string UploadPhoto(string picAdr, string token)
+    {
+        apiResponse response = VK.apiMethod($"https://api.vk.com/method/photos.getMessagesUploadServer?access_token={token}&v=V5.63");
+        string adr = (string)response.tokens["upload_url"];
+
+        if (response.isCorrect) //загрузка пикч в вк
+        {
+            HttpClient client = new HttpClient();
+            MultipartContent content = new MultipartFormDataContent();
+            using (var fstream = File.OpenRead(picAdr))
+            {
+                var streamContent = new StreamContent(fstream);
+                streamContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "photo",
+                    FileName = Path.GetFileName(picAdr)
+                };
+                content.Add(streamContent);
+
+                HttpResponseMessage httpResponse = client.PostAsync(new Uri(adr), content).Result;
+                StreamReader readStream = new StreamReader(httpResponse.Content.ReadAsStreamAsync().Result, Encoding.UTF8);
+                JObject json = JObject.Parse(readStream.ReadToEnd());
+                //JObject json = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                response = new apiResponse();
+                response.request = adr;
+                response.isCorrect = (string)json["photo"] != "[]";
+                response.tokens = json;
+            }
+
+            if (response.isCorrect)
+                response = VK.apiMethod($"https://api.vk.com/method/photos.saveMessagesPhoto?access_token={token}&server={response.tokens["server"]}&hash={response.tokens["hash"]}&photo={Convert.ToString(response.tokens["photo"]).Replace("\\", "")}&v=V5.63");
+            else
+                throw new Exception("error while processing photos on the server");
+
+            if (response.isCorrect)
+                return (string)response.tokens[0]["id"];
+            else
+                throw new Exception("failed to obtain the address of the photo");
+        }
+        else
+            throw new Exception("failed to get the address to download the photos");
+    }
+
+
+    static public void SendPhotos(ref List<string> photos, int start, int stop, string message, string uid, string token)
+    {
+        string attachments = "";
+
+        for (int i = start; i < stop && i < photos.Count; i++)
+            attachments += $",{photos[i]}";
+
+        SendPhotos(attachments, message, uid, token);
+    }
+    
+
+    static public void SendPhotos(string photos, string message, string uid, string token)
+    {
+        if (photos != "")
+            VK.apiMethodPostEmpty(new Dictionary<string, string>()
+                {
+                    { "message",message},
+                    { "uid",uid},
+                    { "attachment", photos.Remove(0,1) },
+                    { "access_token",token},
+                    { "v","V5.53"}
+                },
+                "https://api.vk.com/method/messages.send");
     }
 }
