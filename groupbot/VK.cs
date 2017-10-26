@@ -33,12 +33,12 @@ class apiResponse
         {
             this.tokens = response["response"];
             if (tokens.First != tokens.Last)
-                Console.WriteLine(response);
+            Console.WriteLine($"\r\n<-------------------{DateTime.UtcNow}----------------->\r\n\r\n{response}");
         }
         else
         {
             this.tokens = response["error"];
-            Console.WriteLine(response);
+            Console.WriteLine($"<------------------------------------------------------->\r\n{response}");
         }
     }
 }
@@ -46,6 +46,7 @@ class apiResponse
 
 class VK
 {
+    public static int max_req_count = 2;
     private static int requesrControlCounter = 0;
     private static DateTime lastRequestTime;
 

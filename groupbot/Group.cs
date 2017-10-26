@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using Newtonsoft.Json.Linq;
 using System.IO;
-//using System.Runtime.Serialization.Formatters.Binary;
+using System.Linq;
 using System.Xml.Serialization;
 
 
@@ -24,7 +24,6 @@ public class Group
     public int postCounter;
     public List<ArrayList> posts= new List<ArrayList>(); // [id, текст поста, картинка для поста, адрес пикчи, адрес пикчи]
     public List<string> delayedRequests = new List<string>();
-    //public Dictionary<string, string[]> albums;
 
 
 
@@ -44,10 +43,8 @@ public class Group
     static public Group load(string groupAdress)
     {
         Console.WriteLine($"{groupAdress} deserialization started");
-        /*BinaryFormatter formatter = new BinaryFormatter();
-        using (FileStream fs = new FileStream(groupAdress, FileMode.OpenOrCreate))
-           return (Group)formatter.Deserialize(fs);*/
         XmlSerializer formatter = new XmlSerializer(typeof(Group));
+
         using (FileStream fs = new FileStream(groupAdress, FileMode.OpenOrCreate))
             return (Group)formatter.Deserialize(fs);
     }
@@ -63,17 +60,12 @@ public class Group
 
     public void Save(string key)
     {
-        /*BinaryFormatter binFormat = new BinaryFormatter();
-        using (Stream fStream = new FileStream($"{name}.grp", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
-            binFormat.Serialize(fStream, this);
-        Console.WriteLine($"_{name}:saved");
-        log += $"_{name}:saved\n";*/
         File.Delete($"Groups/{key}.xml");
-        //File.Delete($"Groups\{key}.xml");
         XmlSerializer formatter = new XmlSerializer(typeof(Group));
+
         using (FileStream fs = new FileStream($"Groups/{key}.xml", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
-        //using (FileStream fs = new FileStream($"Groups\\{key}.xml", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
             formatter.Serialize(fs, this);
+
         Console.WriteLine($"_{name}:saved");
         log += $"_{name}:saved\n";
     }
@@ -92,12 +84,13 @@ public class Group
 
 
 
-    private int postponedInf(string accessToken) //[изменял]
+    //информация об отложенных постах
+    private int postponedInf(string accessToken)
     {
-        apiResponse response;
-		response = VK.apiMethod($"https://api.vk.com/method/execute.postponedInf?gid=-{id}&access_token={accessToken}&v=V5.53");
+        apiResponse response = VK.apiMethod($"https://api.vk.com/method/execute.postponedInf?gid=-{id}&access_token={accessToken}&v=V5.53");
         string asd= Convert.ToString(response.tokens[1]);
-		if (response.isCorrect) {
+
+		if (response.isCorrect)
             if (Convert.ToString(response.tokens[1]) != "")
             {
                 postTime = (int)response.tokens[1] + offset; //время последнего 
@@ -108,7 +101,6 @@ public class Group
                 postTime += offset;
                 return 0;
             }
-		}
         else
 			return limit;
     }
@@ -121,7 +113,7 @@ public class Group
         string postPhotos = "";
         string photoSrc_big = "";
         string photoSrc_xbig = "";
-        string[] postParams;
+        string[] postParams = null;
 
 
         foreach (string photo in photos)
@@ -142,30 +134,42 @@ public class Group
             }
         }
 
-        if (postPhotos.Length > 1)
+        if (Create_pl())
         {
-            postPhotos = postPhotos.Remove(0, 1);
-            photoSrc_big = photoSrc_big.Remove(0, 1);
-            photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
+            ArrayList post = new ArrayList();
+            post.Add(postCounter);
+            postCounter++;
+            post.AddRange(postParams);
+            posts.Add(post);
 
-            postParams = new string[] { $"{message} {text}", postPhotos, photoSrc_big, photoSrc_xbig };
+            if (autoPost)
+                if (from_zero)
+                    sendPost(accessToken, true, 0);
+                else
+                    sendPost(accessToken, true, posts.Count - 1);
         }
-        else
-            postParams = new string[] { $"{message} {text}" };
 
-        ArrayList post = new ArrayList();
-        post.Add(postCounter);
-        postCounter++;
-        post.AddRange(postParams);
-        posts.Add(post);
 
-        if (autoPost)
-            if (from_zero)
-                sendPost(accessToken, true, 0);
+        bool Create_pl()
+        {
+            if (postPhotos.Length > 1)
+            {
+                postPhotos = postPhotos.Remove(0, 1);
+                photoSrc_big = photoSrc_big.Remove(0, 1);
+                photoSrc_xbig = photoSrc_xbig.Remove(0, 1);
+
+                postParams = new string[] { $"{message} {text}", postPhotos, photoSrc_big, photoSrc_xbig };
+            }
             else
-                sendPost(accessToken, true, posts.Count - 1);
+                if (text.Where(ch => ch == ' ').Count() != text.Length)
+                    postParams = new string[] { $"{message} {text}" };
+                else
+                    return false;
 
+            return true;
+        }
     }
+
 
     public void repeatOfFailedRequests(string accessToken)
     {
@@ -225,9 +229,7 @@ public class Group
             if (post.Count > 2)
                 response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&publish_date={postTime}&attachments={Convert.ToString(post[2])}&message={System.Web.HttpUtility.UrlEncode((string)post[1])}&access_token={accessToken}&v=V5.53"); // check
             else
-                response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&message={System.Web.HttpUtility.UrlEncode((string)post[1])}&access_token={accessToken}&v=V5.53"); // check
-            //Console.WriteLine(json);
-            //Console.WriteLine(jo);
+                response = VK.apiMethod($"https://api.vk.com/method/wall.post?owner_id=-{id}&message={System.Web.HttpUtility.UrlEncode((string)post[1])}&access_token={accessToken}&v=V5.53"); 
 
             if (response.isCorrect)
             {
@@ -246,13 +248,15 @@ public class Group
     }
 
 
+
     public int deployment(string accessToken)
     {
         if (posteponedOn) //если оповещение разрещенно
         {
             Console.WriteLine($"_DeploymentStart {DateTime.UtcNow}");
             log += $"_DeploymentStart {DateTime.UtcNow}\n";
-            int postsCounter = postponedInf(accessToken);
+            int postsCounter = postponedInf(accessToken)
+                ;
             for (int i = postsCounter; i <= limit; i++)
             {
                 if (posts.Count > 0)
@@ -260,6 +264,7 @@ public class Group
                 else
                     break;
             }
+
             Console.WriteLine("_DeploymentEnd");
             log += "_DeploymentEnd\n";
             return postsCounter + posts.Count;
@@ -271,6 +276,7 @@ public class Group
             return 150;
         }
     }
+
 
 
     public int[] alignment(string accessToken, bool getInf) //[изменял]

@@ -1,6 +1,0 @@
-/home/sektor/mydocs/projects/groupbot/groupbot/obj/x86/Release/.NETFramework,Version=v4.5.AssemblyAttribute.cs
-/home/sektor/mydocs/projects/groupbot/groupbot/bin/Release/groupbot.exe.mdb
-/home/sektor/mydocs/projects/groupbot/groupbot/bin/Release/groupbot.exe
-/home/sektor/mydocs/projects/groupbot/groupbot/obj/x86/Release/groupbot.exe
-/home/sektor/mydocs/projects/groupbot/groupbot/obj/x86/Release/groupbot.exe.mdb
-/home/sektor/mydocs/projects/groupbot/groupbot/bin/Release/Newtonsoft.Json.dll
