@@ -6,7 +6,7 @@ using System.Net;
 
 
 
-namespace photoBot
+namespace groupbot
 {
     class MobileServer
     {
@@ -55,7 +55,7 @@ namespace photoBot
                     case "groups":
                         if (Program.groups.ContainsKey(args["group"]))
                         {
-                            response_string = $"S01\r\n{Program.groups[args["group"]].Serialize()}";
+                            response_string = $"S01\r\n{Program.groups[args["group"]].group_info.Serialize()}";
                             Console.WriteLine($"group: {args["group"]} requested");
                         }
                         else
@@ -66,7 +66,7 @@ namespace photoBot
                         break;
 
                     case "info":
-                        response_string = $"S02\r\nI,{Program.saveDelay},{Program.lastCheckTime},";
+                        response_string = $"S02\r\nI,{Program.saving_delay},{Program.last_checking_time},";
                         foreach (string key in Program.groups.Keys)
                             response_string += $"{key},";
                         Console.WriteLine($"answer: {response_string}");
@@ -91,22 +91,22 @@ namespace photoBot
                                 });
 
                                 //удаление постов
-                                if (Program.groups[args["group"]].posts.Count > 0)
+                                if (Program.groups[args["group"]].group_info.posts.Count > 0)
                                 {
                                     Console.WriteLine("Updating started");
 
                                     for (int i = 0; i < groupUpd.posts.Count; i++)
                                     {
-                                        if ((int)groupUpd.posts[i][0] != (int)Program.groups[args["group"]].posts[post_ind][0])
-                                            for (int j = post_ind; j < Program.groups[args["group"]].posts.Count; j++)
-                                                if ((int)Program.groups[args["group"]].posts[j][0] == (int)groupUpd.posts[i][0])
+                                        if ((int)groupUpd.posts[i][0] != (int)Program.groups[args["group"]].group_info.posts[post_ind][0])
+                                            for (int j = post_ind; j < Program.groups[args["group"]].group_info.posts.Count; j++)
+                                                if ((int)Program.groups[args["group"]].group_info.posts[j][0] == (int)groupUpd.posts[i][0])
                                                     post_ind = j;
 
-                                        if ((int)groupUpd.posts[i][0] == (int)Program.groups[args["group"]].posts[post_ind][0])
+                                        if ((int)groupUpd.posts[i][0] == (int)Program.groups[args["group"]].group_info.posts[post_ind][0])
                                             if (groupUpd.posts[i].Count > 5)
-                                                Program.groups[args["group"]].posts.RemoveAt(post_ind);
+                                                Program.groups[args["group"]].group_info.posts.RemoveAt(post_ind);
                                             else
-                                                Program.groups[args["group"]].posts[post_ind] = groupUpd.posts[i];
+                                                Program.groups[args["group"]].group_info.posts[post_ind] = groupUpd.posts[i];
                                     }
                                 }
 
@@ -132,6 +132,7 @@ namespace photoBot
             output = response.OutputStream;
             output.Write(response_data, 0, response_data.Length);
             output.Close();
+            response.Close();
         }
 
 

@@ -1,11 +1,19 @@
 ﻿using System.Collections.Generic;
 
+
+
+
 public class Command
 {
-    public string type;
-    public List<string> atachments= new List<string>();
+    string _type;
+    public List<string> atachments = new List<string>();
     public string uid;
     public List<string> parametrs;
+    public string type
+    {
+        get { return _type; }
+        set { _type = value.Replace(" ", ""); }
+    }
 
 
 
@@ -57,5 +65,23 @@ public class Command
             parametrs[0] = input;
         else
             parametrs = new List<string>(input.Split('/'));
+    }
+
+
+    public override string ToString()
+    {
+        string res = $"\r\nCommand:" +
+            $"\r\nType: {_type}" +
+            $"\r\nUid: {uid}" +
+            $"\r\nParametrs:";
+
+        for (int i = 0; i < parametrs.Count; i++)
+            res += $"\r\n    {i}. {parametrs[i]}";
+
+        res += "Atachments:";
+        for (int i = 0; i < atachments.Count; i++)
+            res += $"\r\n    {i}. {atachments[i]}";
+
+        return res;
     }
 }

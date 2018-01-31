@@ -1,172 +1,178 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using System.Linq;
 using System.IO;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using VkApi;
 
 
 
-namespace photoBot
+
+namespace groupbot
 {
     class Program
     {
-        static List<Command> commands = new List<Command>();
-        static string[] accessTokenAndTime; //информация для доступа
-        static Dictionary<string, string> dictionary;
-        static string adress = @"words.dat";
-        static public Dictionary<string, Group> groups;
-        static Group CurentGroup;
-        static public DateTime lastCheckTime;
-        static Thread Analysator = new Thread(Analyse);
-        static public int saveDelay = 14400;
-        static bool speedLock = true;
+        static public int saving_delay = 14400;
         static public string pass = "konegd";
-        static MobileServer mServer;
+        static int max_req_in_thread = 4;
+        static int listening_delay = 600;
+        static bool is_sync = false;
+
+        static public Dictionary<string, GroupManager> groups;
+        static public DateTime last_checking_time;
+        static GroupManager current_group;
+        static MobileServer mobile_server;
+        static VkApiInterface vk_account;
 
 
 
+
+        #region  основные функции
         public static void Read() //считывание сообщений и запись их в буффер +
         {
-            string[] auth_data = GetAuthData("bot.txt");
-            apiResponse response;
+            VkResponse response;
             JToken messages;
-            accessTokenAndTime = VK.auth(auth_data[0], auth_data[1], "274556");
-            DateTime authtime = DateTime.UtcNow;
-            TimeSpan timeFromLastCheck;
 
-            Console.WriteLine("Acces granted");
-            Console.WriteLine("auth_data[0]: " + auth_data[0]);
+            //первичная авторизация
+            vk_account.Auth();            
+            Console.WriteLine($"Acces granted\r\nauth_data[0]: {vk_account.login}");
+
             while (true)
             {
-                timeFromLastCheck = DateTime.UtcNow - lastCheckTime;
-                if ((int)timeFromLastCheck.TotalSeconds >= saveDelay) //автоматическое сохранение групп
-                {
-                    lastCheckTime = DateTime.UtcNow;
-                    commands.Add(new Command("deployment", "", "29334144", "all"));
-                    commands.Add(new Command("save", "", "29334144", ""));
-                }
-
-                if ((DateTime.UtcNow - authtime).TotalSeconds > 86400)
-                {
-                    accessTokenAndTime = VK.auth(auth_data[0], auth_data[1], "274556");
-                    authtime = DateTime.UtcNow;
-                    Console.WriteLine("token updated");
-                }
-
                 try
                 {
-                    response = VK.apiMethod($"https://api.vk.com/method/execute.messagesPull?access_token={accessTokenAndTime[0]}&v=V5.53");
+                    if (!vk_account.token.is_alive)
+                    {
+                        vk_account.Auth();
+                        Console.WriteLine("token updated");
+                    }
+
+                    bool is_ttu = (int)((DateTime.UtcNow - last_checking_time).TotalSeconds) >= saving_delay;
+                    response = vk_account.ApiMethodGet($"execute.messagesPull?");
                     messages = response.tokens;
 
                     if (response.isCorrect)
-                    {
-                        //Console.WriteLine(messages);
-                        if ((string)messages[0] != "0")
-                            for (int i = 1; i < messages.Count(); i++)
-                                ParseCommand(messages[i]);
-                        if (commands.Count > 0 && Analysator.ThreadState == ThreadState.Suspended)
-                            Analysator.Resume();
-                    }
-                    Thread.Sleep(500);
+                        if ((string)messages[0] != "0" || is_ttu)
+                            ParseCommand(messages, is_ttu);
+
+                    Thread.Sleep(listening_delay);
                 }
-                catch (Exception e)
+                catch(Exception ex)
                 {
-                    Console.WriteLine(e.Message);
-                    CurentGroup.log += $"{e.Message}\n";
+                    Console.WriteLine(ex.Message);
                 }
             }
-
         }
 
 
-        static void ParseCommand(JToken message)
+        static async void ParseCommand(JToken messages, bool is_time_to_update)
         {
-            JToken token;
-            string[] parametrs;
-            token = message;
-            string uid = (string)token["uid"];
-            List<string> photos = new List<string>();
+            string uid;
             int comType;
-            string[] inputCommands = Convert.ToString(token["body"]).Replace("<br>", "").Split(';');
+            string[] parametrs;
+            string[] inputCommands;
+            List<string> photos = new List<string>();
+            List<Command> commands = new List<Command>();
 
-            for (int i = 0; i < inputCommands.Length; i++)
+
+            if (is_time_to_update)
             {
-                comType = (from num in Convert.ToString(inputCommands[i]) where num == '#' select num).Count();
+                last_checking_time = DateTime.UtcNow;
+                commands.Add(new Command("deployment", "", "29334144", "all"));
+                commands.Add(new Command("save", "", "29334144", ""));
+            }
 
-                if (token["fwd_messages"] != null && i == 0)
-                    foreach (JToken reMeessage in token["fwd_messages"])
-                        photos.AddRange(GetAttachments(reMeessage, uid)); //photos in each fwd message
-                else
-                    photos = new List<string>();
+            for (int i = 1; i < messages.Count(); i++)
+            {
+                uid = (string)messages[i]["uid"];
+                inputCommands = Convert.ToString(messages[i]["body"]).Replace("<br>", "").Split(';');
 
-                photos.AddRange(GetAttachments(token, uid)); //photos in message
-                Command command = new Command(uid, photos);
-
-                switch (comType)
+                for (int j = 0; j < inputCommands.Length; j++)
                 {
-                    case 2:
-                        parametrs = Convert.ToString(inputCommands[i]).Split('#');
-                        if (parametrs[0] == "null")
-                            parametrs[0] = "nope";
-                        command.type = parametrs[0];
-                        command.Setparametrs("#" + parametrs[2]);
-                        commands.Add(command);
-                        break;
+                    comType = (from num in Convert.ToString(inputCommands[j]) where num == '#' select num).Count();
 
-                    case 1:
-                        parametrs = Convert.ToString(inputCommands[i]).Split('#');
-                        if (parametrs[0] == "null")
-                            parametrs[0] = "nope";
-                        command.type = parametrs[0];
-                        command.Setparametrs(parametrs[1]);
-                        commands.Add(command);
-                        break;
+                    if (messages[i]["fwd_messages"] != null && j == 0)
+                        foreach (JToken reMeessage in messages[i]["fwd_messages"])
+                            photos.AddRange(GetAttachments(reMeessage, uid)); //photos in each fwd message
+                    else
+                        photos = new List<string>();
 
-                    case 0:
-                        command.Setparametrs(Convert.ToString(token["body"]));
-                        commands.Add(command);
-                        break;
+                    photos.AddRange(GetAttachments(messages[i], uid)); //photos in message
+                    Command command = new Command(uid, photos);
 
-                    default:
-                        break;
+                    switch (comType)
+                    {
+                        case 2:
+                            parametrs = Convert.ToString(inputCommands[j]).Split('#');
+                            if (parametrs[0] == "null")
+                                parametrs[0] = "nope";
+                            command.type = parametrs[0];
+                            command.Setparametrs("#" + parametrs[2]);
+                            commands.Add(command);
+                            break;
+
+                        case 1:
+                            parametrs = Convert.ToString(inputCommands[j]).Split('#');
+                            if (parametrs[0] == "null")
+                                parametrs[0] = "nope";
+                            command.type = parametrs[0];
+                            command.Setparametrs(parametrs[1]);
+                            commands.Add(command);
+                            break;
+
+                        case 0:
+                            command.Setparametrs(Convert.ToString(messages[i]["body"]));
+                            if(command.atachments.Count > 0)
+                                commands.Add(command);
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
             }
+
+            if(commands.Count > 0)
+                await Analyse(commands);
         }
 
 
-
-        public static void Analyse()
+        public static Task Analyse(List<Command> commands)
         {
-            Analysator.Suspend();
-
-            while (true)
+            return Task.Run(() =>
             {
-                if (commands.Count > 0)
-                    if (commands[0] != null)
+                if (commands.Count() < max_req_in_thread || is_sync)
+                {
+                    for (int i = 0; i < commands.Count; i++)
+                        if (commands[i] != null)
+                        {
+                            //Execute(commands[i]);
+                            try
+                            {
+                                Execute(commands[i]);
+                            }
+                            catch (Exception e)
+                            {
+                                vk_account.vk_logs.AddToLogs(false, "EXCEPTION", 1, e.Message, current_group.group_info.name);
+                            }
+                        }
+                }
+                else
+                    Parallel.ForEach(commands, (Command command) =>
                     {
-                        //Execute(commands[0]);
-                        //commands.RemoveAt(0);
                         try
                         {
-                            Console.WriteLine();
-                            Execute(commands[0]);
+                            Execute(command);
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine($"Error in method execution {e.Message}");
-                            CurentGroup.log += $"Error in method execution {e.Message}\n";
+                            vk_account.vk_logs.AddToLogs(false, "EXCEPTION", 1, e.Message, current_group.group_info.name);
                         }
-                        finally
-                        {
-                            commands.RemoveAt(0);
-                            Console.WriteLine("\r\n<---------------------------------------------->\r\n");
-                        }
-                    }
-                if (speedLock && commands.Count == 0)
-                    Analysator.Suspend();
-            }
+                    });
+            });
         }
 
 
@@ -174,16 +180,24 @@ namespace photoBot
         {
             switch (command.type)
             {
-                case "stpost":
-                    Stpost();
+                case "throw":
+                    throw new Exception("Ну раз ты так просишь, то вот, держи мое исключение");
+                    break;
+
+                case "set":
+                    Set();
+                    break;
+                    
+                case "info":
+                    Info();
+                    break;
+
+                case "sleep":
+                    Sleep();
                     break;
 
                 case "api":
                     Api();
-                    break;
-
-                case "search":
-                    Search();
                     break;
 
                 case "save":
@@ -197,10 +211,6 @@ namespace photoBot
                 case "log":
                     Log();
                     break;
-
-                case "remove":
-                    Remove();
-                    break;
                                     
                 case "null":
                     Null();
@@ -211,23 +221,11 @@ namespace photoBot
                     break;
 
                 case "repeat":
-                    Repeat();
-                    break;
-
-                case "album":
-                    Album();
+                    current_group.RepeatFailedRequests();
                     break;
 
                 case "limit":
                     Limit();
-                    break;
-
-                case "time":
-                    Time();
-                    break;
-
-                case "delay":
-                    Delay();
                     break;
 
                 case "offset":
@@ -240,10 +238,6 @@ namespace photoBot
 
                 case "deployment":
                     Deployment();
-                    break;
-
-                case "signed":
-                    Signed();
                     break;
 
                 case "auto":
@@ -262,137 +256,63 @@ namespace photoBot
                     Alert();
                     break;
 
-                case "speedLock":
-                    SpeedLock();
-                    break;
-
                 case "help":
                     Help();
                     break;
 
                 default:
-                    Console.WriteLine("wrong command");
-                    CurentGroup.log += "wrong command\n";
+                    //current_group.log += "wrong command\n";
                     break;
             }
 
 
 
-            void Album()
+            #region функционал бота
+            void Group(/*ref List<Command> commands*/)
             {
-                GetFromAlbum(command.parametrs, command.uid, "399761627");
-            }
-
-
-            void Repeat()
-            {
-                CurentGroup.repeatOfFailedRequests(accessTokenAndTime[0]);
-            }
-
-
-            void Load()
-            {
-                if (command.uid == "29334144")
-                    SendMessage(LoadGrours(), command.uid);
-            }
-
-
-            void Search()
-            {
-                if (dictionary.ContainsKey(command.parametrs[0]) && command.parametrs[0] != "")
-                    command.parametrs[0] = dictionary[command.parametrs[0]];
-                else
-                    command.parametrs[0] = $"я не знаю слова {command.parametrs[0]}. Неужели, xоть что-то из ваших скудных знаний может мне пригодиться? я приятно удивлена, научите меня семпай";
-                SendMessage(command.parametrs[0], command.uid);
-            }
-
-
-            void Save()
-            {
-                if (command.uid == "29334144")
-                {
-                    SaveDictionary(adress);
-                    foreach (string key in groups.Keys)
-                        groups[key].Save(key);
-                    if (command.parametrs[0] == "ack")
-                        SendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", command.uid);
-                }
-                Console.WriteLine("dictionary saved");
-                CurentGroup.log += "dictionary saved\n";
-            }
-
-
-            void Remove()
-            {
-                dictionary.Remove(command.parametrs[0]);
-                Console.WriteLine("word {0} removed", command.parametrs[0]);
-                CurentGroup.log += "word " + command.parametrs[0] + " removed\n";
-            }
-
-
-            void Log()
-            {
-                if (command.uid == "29334144")
-                {
-                    if (command.parametrs[0] == "clr")
-                    {
-                        CurentGroup.log = "_";
-                        SendMessage("Семпай, я решила все забыть", command.uid);
-                    }
-                    if (command.parametrs[0] == "httpclr")
-                    {
-                        mServer.Clear_logs();
-                        SendMessage("Семпай, я решила все забыть", command.uid);
-                    }
-                    if (command.parametrs[0] == "http")
-                        SendMessage(mServer.Get_logs(), command.uid);
-                    if (command.parametrs[0] == "count")
-                        SendMessage($"{dictionary.Keys.Count}", command.uid);
-                    if (command.parametrs[0] == "")
-                        SendMessage(CurentGroup.log, command.uid);
-                }
-            }
-
-
-            void Null()
-            {
-                if (command.parametrs[0] != "")
-                {
-                    if (command.parametrs[0].Contains(':'))
-                    {
-                        string[] word = command.parametrs[0].Split(':');
-                        string newWord = word[0];
-                        string newValue = word[1];
-                        if (newWord != "")
-                        {
-                            if (!dictionary.ContainsKey(newWord))
-                            {
-                                dictionary.Add(newWord, newValue);
-                                Console.WriteLine(newWord + ": " + newValue);
-                                CurentGroup.log += newWord + ": " + newValue + "\n";
-                            }
-                            if (!dictionary[newWord].Contains(newValue))
-                            {
-                                dictionary[newWord] = dictionary[newWord] + "; " + newValue;
-                                Console.WriteLine($"command updated {newWord}: {newValue}");
-                                CurentGroup.log += "command updated " + newWord + ": " + newValue + "\n";
-                            }
-                        }
-                    }
-                }
+                if (command.parametrs[0] == "")
+                    SendMessage(current_group.group_info.ToString(), command.uid);
                 else
                 {
+                    if (groups.Keys.Contains(command.parametrs[0]) && command.parametrs[0] != "*")
+                    {
+                        current_group = groups[command.parametrs[0]];
+                        SendMessage(current_group.group_info.ToString(), command.uid);
+                    }
+                    if (!groups.Keys.Contains(command.parametrs[0]) && command.parametrs[0] == "*")
+                    {
+                        string info = "";
+                        foreach (GroupManager group in groups.Values)
+                            info += group.ToString();
+                        SendMessage(info, command.uid);
+                    }
+                    if (!groups.Keys.Contains(command.parametrs[0]) && command.parametrs[0] != "*")
+                        SendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
+                }
+                if (command.atachments.Count > 0)
+                    Analyse( new List<Command>() { new Command("null", command.atachments, command.uid, "")});
+            }
+
+
+            void Null(/*ref List<Command> commands*/)
+            {
+                if (command.parametrs[0] == "")
+                {
+                    List<Command> commands = new List<Command>();
                     foreach (string atachment in command.atachments)
                         commands.Add(new Command("post", atachment, command.uid, ""));
+                    Analyse(commands);
                 }
             }
 
 
-            void Post()
+            void Post(/*ref List<Command> commands*/)
             {
+                List<Command> commands = new List<Command>();
+
                 //все пикчи, как один пост с тектом в текущую группу
-                if (command.parametrs.Count <= 1)
-                    CurentGroup.createPost(command.atachments, command.parametrs[0], accessTokenAndTime[0], true);
+                if (command.parametrs.Count == 1)
+                    current_group.CreatePost(command.atachments, command.parametrs[0], true);
 
                 //все пикчи в указанную группу, как один или несколько постов без подписи
                 if (command.parametrs.Count == 2 && groups.Keys.Contains(command.parametrs[0]))
@@ -403,7 +323,7 @@ namespace photoBot
                             commands.Add(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/s"));
                     //как один пост
                     if (command.parametrs[1] == "s")
-                        groups[command.parametrs[0]].createPost(command.atachments, "", accessTokenAndTime[0], true);
+                        groups[command.parametrs[0]].CreatePost(command.atachments, "", true);
                 }
 
                 //все пикчи с текстом, в указанную группу, как один или несколько постов
@@ -415,7 +335,133 @@ namespace photoBot
                             commands.Add(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/{command.parametrs[1]}/s"));
                     //как один пост
                     if (command.parametrs[2] == "s")
-                        groups[command.parametrs[1]].createPost(command.atachments, command.parametrs[0], accessTokenAndTime[0], true);
+                        groups[command.parametrs[1]].CreatePost(command.atachments, command.parametrs[0], true);
+                }
+
+                Analyse(commands);
+            }
+
+
+            void Set()
+            {
+                if (command.parametrs.Count() > 1)
+                {
+                    int new_val;
+
+                    for (int i = 1; i < command.parametrs.Count(); i += 2)
+                        switch (command.parametrs[i - 1])
+                        {
+                            case "sd":
+                                if (Int32.TryParse(command.parametrs[i], out new_val))
+                                {
+                                    saving_delay = new_val;
+                                    vk_account.vk_logs.AddToLogs(true, "", 1, $"save delay set to {new_val}", "bot");
+                                }
+                                break;
+
+                            case "rp":
+                                if (Int32.TryParse(command.parametrs[i], out new_val))
+                                {
+                                    vk_account.rp_controller.requests_period = new_val;
+                                    vk_account.vk_logs.AddToLogs(true, "", 1, $"vk tl set to {new_val}", "bot");
+                                }
+                                break;
+
+                            case "mipc":
+                                if (Int32.TryParse(command.parametrs[i], out new_val))
+                                {
+                                    current_group.group_info.min_posts_count = new_val;
+                                    vk_account.vk_logs.AddToLogs(true, "", 1, $"{current_group.group_info.name} min posts sount set to {new_val}", "bot");
+                                }
+                                break;
+
+                            case "mxlc":
+                                if (Int32.TryParse(command.parametrs[i], out new_val))
+                                {
+                                    vk_account.vk_logs.logs_max_count = new_val;
+                                    vk_account.vk_logs.AddToLogs(true, "", 1, $"max logs set to {new_val}", "bot");
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                }
+            }
+
+
+            void Info()
+            {
+                SendMessage($"last check time: {last_checking_time}\r\n" +
+                    $"groups count: {groups.Count()}\r\n" +
+                    $"current group {current_group.group_info.name}\r\n" +
+                    $"max req per thread: {max_req_in_thread}\r\n" +
+                    $"is sync: {is_sync}\r\n" +
+                    $"vk req period: {vk_account.rp_controller.requests_period}\r\n" +
+                    $"save delay: {saving_delay}\r\n" +
+                    $"S: {vk_account.vk_logs.success_counts}\r\n" +
+                    $"E: {vk_account.vk_logs.errors_count}\r\n" +
+                    $"Max logs: {vk_account.vk_logs.logs_max_count}", command.uid);
+            }
+
+
+            void Load()
+            {
+                if (command.uid == "29334144")
+                    SendMessage(LoadGrours(), command.uid);
+            }
+
+
+            void Sleep()
+            {
+                int time = 10000;
+
+                if (command.parametrs.Count() == 1)
+                    Int32.TryParse(command.parametrs[0], out time);
+
+                Thread.Sleep(time);
+                SendMessage("Семпай, я проснулась", command.uid);
+            }
+
+
+            void Save()
+            {
+                if (command.uid == "29334144")
+                {
+                    foreach (string key in groups.Keys)
+                    {
+                        groups[key].group_info.Save(key);
+                        vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name} saved", current_group.group_info.name);
+                    }
+                    SaveConfigs();
+
+                    if (command.parametrs.Count() == 1)
+                        if (command.parametrs[0] == "ack")
+                            SendMessage("Семпай, неужели вы настолько глупы, что просите меня, своего верного кохая, сделать всю эту сложную работу за вас? Я была о вас лучшего мнения", command.uid);
+                }
+                //current_group.log += "dictionary saved\n";
+            }
+
+
+            void Log()
+            {
+                if (command.uid == "29334144")
+                {
+                    if (command.parametrs[0] == "clr")
+                    {
+                        //current_group.log = "_";
+                        vk_account.vk_logs.Save();
+                        SendMessage("Семпай, я решила все забыть", command.uid);
+                    }
+                    if (command.parametrs[0] == "httpclr")
+                    {
+                        mobile_server.Clear_logs();
+                        SendMessage("Семпай, я решила все забыть", command.uid);
+                    }
+                    if (command.parametrs[0] == "http")
+                        SendMessage(mobile_server.Get_logs(), command.uid);
+                    if (command.parametrs[0] == "")
+                        SendMessage($"S: {vk_account.vk_logs.success_counts}\r\nE: {vk_account.vk_logs.errors_count}", command.uid);
                 }
             }
 
@@ -426,62 +472,12 @@ namespace photoBot
                 {
                     IEnumerable<char> letters = from char ch in command.parametrs[0] where (ch < 48 || ch > 57) select ch;
                     if (letters.Count<char>() == 0)
-                        CurentGroup.limit = Convert.ToInt32(command.parametrs[0]);
-                    else
-                        SendMessage("Семпай, вы настолько глупый, что даже предел не можете правильно указать, да?", command.uid);
-                }
-            }
-
-
-            void Time()
-            {
-                if (command.parametrs[0] == "")
-                    SendMessage($"{CurentGroup.postTime}", command.uid);
-                else
-                {
-                    IEnumerable<char> letters = from char ch in command.parametrs[0] where (ch < 48 || ch > 57) select ch;
-                    if (letters.Count<char>() == 0)
-                        CurentGroup.postTime = Convert.ToInt32(command.parametrs[0]);
-                    else
-                        SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
-                }
-            }
-
-
-            void Delay()
-            {
-                if (command.parametrs[0] == "")
-                    SendMessage($"{saveDelay}", command.uid);
-                else
-                {
-                    IEnumerable<char> letters = from char ch in command.parametrs[0] where (ch < 48 || ch > 57) select ch;
-                    if (letters.Count<char>() == 0)
-                        saveDelay = Convert.ToInt32(command.parametrs[0]);
-                    else
-                        SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
-                }
-            }
-
-
-            void Stpost()
-            {
-                if (command.parametrs.Count > 0 && command.uid[0] == '-')
-                {
-                    command.uid = command.uid.Remove(0, 1);
-                    Group group = null;
-                    bool buf;
-
-                    group = groups.Values.Where(g => g.id == command.uid).FirstOrDefault();
-
-                    if (group != null)
                     {
-                        buf = group.autoPost;
-                        group.autoPost = true;
-                        group.createPost(new List<string>(), command.parametrs[0].Replace("|", "/").Replace("@", "\r\n"), accessTokenAndTime[0], false);
-                        SendMessage(command.parametrs[0], $"-{command.uid}");
+                        current_group.group_info.limit = Convert.ToInt32(command.parametrs[0]);
+                        vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name} limit change to {current_group.group_info.limit}", current_group.group_info.name);
                     }
                     else
-                        SendMessage("Неужели ты и правда настолько глупый, я была о тебе ьолее высокого мнения, как я могу выложить что-то в эту группу, если ее нет у меня в памяти?", $"-{command.uid}");
+                        SendMessage("Семпай, вы настолько глупый, что даже предел не можете правильно указать, да?", command.uid);
                 }
             }
 
@@ -490,9 +486,9 @@ namespace photoBot
             {
                 if (command.uid == "29334144")
                 {
-                    string request = $"https://api.vk.com/method/{command.parametrs[0]}&access_token={accessTokenAndTime[0]}&v=V5.53";
+                    string request = $"{command.parametrs[0]}";
                     request = request.Replace("amp;", "");
-                    SendMessage(Convert.ToString(VK.apiMethod(request).tokens), command.uid);
+                    SendMessage(Convert.ToString(vk_account.ApiMethodGet(request).tokens), command.uid);
                 }
             }
 
@@ -507,37 +503,25 @@ namespace photoBot
             }
 
 
-            void SpeedLock()
-            {
-                if (command.parametrs[0] == "off")
-                {
-                    speedLock = false;
-                    Console.WriteLine("speed lock off");
-                    CurentGroup.log += $"\nspeed lock off";
-                }
-                if (command.parametrs[0] == "on")
-                {
-                    speedLock = true;
-                    Console.WriteLine("speed lock on");
-                    CurentGroup.log += $"\nspeed lock on";
-                }
-            }
-
-
             void Alert()
             {
                 if (command.parametrs[0] == "off")
-                    CurentGroup.alert = false;
+                {
+                    current_group.group_info.alert = false;
+                    vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name} auto change to 'false'", current_group.group_info.name);
+                }
                 if (command.parametrs[0] == "on")
-                    CurentGroup.alert = true;
+                {
+                    current_group.group_info.alert = true;
+                    vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name} auto change to 'true'", current_group.group_info.name);
+                }
             }
 
 
             void Tag()
             {
-                CurentGroup.text = command.parametrs[0];
-                CurentGroup.log += $"\n{CurentGroup.name} text change to '{command.parametrs[0]}'";
-                Console.WriteLine($"{CurentGroup.name} text change to '{command.parametrs[0]}'");
+                current_group.group_info.text = command.parametrs[0];
+                vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name} text change to '{command.parametrs[0]}'", current_group.group_info.name);
             }
 
 
@@ -545,20 +529,20 @@ namespace photoBot
             {
                 int[] res;
                 if (command.parametrs[0] == "")
-                    res = CurentGroup.alignment(accessTokenAndTime[0], false);
+                    res = current_group.Alignment(false);
                 if (command.parametrs[0] == "count")
                 {
-                    res = CurentGroup.alignment(accessTokenAndTime[0], true);
+                    res = current_group.Alignment(true);
                     if (res.Length == 2)
                         SendMessage($"{res[0]} {res[1]}", command.uid);
                 }
                 if (command.parametrs[0] == "last")
                 {
                     TimeSpan unixTime = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
-                    double lastPostTime = (CurentGroup.postTime - unixTime.TotalSeconds - CurentGroup.offset + CurentGroup.posts.Count * CurentGroup.offset) / 3600;
+                    double lastPostTime = (current_group.group_info.post_time - unixTime.TotalSeconds - current_group.group_info.offset + current_group.group_info.posts.Count * current_group.group_info.offset) / 3600;
                     if (lastPostTime < 0)
                         lastPostTime = 0;
-                    SendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {CurentGroup.offset} секунд вам осталось \n{(int)lastPostTime / 24}д:{(int)(lastPostTime - ((int)lastPostTime / 24) * 24)}ч", command.uid);
+                    SendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {current_group.group_info.offset} секунд вам осталось \n{(int)lastPostTime / 24}д:{(int)(lastPostTime - ((int)lastPostTime / 24) * 24)}ч", command.uid);
                 }
             }
 
@@ -566,18 +550,15 @@ namespace photoBot
             void Auto()
             {
                 if (command.parametrs[0] == "on")
-                    CurentGroup.autoPost = true;
+                {
+                    current_group.group_info.is_wt = true;
+                    vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name}'s auto = {current_group.group_info.postpone_enabled}", current_group.group_info.name);
+                }
                 if (command.parametrs[0] == "off")
-                    CurentGroup.autoPost = false;
-            }
-
-
-            void Signed()
-            {
-                if (command.parametrs[0] == "on")
-                    CurentGroup.signed = 1;
-                if (command.parametrs[0] == "off")
-                    CurentGroup.signed = 0;
+                {
+                    current_group.group_info.is_wt = false;
+                    vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name}'s auto = {current_group.group_info.postpone_enabled}", current_group.group_info.name);
+                }
             }
 
 
@@ -586,154 +567,53 @@ namespace photoBot
                 if (command.parametrs[0] == "")
                 {
                     SendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
-                    CurentGroup.deployment(accessTokenAndTime[0]);
+                    current_group.Deployment();
                 }
+
                 if (command.parametrs[0] == "all")
-                    foreach (Group groupToDeploy in groups.Values)
-                        if (groupToDeploy.deployment(accessTokenAndTime[0]) <= 10 && groupToDeploy.alert)
-                            SendMessage($"Семпай, в группе {CurentGroup.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", "70137831");
+                    foreach (GroupManager group_to_deploy in groups.Values)
+                        if (group_to_deploy.Deployment() < group_to_deploy.group_info.min_posts_count && group_to_deploy.group_info.alert)
+                            foreach (string admin_id in group_to_deploy.group_info.admin_id)
+                                SendMessage($"Семпай, в группе {group_to_deploy.group_info.name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", admin_id);
+
                 if (command.parametrs[0] == "off")
-                    CurentGroup.posteponedOn = false;
-                if (command.parametrs[0] == "on")
-                    CurentGroup.posteponedOn = true;
-            }
-
-
-            void Group()
-            {
-                if (command.parametrs[0] == "")
-                    SendMessage(
-                        $"group: {CurentGroup.name}" +
-                        $"\n save delay: {saveDelay}" +
-                        $"\n post time: {CurentGroup.postTime}" +
-                        $"\n posts in memory: {CurentGroup.posts.Count}" +
-                        $"\n failed copying: {CurentGroup.delayedRequests.Count}" +
-                        $"\n limit: {CurentGroup.limit}\n text: {CurentGroup.text}" +
-                        $"\n offset: {CurentGroup.offset}" +
-                        $"\n deployment: {CurentGroup.posteponedOn}" +
-                        $"\n alert: {CurentGroup.alert}" +
-                        $"\n signed: {CurentGroup.signed}" +
-                        $"\n speed lock: {speedLock}" +
-                        $"\n auto posting: {CurentGroup.autoPost}", command.uid);
-                else
                 {
-                    if (groups.Keys.Contains(command.parametrs[0]) && command.parametrs[0] != "all")
-                    {
-                        CurentGroup = groups[command.parametrs[0]];
-                        SendMessage(
-                            $"group: {CurentGroup.name}" +
-                            $"\n save delay: {saveDelay}" +
-                            $"\n post time: {CurentGroup.postTime}" +
-                            $"\n posts in memory: {CurentGroup.posts.Count}" +
-                            $"\n failed copying: {CurentGroup.delayedRequests.Count}" +
-                            $"\n limit: {CurentGroup.limit}" +
-                            $"\n text: {CurentGroup.text}" +
-                            $"\n offset: {CurentGroup.offset}" +
-                            $"\n deployment: {CurentGroup.posteponedOn}" +
-                            $"\n alert: {CurentGroup.alert}" +
-                            $"\n signed: {CurentGroup.signed}" +
-                            $"\n speed lock: {speedLock}" +
-                            $"\n auto posting: {CurentGroup.autoPost}", command.uid);
-                    }
-                    if (!groups.Keys.Contains(command.parametrs[0]) && command.parametrs[0] == "all")
-                    {
-                        string info = "";
-                        foreach (Group group in groups.Values)
-                            info += $"group: {group.name}" +
-                                $"\n save delay: {saveDelay}" +
-                                $"\n post time: {group.postTime}" +
-                                $"\n posts in memory: {group.posts.Count}" +
-                                $"\n failed copying: {CurentGroup.delayedRequests.Count}" +
-                                $"\n limit: {group.limit}" +
-                                $"\n text: {group.text}" +
-                                $"\n offset: {group.offset}" +
-                                $"\n deployment: {group.posteponedOn}" +
-                                $"\n alert: {group.alert}" +
-                                $"\n signed: {group.signed}" +
-                                $"\n speed lock: {speedLock}" +
-                                $"\n auto posting: {group.autoPost}" +
-                                $"\n\n";
-                        SendMessage(info, command.uid);
-                    }
-                    if (!groups.Keys.Contains(command.parametrs[0]) && command.parametrs[0] != "all")
-                        SendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
+                    current_group.group_info.postpone_enabled = false;
+                    vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name}'s postponedOn = {current_group.group_info.postpone_enabled}", current_group.group_info.name);
                 }
-                if (command.atachments.Count > 0)
-                    commands.Add(new Command("null", command.atachments, command.uid, ""));
+
+                if (command.parametrs[0] == "on")
+                {
+                    current_group.group_info.postpone_enabled = true;
+                    vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name}'s postponedOn = {current_group.group_info.postpone_enabled}", current_group.group_info.name);
+                }
             }
 
 
             void Offset()
             {
                 if (command.parametrs[0] == "")
-                    SendMessage($"{CurentGroup.offset}", command.uid);
+                    SendMessage($"{current_group.group_info.offset}", command.uid);
                 else
                 {
                     IEnumerable<char> letters = from char ch in command.parametrs[0] where (ch < 48 || ch > 57) select ch;
                     if (letters.Count<char>() == 0)
-                        CurentGroup.offset = Convert.ToInt32(command.parametrs[0]);
+                    {
+                        current_group.group_info.offset = Convert.ToInt32(command.parametrs[0]);
+                        vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name}'s offset = {current_group.group_info.offset}", current_group.group_info.name);
+                    }
                     else
                         SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
                 }
             }
+            #endregion
         }
+        #endregion
 
 
 
-        static void GetFromAlbum(List<string> parametrs, string uid, string albumOwnerId)
-        {
-            apiResponse response;
-            JToken albums = null;
-            string aid = "";
 
-            if (parametrs.Count == 3)
-                albumOwnerId = parametrs[2];
-
-            response = VK.apiMethod($"https://api.vk.com/method/photos.getAlbums?owner_id={albumOwnerId}&access_token={accessTokenAndTime[0]}&v=V5.53");
-            if (response.isCorrect)
-            {
-                albums = response.tokens;
-
-                foreach (JToken album in albums)
-                    if ((string)album["title"] == parametrs[0])
-                    {
-                        aid = (string)album["aid"];
-                        if (!dictionary.ContainsKey(aid))
-                            dictionary[aid] = "0";
-                        break;
-                    }
-
-                if (aid == "")
-                    SendMessage("Семпай, нету такого альбома, хватит меня уже заставлять делать бессмысленную работу", uid);
-                else
-                {
-                    SendMessage("Семпай, я начала работу, может вы хоть раз попробуете сделать все сами, и тогда-то вы поймете, какого это, когда тебя напрягают по всякой ерунде, ААААН?", uid);
-                    response = VK.apiMethod($"https://api.vk.com/method/photos.get?owner_id={albumOwnerId}&album_id={aid}&access_token={accessTokenAndTime[0]}&v=V5.53");
-                    JToken photos = response.tokens;
-                    int counter = photos.Count<JToken>(), i = Convert.ToInt32(dictionary[aid]);
-                    try
-                    {
-                        if (parametrs.Count == 2)
-                            counter = Convert.ToInt32(parametrs[1]);
-                    }
-                    catch { }
-                    while (counter > 0 && i != photos.Count<JToken>())
-                    {
-                        //Thread.Sleep(1000);
-                        commands.Add(new Command("post", $"{photos[i]["owner_id"]}_{photos[i]["pid"]}_{photos[i]["access_token"]}", uid, $"#{parametrs[0]}@{CurentGroup.name}"));
-                        //JObject messageResp = VK.apiMethod($"https://api.vk.com/method/messages.send?attachment=photo{photos[i]["owner_id"]}_{photos[i]["pid"]}&chat_id=1&access_token={accessTokenAndTime[0]}&v=V5.53");
-                        //Console.WriteLine(photos[i]["pid"]);
-                        //Console.WriteLine(messageResp);
-                        counter--;
-                        i++;
-                    }
-                    dictionary[aid] = Convert.ToString(i);
-                    SendMessage("Семпай, все готово", uid);
-                }
-            }
-        }
-
-
+        #region  вспомогательные функции
         static List<string> GetAttachments(JToken message, string uid) // берем фото
         {
             List<string> photos = new List<string>();
@@ -753,43 +633,17 @@ namespace photoBot
 
         static void SendMessage(string message, string uid)
         {
-            VK.apiMethodPostEmpty(new Dictionary<string, string>()
+            vk_account.ApiMethodPost(new Dictionary<string, string>()
                 {
                     { "message",message},
-                    { "uid",uid},
-                    { "access_token",accessTokenAndTime[0]},
-                    { "v","V5.53"}
-                },
-                "https://api.vk.com/method/messages.send");
-
-            Console.WriteLine($"message sent to {uid}");
-            CurentGroup.log += $"message sent to {uid}\n";
+                    { "uid",uid}
+                }, "messages.send");
         }
+        #endregion
 
 
 
-        public static Dictionary<string, string> InizializeDictionary(string path) //+
-        {
-            string[] buffer;
-            Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            using (BinaryReader Reader = new BinaryReader(File.Open(path, FileMode.OpenOrCreate)))
-                while (Reader.PeekChar() > -1)
-                {
-                    buffer = Reader.ReadString().Split(':');
-                    dictionary.Add(buffer[0], buffer[1]);
-                }
-            return dictionary;
-        }
-
-
-        public static void SaveDictionary(string path)
-        {
-            using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.OpenOrCreate)))
-                foreach (string key in dictionary.Keys)
-                    writer.Write(key + ": " + dictionary[key]);
-        }
-
-
+        #region функции для инициализации бота
         public static string LoadGrours()
         {
             string res = "ERROR 404";
@@ -801,26 +655,28 @@ namespace photoBot
                 res = "groups loading:\r\n";
 
                 groups_names = Directory.GetFiles("Groups", "*.xml");
-                groups = new Dictionary<string, Group>();
+                groups = new Dictionary<string, GroupManager>();
 
                 foreach (string group_name in groups_names)
                 {
                     try
                     {
                         chosen_group = Path.GetFileNameWithoutExtension(group_name);
-                        groups.Add(chosen_group, Group.load(group_name));
+                        groups.Add(chosen_group, new GroupManager(Group.load(group_name), vk_account));
+
                         Console.WriteLine($"{chosen_group} deserialization endeed");
-                        CurentGroup = groups[chosen_group];
+                        current_group = groups[chosen_group];
                         res += $"{group_name}: OK\r\n";
-                    }
+                }
                     catch
-                    {
-                        Console.WriteLine($"{group_name} deserialization failed");
-                        res += $"{group_name}: Failed\r\n";
-                    }
+                {
+                    Console.WriteLine($"{group_name} deserialization failed");
+                    res += $"{group_name}: Failed\r\n";
                 }
             }
+            }
 
+            vk_account.vk_logs.AddToLogs(true, "", 1, res, "bot");
             return res;
         }
 
@@ -839,25 +695,59 @@ namespace photoBot
         }
 
 
+        static void SaveConfigs()
+        {
+            XDocument xdoc = new XDocument(new XElement("configs",
+                new XElement("is_sync", is_sync),
+                new XElement("max_req_in_thread", max_req_in_thread),
+                new XElement("saving_delay", saving_delay),
+                new XElement("listening_delay", listening_delay),
+                new XElement("vk_requests_period", vk_account.rp_controller.requests_period),
+                new XElement("max_logs_count", vk_account.vk_logs.logs_max_count),
+                new XElement("pass", pass)));
 
+            xdoc.Save("botconfig.xml");
+            Console.WriteLine("configs saved");
+            vk_account.vk_logs.AddToLogs(true, "", 2, $"configs saved", "bot");
+        }
+
+
+        static void LoadConfigs()
+        {
+            if (File.Exists("botconfig.xml"))
+            {
+                var xdoc = XDocument.Load("botconfig.xml").Element("configs");
+                is_sync = Convert.ToBoolean(xdoc.Element("is_sync").Value);
+                max_req_in_thread = Convert.ToInt32(xdoc.Element("max_req_in_thread").Value);
+                saving_delay = Convert.ToInt32(xdoc.Element("saving_delay").Value);
+                listening_delay = Convert.ToInt32(xdoc.Element("listening_delay").Value);
+                vk_account.rp_controller.requests_period = Convert.ToInt32(xdoc.Element("vk_requests_period").Value);
+                vk_account.vk_logs.logs_max_count = Convert.ToInt32(xdoc.Element("max_logs_count").Value);
+                pass = xdoc.Element("pass").Value;
+                Console.WriteLine("configs successfully loaded");
+            }
+            else
+                Console.WriteLine("cannot find file botconfig.xml");
+        }
+        #endregion
+
+
+
+        //главная функция
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome!");
-            lastCheckTime = DateTime.UtcNow;
+            string[] auth_data = GetAuthData("bot.txt");
+            mobile_server = new MobileServer();
+            vk_account = new VkApiInterface(auth_data[0], auth_data[1], "274556", 1800, 3);
 
-            //groups.Add("2d",new Group("hentai_im_kosty", "121519170", 24));
-            //groups.Add("3d", new Group("porno_im_kosty", "138077475", 24));
-            //groups.Add("luk", new Group("luke_shelter", "129223693", 149));
-            //groups["luk"].Save();
-            //CurentGroup = groups["luk"];
+            Console.WriteLine("Welcome");
+            last_checking_time = DateTime.UtcNow;
 
+            LoadConfigs();
             LoadGrours();
-            dictionary = InizializeDictionary(adress);
-            mServer = new MobileServer();
-            Task.Run(() => { mServer.Run(); });
-            Analysator.Start();
+
+            Task.Run(() => { mobile_server.Run(); });
             Read();
-            //mServer.Run();
         }
     }
 }
