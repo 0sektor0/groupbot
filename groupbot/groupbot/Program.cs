@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using System.Linq;
 using System.IO;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using groupbot.server;
 using VkApi;
 
 
@@ -15,17 +15,11 @@ namespace groupbot
 {
     class Program
     {
-        static public int saving_delay = 14400;
-        static public string pass = "konegd";
-        static int max_req_in_thread = 4;
-        static int listening_delay = 600;
-        static bool is_sync = false;
-
         static public Dictionary<string, GroupManager> groups;
-        static public DateTime last_checking_time;
         static GroupManager current_group;
         static MobileServer mobile_server;
         static VkApiInterface vk_account;
+        static BotSettings settings;
 
 
 
@@ -37,7 +31,7 @@ namespace groupbot
             JToken messages;
 
             //первичная авторизация
-            vk_account.Auth();            
+            vk_account.Auth();
             Console.WriteLine($"Acces granted\r\nauth_data[0]: {vk_account.login}");
 
             while (true)
@@ -50,7 +44,7 @@ namespace groupbot
                         Console.WriteLine("token updated");
                     }
 
-                    bool is_ttu = (int)((DateTime.UtcNow - last_checking_time).TotalSeconds) >= saving_delay;
+                    bool is_ttu = (int)((DateTime.UtcNow - settings.last_checking_time).TotalSeconds) >= settings.saving_delay;
                     response = vk_account.ApiMethodGet($"execute.messagesPull?");
                     messages = response.tokens;
 
@@ -58,9 +52,9 @@ namespace groupbot
                         if ((string)messages[0] != "0" || is_ttu)
                             ParseCommand(messages, is_ttu);
 
-                    Thread.Sleep(listening_delay);
+                    Thread.Sleep(settings.listening_delay);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
@@ -80,7 +74,7 @@ namespace groupbot
 
             if (is_time_to_update)
             {
-                last_checking_time = DateTime.UtcNow;
+                settings.last_checking_time = DateTime.UtcNow;
                 commands.Add(new Command("deployment", "", "29334144", "all"));
                 commands.Add(new Command("save", "", "29334144", ""));
             }
@@ -125,7 +119,7 @@ namespace groupbot
 
                         case 0:
                             command.Setparametrs(Convert.ToString(messages[i]["body"]));
-                            if(command.atachments.Count > 0)
+                            if (command.atachments.Count > 0)
                                 commands.Add(command);
                             break;
 
@@ -135,7 +129,7 @@ namespace groupbot
                 }
             }
 
-            if(commands.Count > 0)
+            if (commands.Count > 0)
                 await Analyse(commands);
         }
 
@@ -144,20 +138,20 @@ namespace groupbot
         {
             return Task.Run(() =>
             {
-                if (commands.Count() < max_req_in_thread || is_sync)
+                if (commands.Count() < settings.max_req_in_thread || settings.is_sync)
                 {
                     for (int i = 0; i < commands.Count; i++)
                         if (commands[i] != null)
                         {
-                            //Execute(commands[i]);
-                            try
-                            {
-                                Execute(commands[i]);
-                            }
-                            catch (Exception e)
-                            {
-                                vk_account.vk_logs.AddToLogs(false, "EXCEPTION", 1, e.Message, current_group.group_info.name);
-                            }
+                            Execute(commands[i]);
+                            //try
+                            //{
+                            //    Execute(commands[i]);
+                            //}
+                            //catch (Exception e)
+                            //{
+                            //    vk_account.vk_logs.AddToLogs(false, "EXCEPTION", 1, e.Message, current_group.group_info.name);
+                            //}
                         }
                 }
                 else
@@ -187,7 +181,7 @@ namespace groupbot
                 case "set":
                     Set();
                     break;
-                    
+
                 case "info":
                     Info();
                     break;
@@ -211,11 +205,11 @@ namespace groupbot
                 case "log":
                     Log();
                     break;
-                                    
+
                 case "null":
                     Null();
                     break;
-                                    
+
                 case "post":
                     Post();
                     break;
@@ -283,14 +277,14 @@ namespace groupbot
                     {
                         string info = "";
                         foreach (GroupManager group in groups.Values)
-                            info += group.ToString();
+                            info += group.group_info.ToString();
                         SendMessage(info, command.uid);
                     }
                     if (!groups.Keys.Contains(command.parametrs[0]) && command.parametrs[0] != "*")
                         SendMessage("Семпай, я не управляю такой группой тебе стоит обратиться по этому вопросу к моему создателю и не отвлекать меня от важных дел", command.uid);
                 }
                 if (command.atachments.Count > 0)
-                    Analyse( new List<Command>() { new Command("null", command.atachments, command.uid, "")});
+                    Analyse(new List<Command>() { new Command("null", command.atachments, command.uid, "") });
             }
 
 
@@ -354,7 +348,7 @@ namespace groupbot
                             case "sd":
                                 if (Int32.TryParse(command.parametrs[i], out new_val))
                                 {
-                                    saving_delay = new_val;
+                                    settings.saving_delay = new_val;
                                     vk_account.vk_logs.AddToLogs(true, "", 1, $"save delay set to {new_val}", "bot");
                                 }
                                 break;
@@ -392,13 +386,13 @@ namespace groupbot
 
             void Info()
             {
-                SendMessage($"last check time: {last_checking_time}\r\n" +
+                SendMessage($"last check time: {settings.last_checking_time}\r\n" +
                     $"groups count: {groups.Count()}\r\n" +
                     $"current group {current_group.group_info.name}\r\n" +
-                    $"max req per thread: {max_req_in_thread}\r\n" +
-                    $"is sync: {is_sync}\r\n" +
+                    $"max req per thread: {settings.max_req_in_thread}\r\n" +
+                    $"is sync: {settings.is_sync}\r\n" +
                     $"vk req period: {vk_account.rp_controller.requests_period}\r\n" +
-                    $"save delay: {saving_delay}\r\n" +
+                    $"save delay: {settings.saving_delay}\r\n" +
                     $"S: {vk_account.vk_logs.success_counts}\r\n" +
                     $"E: {vk_account.vk_logs.errors_count}\r\n" +
                     $"Max logs: {vk_account.vk_logs.logs_max_count}", command.uid);
@@ -433,7 +427,8 @@ namespace groupbot
                         groups[key].group_info.Save(key);
                         vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name} saved", current_group.group_info.name);
                     }
-                    SaveConfigs();
+                    settings.SaveConfigs(vk_account);
+                    vk_account.vk_logs.AddToLogs(true, "", 2, $"configs saved", "bot");
 
                     if (command.parametrs.Count() == 1)
                         if (command.parametrs[0] == "ack")
@@ -667,13 +662,13 @@ namespace groupbot
                         Console.WriteLine($"{chosen_group} deserialization endeed");
                         current_group = groups[chosen_group];
                         res += $"{group_name}: OK\r\n";
-                }
+                    }
                     catch
-                {
-                    Console.WriteLine($"{group_name} deserialization failed");
-                    res += $"{group_name}: Failed\r\n";
+                    {
+                        Console.WriteLine($"{group_name} deserialization failed");
+                        res += $"{group_name}: Failed\r\n";
+                    }
                 }
-            }
             }
 
             vk_account.vk_logs.AddToLogs(true, "", 1, res, "bot");
@@ -693,42 +688,6 @@ namespace groupbot
 
             return data;
         }
-
-
-        static void SaveConfigs()
-        {
-            XDocument xdoc = new XDocument(new XElement("configs",
-                new XElement("is_sync", is_sync),
-                new XElement("max_req_in_thread", max_req_in_thread),
-                new XElement("saving_delay", saving_delay),
-                new XElement("listening_delay", listening_delay),
-                new XElement("vk_requests_period", vk_account.rp_controller.requests_period),
-                new XElement("max_logs_count", vk_account.vk_logs.logs_max_count),
-                new XElement("pass", pass)));
-
-            xdoc.Save("botconfig.xml");
-            Console.WriteLine("configs saved");
-            vk_account.vk_logs.AddToLogs(true, "", 2, $"configs saved", "bot");
-        }
-
-
-        static void LoadConfigs()
-        {
-            if (File.Exists("botconfig.xml"))
-            {
-                var xdoc = XDocument.Load("botconfig.xml").Element("configs");
-                is_sync = Convert.ToBoolean(xdoc.Element("is_sync").Value);
-                max_req_in_thread = Convert.ToInt32(xdoc.Element("max_req_in_thread").Value);
-                saving_delay = Convert.ToInt32(xdoc.Element("saving_delay").Value);
-                listening_delay = Convert.ToInt32(xdoc.Element("listening_delay").Value);
-                vk_account.rp_controller.requests_period = Convert.ToInt32(xdoc.Element("vk_requests_period").Value);
-                vk_account.vk_logs.logs_max_count = Convert.ToInt32(xdoc.Element("max_logs_count").Value);
-                pass = xdoc.Element("pass").Value;
-                Console.WriteLine("configs successfully loaded");
-            }
-            else
-                Console.WriteLine("cannot find file botconfig.xml");
-        }
         #endregion
 
 
@@ -737,16 +696,20 @@ namespace groupbot
         static void Main(string[] args)
         {
             string[] auth_data = GetAuthData("bot.txt");
-            mobile_server = new MobileServer();
+            settings = new BotSettings();
+
             vk_account = new VkApiInterface(auth_data[0], auth_data[1], "274556", 1800, 3);
 
+            settings.LoadConfigs(vk_account);
+            settings.last_checking_time = DateTime.UtcNow;
             Console.WriteLine("Welcome");
-            last_checking_time = DateTime.UtcNow;
 
-            LoadConfigs();
             LoadGrours();
 
+            mobile_server = new MobileServer(groups, settings);
             Task.Run(() => { mobile_server.Run(); });
+            //mobile_server.Run();
+
             Read();
         }
     }

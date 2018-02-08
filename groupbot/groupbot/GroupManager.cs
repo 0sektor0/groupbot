@@ -10,7 +10,7 @@ using VkApi;
 
 namespace groupbot
 {
-    class GroupManager
+    public class GroupManager
     {
         public VkApiInterface vk_user;
         public Group group_info;
@@ -30,8 +30,7 @@ namespace groupbot
         //информация об отложенных постах
         private int PostponedInf()
         {
-            VkResponse response = vk_user.ApiMethodGet($"execute.PostponedInf?gid=-{group_info.id}");
-            string asd = Convert.ToString(response.tokens[1]);
+            VkResponse response = vk_user.ApiMethodGet($"execute.postponedInf?gid=-{group_info.id}");
 
             if (response.isCorrect)
                 if (Convert.ToString(response.tokens[1]) != "")
