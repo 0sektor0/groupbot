@@ -33,8 +33,6 @@ namespace groupbot_dev.Infrastructure
 
         private void Listen()
         {
-            Console.WriteLine("Listening");
-
             VkResponse response;
             JToken messages;
             

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using System.Data.Entity;
 using System.Collections;
 using System.Linq;
 using System;
@@ -29,7 +30,7 @@ namespace groupbot_dev.Models
         //информация об отложенных постах
         private int PostponedInf()
         {
-            VkResponse response = vk_user.ApiMethodGet($"execute.postponedInf?gid=-{group_info.Id}");
+            VkResponse response = vk_user.ApiMethodGet($"execute.postponedInf?gid=-{group_info.VkId}");
 
             if (response.isCorrect)
                 if (Convert.ToString(response.tokens[1]) != "")
@@ -43,6 +44,7 @@ namespace groupbot_dev.Models
                     return 0;
                 }
             else
+                /*logs*/
                 return group_info.Limit;
         }
 
@@ -74,17 +76,23 @@ namespace groupbot_dev.Models
                 }
                 else
                 {
-                    DelayedRequest delayed_request = new DelayedRequest() { Request = response.request.url.Replace(vk_user.token.value, "}|{}|{04"), Group = group_info};
+                    DelayedRequest delayed_request = new DelayedRequest(ref response.request.url, ref group_info, ref vk_user);
+
+                    if (group_info.DelayedRequests == null)
+                        group_info.DelayedRequests = new List<DelayedRequest>();
+
                     group_info.DelayedRequests.Add(delayed_request);
                 }
             }
 
-            if (downloaded_photos.Count > 0)
-            {
-                post.Group = group_info;
-                post.Photos = downloaded_photos;
-                post.Text = $"{group_info.Text} {message}";
+            post.Group = group_info;
+            post.Text = $"{group_info.Text} {message}";
 
+            if (downloaded_photos.Count > 0)
+                post.Photos = downloaded_photos;
+
+            if(post.IsPostCorrect())
+            {
                 if (group_info.Posts == null)
                     group_info.Posts = new List<Post>() { post };
                 else
@@ -92,8 +100,11 @@ namespace groupbot_dev.Models
 
                 //сквозной пост (заливается сразу)
                 if (group_info.IsWt)
-                        SendPost(ref post, true);
+                    SendPost(ref post, true);
             }
+            else
+                /*logs*/
+                Console.WriteLine($"Invalid post to {group_info.PseudoName}");
         }
 
 
@@ -111,47 +122,88 @@ namespace groupbot_dev.Models
                 post.IsPublished = true;
             }
             else
+                /*logs*/
                 PostponedInf();
         }
 
 
-        /*public void RepeatFailedRequests()
+        private void SendPost()
         {
-            VkResponse response = null;
-            string postPhotos;
-            string photoSrc_big;
-            string photoSrc_xbig;
-
-            while (group_info.delayed_requests.Count > 0)
+            if (group_info.Posts != null)
             {
-                postPhotos = "";
-                photoSrc_big = "";
-                photoSrc_xbig = "";
+                TimeSpan date = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
+                Post post = null;
+                bool is_correct = false;
 
-                response = vk_user.ApiMethodGet(group_info.delayed_requests[0].Replace("}|{}|{04", vk_user.token.value));
-                if (response.isCorrect)
+                while (!is_correct)
                 {
-                    postPhotos = $"photo{bot_id}_{(string)response.tokens[0]["pid"]}";
-                    photoSrc_big = $"{(string)response.tokens[0]["src_big"]}";
-                    photoSrc_xbig = $"{(string)response.tokens[0]["src_xbig"]}";
-                    group_info.delayed_requests.RemoveAt(0);
+                    post = group_info.Posts.Where(p => p.IsPublished == false).FirstOrDefault();
+
+                    if (post == null)
+                        return;
+
+                    is_correct = post.IsPostCorrect();
+                    if (!is_correct)
+                        post.IsPublished = true;
+                }
+
+                if ((group_info.PostTime < (int)date.TotalSeconds))
+                    group_info.PostTime = (int)date.TotalSeconds + group_info.Offset;
+
+                if (vk_user.ApiMethodGet(post.ToVkUrl()).isCorrect)
+                {
+                    group_info.PostTime = group_info.PostTime + group_info.Offset;
+                    post.IsPublished = true;
                 }
                 else
-                    break;
+                    /*logs*/
+                    PostponedInf();
+            }
+        }
 
-                vk_user.vk_logs.AddToLogs(response, 2, "uploading pics");
 
-                if (postPhotos.Length > 1)
+        //повтор загрузки пикч, которые вызвали ошибку при первой загрузке
+        public void RepeatFailedRequests()
+        {
+            VkResponse response = null;
+            Photo photo;
+
+            if (group_info.DelayedRequests != null)
+            {
+                List<DelayedRequest> drequests = null;
+                drequests = group_info.DelayedRequests.Where(d => d.IsResended == false).ToList();
+
+                if (drequests != null)
                 {
-                    string[] postParams = { $"{group_info.text}", postPhotos, photoSrc_big, photoSrc_xbig };
-                    ArrayList post = new ArrayList();
-                    post.Add(group_info.PostsCounter);
-                    group_info.PostsCounter++;
-                    post.AddRange(postParams);
-                    group_info.posts.Add(post);
+                    for (int i = 0; i < drequests.Count; i++)
+                    {
 
-                    if (group_info.is_wt)
-                        SendPost(true, 0);
+                        response = vk_user.ApiMethodGet(drequests[i].GetNewRequest(ref vk_user));
+                        if (response.isCorrect)
+                        {
+                            photo = new Photo
+                            {
+                                PictureName = $"photo{bot_id}_{(string)response.tokens[0]["pid"]}",
+                                SPictureAddress = $"{(string)response.tokens[0]["src_big"]}",
+                                XPictureAddress = $"{(string)response.tokens[0]["src_xbig"]}"
+                            };
+                            drequests[i].IsResended = true;
+                        }
+                        else
+                            /*logs*/
+                            break;
+
+                        Post post = new Post();
+                        post.Photos.Add(photo);
+                        post.Group = group_info;
+
+                        group_info.PostsCounter++;
+
+                        if (group_info.Posts == null)
+                            group_info.Posts = new List<Post>();
+
+                        group_info.Posts.Add(post);
+                    }
                 }
             }
         }        
@@ -159,42 +211,30 @@ namespace groupbot_dev.Models
 
         public int Deployment()
         {
-            if (group_info.postpone_enabled) //если оповещение разрещенно
+            if (group_info.PostponeEnabled)
             {
-                string text = $"_DeploymentStart {DateTime.UtcNow}";
-                //Console.WriteLine($"_DeploymentStart {DateTime.UtcNow}");
-                //log += $"_DeploymentStart {DateTime.UtcNow}\n";
-                int postsCounter = PostponedInf();
-
-                for (int i = postsCounter; i <= group_info.Limit; i++)
+                if (group_info.Posts != null)
                 {
-                    if (group_info.posts.Count > 0)
-                        SendPost(true, 0);
-                    else
-                        break;
+                    int postsCounter = PostponedInf();
+
+                    for (int i = postsCounter; i <= group_info.Limit; i++)
+                        SendPost();
+
+                    //Console.WriteLine("_DeploymentEnd");
+                    //log += "_DeploymentEnd\n";
+
+                    RepeatFailedRequests();
+                    return postsCounter + group_info.Posts.Where(p => p.IsPublished == false).Count();
                 }
-
-                text += "\r\n_DeploymentEnd";
-                //Console.WriteLine("_DeploymentEnd");
-                //log += "_DeploymentEnd\n";
-
-                vk_user.vk_logs.AddToLogs(true, "", 2, text, group_info.name);
-                RepeatFailedRequests(); //njkmrj xnj lj,fdbk ye;yj ghjntcnbnm
-                return postsCounter + group_info.posts.Count;
             }
-            else //если оповещение запрещенно
-            {
-                vk_user.vk_logs.AddToLogs(true, "", 2, $"_DeploymentOffline {DateTime.UtcNow}", group_info.name);
-                //Console.WriteLine($"_DeploymentOffline {DateTime.UtcNow}");
-                //log += $"_DeploymentOffline {DateTime.UtcNow}\n";
-                return 0;
-            }
+
+            return 0;
         }
 
 
         public int[] Alignment(bool getInf) //[изменял]
         {
-            VkResponse response = vk_user.ApiMethodGet($"execute.delaySearch?gid=-{group_info.id}&offset={group_info.Offset}");
+            VkResponse response = vk_user.ApiMethodGet($"execute.delaySearch?gid=-{group_info.VkId}&offset={group_info.Offset}");
             JToken jo = response.tokens;
             string text = "";
 
@@ -221,7 +261,7 @@ namespace groupbot_dev.Models
                             else
                             {
                                 group_info.PostTime += group_info.Offset;
-                                SendPost(false, 0);
+                                SendPost();
                                 group_info.PostTime -= group_info.Offset;
                                 postsCount++;
                             }
@@ -233,18 +273,18 @@ namespace groupbot_dev.Models
                     //log += "alignment ended\n";
                     group_info.PostTime = temppost_time;
 
-                    vk_user.vk_logs.AddToLogs(response, 2, text, group_info.name);
+                    //vk_user.vk_logs.AddToLogs(response, 2, text, group_info.Name);
                     return new int[] { 0 };
                 }
                 //Console.Write("alignment ended");
                 text += "alignment ended";
                 //log += "alignment ended\n";
 
-                vk_user.vk_logs.AddToLogs(response, 2, text, group_info.name);
+                //vk_user.vk_logs.AddToLogs(response, 2, text, group_info.Name);
                 return new int[] { errorCount, postsCount };
             }
 
             return new int[] { 0 };
-        }*/
+        }
     }
 }

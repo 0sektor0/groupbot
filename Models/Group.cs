@@ -1,6 +1,7 @@
 ﻿using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Data.Entity;
+using VkApi;
 using System;
 using System.Linq;
 
@@ -17,19 +18,26 @@ namespace groupbot_dev.Models
         public string PseudoName { get; set; }
         public int PostTime { get; set; }
         public bool PostponeEnabled { get; set; }
+        //max posts num
         public int Limit { get; set; }
+        //text to every next post
         public string Text { get; set; }
+        //time delay per posts
         public int Offset { get; set; }
+        //flsg that defuned should post be posted immediately after creation
         public bool IsWt { get; set; }
         public bool Notify { get; set; }
         public int PostsCounter { get; set; }
         public int MinPostCount { get; set; }
-        
+        public DateTime CreationTime { get; set; }
+
+
         public List<Post> Posts { get; set; }
         public List<GroupAdmins> GroupAdmins { get; set; }
         public List<DelayedRequest> DelayedRequests { get; set; }
 
-        
+
+
         public Group()
         {
             PostTime = 0;
@@ -41,7 +49,9 @@ namespace groupbot_dev.Models
             Notify = false;
             PostsCounter = 0;
             MinPostCount = 10;
+            CreationTime = DateTime.UtcNow;
         }
+
 
         public override string ToString()
         {
@@ -51,7 +61,7 @@ namespace groupbot_dev.Models
 
             int posts_count = 0;
             if (Posts != null)
-                posts_count = Posts.Where( p => !p.IsPublished).Count();
+                posts_count = Posts.Where(p => !p.IsPublished).Count();
 
             return $"group: {Name}" +
                    $"\n post time: {PostTime}" +
@@ -67,45 +77,82 @@ namespace groupbot_dev.Models
         }
     }
 
-    
+
+
+
     public class Admin
     {
         public int Id { get; set; }
         public int VkId { get; set; }
         public string FName { get; set; }
         public string SName { get; set; }
+        public DateTime CreationTime { get; set; }
 
         public Group ActiveGroup { get; set; }
         public List<GroupAdmins> GroupAdmins { get; set; }
-     }
+
+
+        public Admin()
+        {
+            CreationTime = DateTime.UtcNow;
+        }
+
+
+        public void DisableAlerts(string group_name, bool is_disabled)
+        {
+            if (GroupAdmins != null)
+            {
+                if (group_name == "*")
+                    foreach (GroupAdmins admin_group in GroupAdmins)
+                        admin_group.Notify = is_disabled;
+                else if (group_name == "")
+                    ActiveGroup.Notify = is_disabled;
+                else
+                    GroupAdmins
+                        .Where(ga => ga.Admin == this && ga.Group.PseudoName == group_name)
+                        .First().Notify = is_disabled;
+            }
+        }
+    }
+
+
 
 
     public class GroupAdmins
     {
         public int Id { get; set; }
         public int GroupId { get; set; }
-        public int AdminId { get; set; }      
+        public int AdminId { get; set; }
         public bool Notify { get; set; }
 
+
         public Group Group { get; set; }
+
         public Admin Admin { get; set; }
     }
 
-    
+
+
+
     public class Post
     {
         public int Id { get; set; }
         public string Text { get; set; }
         public bool IsPublished { get; set; }
+        public DateTime CreationDate { get; set; }
+
 
         public List<Photo> Photos { get; set; }
         public Group Group { get; set; }
+
 
 
         public Post()
         {
             Text = "";
             IsPublished = false;
+            CreationDate = DateTime.UtcNow;
+            Photos = new List<Photo>();
         }
 
 
@@ -138,7 +185,7 @@ namespace groupbot_dev.Models
 
             if (status)
                 url += $"&message={System.Web.HttpUtility.UrlEncode(Text)}";
-            
+
             if (IsPhotosCorrect())
             {
                 status = status || true;
@@ -157,23 +204,35 @@ namespace groupbot_dev.Models
         }
     }
 
-    
+
+
+
     public class Photo
     {
         public int Id { get; set; }
         public string PictureName { get; set; }
         public string XPictureAddress { get; set; }
         public string SPictureAddress { get; set; }
+        public DateTime UploadTime { get; set; }
 
         public Post Post { get; set; }
+
+
+        public Photo()
+        {
+            UploadTime = DateTime.UtcNow;
+        }
     }
 
-    
+
+
+
     public class DelayedRequest
     {
         public int Id { get; set; }
         public string Request { get; set; }
         public bool IsResended { get; set; }
+        public DateTime CreationTime { get; set; }
 
         public Group Group { get; set; }
 
@@ -181,17 +240,30 @@ namespace groupbot_dev.Models
         public DelayedRequest()
         {
             IsResended = false;
+            CreationTime = DateTime.UtcNow;
+        }
+
+
+        public DelayedRequest(ref string req, ref Group group, ref VkApiInterface vk_interface)
+        {
+            Request = req.Replace(vk_interface.token.value, "}|{}|{04");
+            IsResended = false;
+        }
+
+
+        public string GetNewRequest(ref VkApiInterface vk_interface)
+        {
+            return Request.Replace("}|{}|{04", vk_interface.token.value);
         }
     }
+
 
 
 
     [DbConfigurationType(typeof(MySql.Data.Entity.MySqlEFConfiguration))]
     class GroupContext : DbContext
     {
-        public GroupContext() :
-        base("")
-        { }
+        static public string connection_string = "";
 
         public DbSet<Group> Groups { get; set; }
         public DbSet<Admin> Admins { get; set; }
@@ -201,25 +273,89 @@ namespace groupbot_dev.Models
         public DbSet<Photo> Photos { get; set; }
 
 
-        public List<Group> GetAdminGroups(int user_id, string group_name)
-        {
-            List<Group> groups = null;
 
-            if (group_name != "*")
-                groups = GroupAdmins.Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name).Select(ga => ga.Group).ToList();
+        public GroupContext() : base(connection_string)
+        { }
+
+
+        //возвращает группы с постами и отложенными запросам, но без фото
+        public Group[] GetAdminGroups(int user_id, string group_name)
+        {
+            Group[] groups = null;
+
+            if (group_name == "*")
+                groups = GroupAdmins
+                    .Where(ga => ga.Admin.VkId == user_id)
+                    .Select(ga => ga.Group)
+                    .Include(g => g.Posts)
+                    .Include(g => g.DelayedRequests).ToArray();
+            else if (group_name == "")
+                return Admins
+                    .Where(u => u.VkId == user_id)
+                    .Select(u => u.ActiveGroup)
+                    .Include(g => g.Posts)
+                    .Include(g => g.DelayedRequests).ToArray();
             else
-                groups = GroupAdmins.Where(ga => ga.Admin.VkId == user_id).Select(ga => ga.Group).ToList();
+                groups = GroupAdmins
+                    .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
+                    .Select(ga => ga.Group)
+                    .Include(g => g.Posts)
+                    .Include(g => g.DelayedRequests).ToArray();
 
             return groups;
         }
 
 
-        public Group GetCurrentGroup(int user_id, bool IsEager)
+        public Group GetAdminGroup(int user_id, string group_name, bool is_eager)
         {
-            if(!IsEager)
-                return Admins.Where(u => u.VkId == user_id).Select(u => u.ActiveGroup).FirstOrDefault();
+            if (is_eager)
+                return GroupAdmins
+                    .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
+                    .Select(ga => ga.Group)
+                    .Include(g => g.Posts.Select(p => p.Photos))
+                    .Include(g => g.DelayedRequests).FirstOrDefault();
             else
-                return Admins.Where(u => u.VkId == user_id).Select(u => u.ActiveGroup).Include( g => g.Posts).FirstOrDefault();
+                return GroupAdmins
+                    .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
+                    .Select(ga => ga.Group).FirstOrDefault();
+        }
+
+
+        public Group GetCurrentGroup(int user_id, bool is_eager)
+        {
+            if (!is_eager)
+                return Admins
+                    .Where(u => u.VkId == user_id)
+                    .Select(u => u.ActiveGroup)
+                    .FirstOrDefault();
+            else
+                return Admins
+                    .Where(u => u.VkId == user_id)
+                    .Select(u => u.ActiveGroup)
+                    .Include(g => g.Posts.Select(p => p.Photos))
+                    .Include(g => g.DelayedRequests).FirstOrDefault();
+        }
+
+
+        public Admin GetAdmin(int user_id, bool is_eager)
+        {
+            if (is_eager)
+                return Admins
+                    .Include(a => a.GroupAdmins)
+                    .Include(a => a.ActiveGroup)
+                    .Where(a => a.VkId == user_id).FirstOrDefault();
+            else
+                return Admins
+                    .Where(a => a.VkId == user_id).FirstOrDefault();
+        }
+
+
+        public Group[] GetDeployInfo()
+        {
+            return Groups
+                .Include(g => g.DelayedRequests)
+                .Include(g => g.GroupAdmins.Select(ga => ga.Admin))
+                .Include(g => g.Posts.Select(p => p.Photos)).ToArray();
         }
     }
 }
