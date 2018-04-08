@@ -353,9 +353,10 @@ namespace groupbot_dev.Models
         public Group[] GetDeployInfo()
         {
             return Groups
-                .Include(g => g.DelayedRequests)
                 .Include(g => g.GroupAdmins.Select(ga => ga.Admin))
-                .Include(g => g.Posts.Select(p => p.Photos)).ToArray();
+                .Include(g => g.Posts.Select(p => p.Photos))
+                .Include(g => g.DelayedRequests)
+                .Where( g => g.Notify == true).ToArray();
         }
     }
 }

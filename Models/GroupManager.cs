@@ -44,8 +44,10 @@ namespace groupbot_dev.Models
                     return 0;
                 }
             else
-                /*logs*/
+            {
+                Console.WriteLine($"GROUPMANAGER: failed postponedinf \r\ntime: {DateTime.UtcNow}");
                 return group_info.Limit;
+            }
         }
 
 
@@ -103,8 +105,7 @@ namespace groupbot_dev.Models
                     SendPost(ref post, true);
             }
             else
-                /*logs*/
-                Console.WriteLine($"Invalid post to {group_info.PseudoName}");
+                Console.WriteLine($"GROUPMANAGER: Invalid post to {group_info.PseudoName}\r\ntime: {DateTime.UtcNow}");
         }
 
 
@@ -115,15 +116,17 @@ namespace groupbot_dev.Models
 
             if ((group_info.PostTime < (int)date.TotalSeconds) && fixtime)
                 group_info.PostTime = (int)date.TotalSeconds + group_info.Offset;
-            
+
             if (vk_user.ApiMethodGet(post.ToVkUrl()).isCorrect)
             {
                 group_info.PostTime = group_info.PostTime + group_info.Offset;
                 post.IsPublished = true;
             }
             else
-                /*logs*/
+            {
+                Console.WriteLine($"GROUPMANAGER: failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}");
                 PostponedInf();
+            }
         }
 
 
@@ -156,8 +159,10 @@ namespace groupbot_dev.Models
                     post.IsPublished = true;
                 }
                 else
-                    /*logs*/
+                {
+                    Console.WriteLine($"GROUPMANAGER: failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}");
                     PostponedInf();
+                }
             }
         }
 
@@ -190,8 +195,10 @@ namespace groupbot_dev.Models
                             drequests[i].IsResended = true;
                         }
                         else
-                            /*logs*/
+                        {
+                            Console.WriteLine($"GROUPMANAGER: failed to resend photo\r\nGroup: {group_info.Id} DelayedRequest: {drequests[i].Id}\r\ntime: {DateTime.UtcNow}");
                             break;
+                        }
 
                         Post post = new Post();
                         post.Photos.Add(photo);
@@ -220,7 +227,7 @@ namespace groupbot_dev.Models
                     for (int i = postsCounter; i <= group_info.Limit; i++)
                         SendPost();
 
-                    //Console.WriteLine("_DeploymentEnd");
+                    Console.WriteLine($"GROUPMANAGER: Deployment Ended\r\nGroup: {group_info.Id}\r\ntime: {DateTime.UtcNow}");
                     //log += "_DeploymentEnd\n";
 
                     RepeatFailedRequests();

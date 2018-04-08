@@ -220,6 +220,7 @@ namespace groupbot_dev.Infrastructure
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
                                 settings.saving_delay = new_val;
+                                Console.WriteLine($"EXECUTOR: savedelay changed\r\nUser: {admin.VkId}\r\ntime: {DateTime.UtcNow}");
                                 /*logs*/
                                 //vk_account.vk_logs.AddToLogs(true, "", 1, $"save delay set to {new_val}", "bot");
                             }
@@ -229,6 +230,7 @@ namespace groupbot_dev.Infrastructure
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
                                 vk_account.rp_controller.requests_period = new_val;
+                                Console.WriteLine($"EXECUTOR: rp changed\r\nUser: {admin.VkId}\r\ntime: {DateTime.UtcNow}");
                                 /*logs*/
                                 //vk_account.vk_logs.AddToLogs(true, "", 1, $"vk tl set to {new_val}", "bot");
                             }
@@ -337,11 +339,15 @@ namespace groupbot_dev.Infrastructure
             if (admin.ActiveGroup != null)
             {
                 if (command.parametrs[0] == "on")
-                    /*logs*/
+                {
                     admin.ActiveGroup.IsWt = true;
+                    Console.WriteLine($"EXECUTOR: auto enabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}\r\ntime: {DateTime.UtcNow}");
+                }
                 if (command.parametrs[0] == "off")
-                    /*logs*/
+                {
                     admin.ActiveGroup.IsWt = false;
+                    Console.WriteLine($"EXECUTOR: auto disabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}\r\ntime: {DateTime.UtcNow}");
+                }
             }
         }
 
@@ -356,8 +362,7 @@ namespace groupbot_dev.Infrastructure
                 if (letters.Count<char>() == 0)
                 {
                     admin.ActiveGroup.Offset = Convert.ToInt32(command.parametrs[0]);
-                    /*logs*/
-                    //vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.name}'s offset = {current_group.group_info.offset}", current_group.group_info.name);
+                    Console.WriteLine($"EXECUTOR: offset changed at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}\r\ntime: {DateTime.UtcNow}");
                 }
                 else
                     SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
