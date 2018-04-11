@@ -16,6 +16,7 @@ namespace groupbot_dev.Infrastructure
         public bool is_sync = false;
         public string bot_login;
         public string bot_pass;
+        public int bot_id;
         public string connection_string;
 
 
@@ -30,6 +31,7 @@ namespace groupbot_dev.Infrastructure
                 new XElement("max_logs_count", vk_account.vk_logs.logs_max_count),
                 new XElement("bot_login", bot_login),
                 new XElement("bot_pass", bot_pass),
+                new XElement("bot_pass", bot_id),
                 new XElement("connection_string", connection_string)));
 
             xdoc.Save(file);
@@ -51,6 +53,7 @@ namespace groupbot_dev.Infrastructure
                 vk_account.vk_logs.logs_max_count = Convert.ToInt32(xdoc.Element("max_logs_count").Value);
                 bot_login = Convert.ToString(xdoc.Element("bot_login").Value);
                 bot_pass = Convert.ToString(xdoc.Element("bot_pass").Value);
+                bot_id = Convert.ToInt32(xdoc.Element("bot_id").Value);
                 connection_string = Convert.ToString(xdoc.Element("connection_string").Value);
 
                 vk_account.login = bot_login;

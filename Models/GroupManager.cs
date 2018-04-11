@@ -13,16 +13,23 @@ namespace groupbot_dev.Models
 {
     public class GroupManager
     {
-        private int bot_id = 456929510;
+        private int bot_id;
         public VkApiInterface vk_user;
         public Group group_info;
 
 
 
-        public GroupManager(Group group_info, VkApiInterface vk_user)
+        public GroupManager(int bot_id, Group group_info, VkApiInterface vk_user)
         {
             this.group_info = group_info;
             this.vk_user = vk_user;
+            this.bot_id = bot_id;
+        }
+
+
+        private GroupManager()
+        {
+
         }
 
 
@@ -105,7 +112,7 @@ namespace groupbot_dev.Models
                     SendPost(ref post, true);
             }
             else
-                Console.WriteLine($"GROUPMANAGER: Invalid post to {group_info.PseudoName}\r\ntime: {DateTime.UtcNow}");
+                Console.WriteLine($"GROUPMANAGER: Invalid post to {group_info.PseudoName}\r\ntime: {DateTime.UtcNow}\r\n");
         }
 
 
@@ -124,13 +131,13 @@ namespace groupbot_dev.Models
             }
             else
             {
-                Console.WriteLine($"GROUPMANAGER: failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}");
+                Console.WriteLine($"GROUPMANAGER: failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}\r\n");
                 PostponedInf();
             }
         }
 
 
-        private void SendPost()
+        private bool SendPost()
         {
             if (group_info.Posts != null)
             {
@@ -143,9 +150,13 @@ namespace groupbot_dev.Models
                     post = group_info.Posts.Where(p => p.IsPublished == false).FirstOrDefault();
 
                     if (post == null)
-                        return;
+                    {
+                        Console.WriteLine($"GROUPMANAGER: failed to get post vkurl there is no posts at all\r\nGroup: {group_info.Id} \r\ntime: {DateTime.UtcNow}\r\n");
+                        return false;
+                    }
 
                     is_correct = post.IsPostCorrect();
+                    //если пост поломан, то помечаем его, как отправленный, чтобы не захламлять очередь
                     if (!is_correct)
                         post.IsPublished = true;
                 }
@@ -157,13 +168,18 @@ namespace groupbot_dev.Models
                 {
                     group_info.PostTime = group_info.PostTime + group_info.Offset;
                     post.IsPublished = true;
+                    Console.WriteLine($"GROUPMANAGER: post successfully created\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}\r\n");
+                    return true;
                 }
                 else
                 {
-                    Console.WriteLine($"GROUPMANAGER: failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}");
+                    Console.WriteLine($"GROUPMANAGER: failed to send post\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}\r\n");
                     PostponedInf();
+                    return false;
                 }
             }
+
+            return false;
         }
 
 
@@ -213,6 +229,8 @@ namespace groupbot_dev.Models
                     }
                 }
             }
+            else
+                Console.WriteLine($"GROUPMANAGER: there is no photo to resend\r\nGroup: {group_info.Id} \r\ntime: {DateTime.UtcNow}");
         }        
 
 
@@ -225,9 +243,10 @@ namespace groupbot_dev.Models
                     int postsCounter = PostponedInf();
 
                     for (int i = postsCounter; i <= group_info.Limit; i++)
-                        SendPost();
+                        if (!SendPost())
+                            break;
 
-                    Console.WriteLine($"GROUPMANAGER: Deployment Ended\r\nGroup: {group_info.Id}\r\ntime: {DateTime.UtcNow}");
+                    Console.WriteLine($"GROUPMANAGER: Deployment Ended\r\nGroup: {group_info.Id}\r\ntime: {DateTime.UtcNow}\r\n");
                     //log += "_DeploymentEnd\n";
 
                     RepeatFailedRequests();

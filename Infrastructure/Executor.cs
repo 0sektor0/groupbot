@@ -59,6 +59,8 @@ namespace groupbot_dev.Infrastructure
             }
             catch (Exception e)
             {
+
+                SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}", "29334144");
                 Console.WriteLine($"ERROR: {e.Message}");
             }
         }
@@ -182,7 +184,7 @@ namespace groupbot_dev.Infrastructure
                     case 1:
                         Group current_group = db.GetCurrentGroup(admin.VkId, false);
                         if (current_group != null)
-                            new GroupManager(current_group, vk_account).CreatePost(command.atachments, command.parametrs[0], true);
+                            new GroupManager( settings.bot_id, current_group, vk_account).CreatePost(command.atachments, command.parametrs[0], true);
                         break;
 
                     case 2:
@@ -196,7 +198,7 @@ namespace groupbot_dev.Infrastructure
                                     commands.Push(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/s"));
                             //как один пост
                             if (command.parametrs[1] == "s")
-                                new GroupManager(group, vk_account).CreatePost(command.atachments, "", true);
+                                new GroupManager( settings.bot_id, group, vk_account).CreatePost(command.atachments, "", true);
                         }
                         break;
 
@@ -377,7 +379,7 @@ namespace groupbot_dev.Infrastructure
             GroupManager current_group = null;
 
             if (group != null)
-                current_group = new GroupManager(admin.ActiveGroup, vk_account);
+                current_group = new GroupManager( settings.bot_id, admin.ActiveGroup, vk_account);
             else
                 return;
 
@@ -415,7 +417,7 @@ namespace groupbot_dev.Infrastructure
                 GroupManager current_group = null;
 
                 if (g != null)
-                    current_group = new GroupManager(g, vk_account);
+                    current_group = new GroupManager( settings.bot_id, g, vk_account);
                 else
                     return;
 
@@ -437,10 +439,11 @@ namespace groupbot_dev.Infrastructure
                             Group[] groups = db.GetDeployInfo();
                             foreach (Group group in groups)
                             {
-                                GroupManager gm = new GroupManager(group, vk_account);
-                                if (gm.Deployment() < group.MinPostCount && group.Notify)
+                                GroupManager gm = new GroupManager( settings.bot_id, group, vk_account);
+                                int depinfo = gm.Deployment();
+                                if (depinfo < group.MinPostCount && group.Notify)
                                     foreach (GroupAdmins ga in group.GroupAdmins)
-                                        if(ga.Notify)
+                                        if(ga.Notify && group.Notify)
                                             SendMessage($"Семпай, в группе {group.Name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", Convert.ToString(ga.Admin.VkId));
                             }
                         }

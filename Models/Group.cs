@@ -355,8 +355,8 @@ namespace groupbot_dev.Models
             return Groups
                 .Include(g => g.GroupAdmins.Select(ga => ga.Admin))
                 .Include(g => g.Posts.Select(p => p.Photos))
-                .Include(g => g.DelayedRequests)
-                .Where( g => g.Notify == true).ToArray();
+                //.Include(g => g.DelayedRequests)
+                .ToArray();
         }
     }
 }
