@@ -375,11 +375,11 @@ namespace groupbot_dev.Infrastructure
         private void Alignment(ref Command command, ref GroupContext db, ref Admin admin)
         {
             int[] res;
-            Group group = db.GetCurrentGroup(admin.VkId, true);
+            Group group = db.GetCurrentGroup(admin.VkId, false);
             GroupManager current_group = null;
 
             if (group != null)
-                current_group = new GroupManager( settings.bot_id, admin.ActiveGroup, vk_account);
+                current_group = new GroupManager( settings.bot_id, admin.ActiveGroup, vk_account, db);
             else
                 return;
 
@@ -413,11 +413,11 @@ namespace groupbot_dev.Infrastructure
         {
             if (command.parametrs.Count == 1)
             {
-                Group g = db.GetCurrentGroup(admin.VkId, true);
+                Group g = db.GetCurrentGroup(admin.VkId, false);
                 GroupManager current_group = null;
 
                 if (g != null)
-                    current_group = new GroupManager( settings.bot_id, g, vk_account);
+                    current_group = new GroupManager( settings.bot_id, g, vk_account, db);
                 else
                     return;
 
@@ -436,10 +436,10 @@ namespace groupbot_dev.Infrastructure
                     case "all":
                         if (command.uid == "29334144")
                         {
-                            Group[] groups = db.GetDeployInfo();
+                            Group[] groups = db.GetDeployInfo(false);
                             foreach (Group group in groups)
                             {
-                                GroupManager gm = new GroupManager( settings.bot_id, group, vk_account);
+                                GroupManager gm = new GroupManager( settings.bot_id, group, vk_account, db);
                                 int depinfo = gm.Deployment();
                                 if (depinfo < group.MinPostCount && group.Notify)
                                     foreach (GroupAdmins ga in group.GroupAdmins)

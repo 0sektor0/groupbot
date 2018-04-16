@@ -22,8 +22,22 @@ namespace groupbot_dev.Models
         public GroupManager(int bot_id, Group group_info, VkApiInterface vk_user)
         {
             this.group_info = group_info;
+            this.vk_user = vk_user;            this.bot_id = bot_id;
+
+        }
+
+        public GroupManager(int bot_id, Group group_info, VkApiInterface vk_user, GroupContext db)
+        {
+            this.group_info = group_info;
             this.vk_user = vk_user;
             this.bot_id = bot_id;
+
+            this.group_info.Posts = db.Posts.Where(p => p.Group.Id == this.group_info.Id && !p.IsPublished)
+                .Include(p => p.Photos)
+                .ToList();
+
+            this.group_info.DelayedRequests = db.DelayedRequests.Where(d => d.Group.Id == this.group_info.Id && !d.IsResended)
+                .ToList();
         }
 
 

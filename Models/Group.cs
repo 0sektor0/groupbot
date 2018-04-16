@@ -261,7 +261,7 @@ namespace groupbot_dev.Models
 
 
     [DbConfigurationType(typeof(MySql.Data.Entity.MySqlEFConfiguration))]
-    class GroupContext : DbContext
+    public class GroupContext : DbContext
     {
         static public string connection_string = "";
 
@@ -350,13 +350,18 @@ namespace groupbot_dev.Models
         }
 
 
-        public Group[] GetDeployInfo()
+        public Group[] GetDeployInfo(bool is_eager)
         {
+            if(is_eager)
             return Groups
                 .Include(g => g.GroupAdmins.Select(ga => ga.Admin))
                 .Include(g => g.Posts.Select(p => p.Photos))
                 //.Include(g => g.DelayedRequests)
                 .ToArray();
+            else
+                return Groups
+                    .Include(g => g.GroupAdmins.Select(ga => ga.Admin))
+                    .ToArray();
         }
     }
 }
