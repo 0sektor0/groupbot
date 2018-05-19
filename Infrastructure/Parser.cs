@@ -2,34 +2,28 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using groupbot.Core;
 
 
 
 
-namespace groupbot_dev.Infrastructure
+namespace groupbot.Infrastructure
 {
-    class Parser
+    class Parser : AParser
     {
         const string ultimate_admin_id = "29334144";
         BotSettings settings;
-        Executor executor;
 
 
-        private Parser()
-        {
 
-        }
-
-
-        public Parser(BotSettings settings, Executor executor)
+        public Parser(BotSettings settings, IExecutor executor) : base(executor)
         {
             this.settings = settings;
-            this.executor = executor;
         }
 
 
 
-        public void Parse(JToken messages, bool timer)
+        public override void Parse(JToken messages, bool timer)
         {
             string uid;
             int comType;

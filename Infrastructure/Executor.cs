@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using groupbot_dev.Models;
+using groupbot.Models;
+using groupbot.Core;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -10,14 +11,15 @@ using VkApi;
 
 
 
-namespace groupbot_dev.Infrastructure
+namespace groupbot.Infrastructure
 {
-    class Executor
+    class Executor : IExecutor
     {
-        private delegate void CommandExecution(ref Command command, ref GroupContext db, ref Admin admin);
+        private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
         private Dictionary<string, CommandExecution> functions;
         private VkApiInterface vk_account;
         private BotSettings settings;
+        const string help_file = "data/help.txt";
 
 
 
@@ -47,7 +49,7 @@ namespace groupbot_dev.Infrastructure
         {
             try
             {
-                GroupContext db = new GroupContext();
+                IContext db = new GroupContext();
                 Admin admin = db.GetAdmin(Convert.ToInt32(command.uid), true);
 
                 if (admin != null)
@@ -116,7 +118,7 @@ namespace groupbot_dev.Infrastructure
 
 
         
-        private void Info(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Info(ref Command command, ref IContext db, ref Admin admin)
         {
             SendMessage($"last check time: {settings.last_checking_time}\r\n" +
                 $"is sync: {settings.is_sync}\r\n" +
@@ -128,13 +130,13 @@ namespace groupbot_dev.Infrastructure
         }
 
         
-        private void Test(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Test(ref Command command, ref IContext db, ref Admin admin)
         {
             SendMessage(RandomString(15), command.uid);
         }
 
 
-        private void Group(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Group(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count() == 1)
             {
@@ -158,7 +160,7 @@ namespace groupbot_dev.Infrastructure
 
 
         //пустая команда (без текста, но с картинками)
-        private void NullCommand(ref Command command, ref GroupContext db, ref Admin admin)
+        private void NullCommand(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs[0] == "")
             {
@@ -169,7 +171,7 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        private void Post(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Post(ref Command command, ref IContext db, ref Admin admin)
         {
             Stack<Command> commands = new Stack<Command>();
             commands.Push(command);
@@ -209,7 +211,7 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        private void Set(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Set(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count() > 1)
             {
@@ -263,7 +265,7 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        private void Limit(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Limit(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count == 1)
             {
@@ -279,7 +281,7 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        private void Api(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Api(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.uid == "29334144")
             {
@@ -290,10 +292,10 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        private void Help(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Help(ref Command command, ref IContext db, ref Admin admin)
         {
-            if (File.Exists("help.txt"))
-                using (StreamReader reader = new StreamReader("help.txt"))
+            if (File.Exists(help_file))
+                using (StreamReader reader = new StreamReader(help_file))
                     SendMessage(reader.ReadToEnd(), command.uid);
             else
                 SendMessage("help file dosent exist", command.uid);
@@ -301,7 +303,7 @@ namespace groupbot_dev.Infrastructure
 
 
         //добавить отключение для различных групп
-        private void Alert(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Alert(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count == 1)
             {
@@ -313,7 +315,7 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        private void Text(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Text(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count == 1)
             {
@@ -324,7 +326,7 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        private void Tag(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Tag(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count == 1)
             {
@@ -336,7 +338,7 @@ namespace groupbot_dev.Infrastructure
 
 
 
-        private void Auto(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Auto(ref Command command, ref IContext db, ref Admin admin)
         {
             if (admin.ActiveGroup != null)
             {
@@ -354,7 +356,7 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        void Offset(ref Command command, ref GroupContext db, ref Admin admin)
+        void Offset(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs[0] == "")
                 SendMessage($"{admin.ActiveGroup.Offset}", command.uid);
@@ -372,7 +374,7 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        private void Alignment(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Alignment(ref Command command, ref IContext db, ref Admin admin)
         {
             int[] res;
             Group group = db.GetCurrentGroup(admin.VkId, false);
@@ -409,7 +411,7 @@ namespace groupbot_dev.Infrastructure
         }
 
 
-        private void Deployment(ref Command command, ref GroupContext db, ref Admin admin)
+        private void Deployment(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count == 1)
             {

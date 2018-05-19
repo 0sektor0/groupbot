@@ -5,7 +5,7 @@ using VkApi;
 
 
 
-namespace groupbot_dev.Infrastructure
+namespace groupbot.Infrastructure
 {
     class Program
     {
@@ -13,13 +13,13 @@ namespace groupbot_dev.Infrastructure
         {
             VkResponse.debug = true;
 
-            BotSettings settings = new BotSettings();
+            Core.BotSettings settings = new Core.BotSettings();
             VkApiInterface vk_account = new VkApiInterface("", "", "274556", 1800, 3);
 
             if (settings.LoadConfigs(vk_account, "data/botconfig.xml"))
             {
                 Console.WriteLine("configs successfully loaded");
-                groupbot_dev.Models.GroupContext.connection_string = settings.connection_string;
+                groupbot.Models.GroupContext.connection_string = settings.connection_string;
                 settings.last_checking_time = DateTime.UtcNow;
 
                 Executor executor = new Executor(settings, vk_account);

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Data.Entity;
-using System.Collections;
+using groupbot.Core;
 using System.Linq;
 using System;
 using VkApi;
@@ -9,7 +9,7 @@ using VkApi;
 
 
 
-namespace groupbot_dev.Models
+namespace groupbot.Models
 {
     public class GroupManager
     {
@@ -22,22 +22,20 @@ namespace groupbot_dev.Models
         public GroupManager(int bot_id, Group group_info, VkApiInterface vk_user)
         {
             this.group_info = group_info;
-            this.vk_user = vk_user;            this.bot_id = bot_id;
+            this.vk_user = vk_user;
+            this.bot_id = bot_id;
 
         }
 
-        public GroupManager(int bot_id, Group group_info, VkApiInterface vk_user, GroupContext db)
+        public GroupManager(int bot_id, Group group_info, VkApiInterface vk_user, IContext db)
         {
             this.group_info = group_info;
             this.vk_user = vk_user;
             this.bot_id = bot_id;
 
-            this.group_info.Posts = db.Posts.Where(p => p.Group.Id == this.group_info.Id && !p.IsPublished)
-                .Include(p => p.Photos)
-                .ToList();
+            this.group_info.Posts = db.GetUnpublishedPosts(this.group_info.Id);
 
-            this.group_info.DelayedRequests = db.DelayedRequests.Where(d => d.Group.Id == this.group_info.Id && !d.IsResended)
-                .ToList();
+            this.group_info.DelayedRequests = db.GetDelayedRequests(this.group_info.Id);
         }
 
 

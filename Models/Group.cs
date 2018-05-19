@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Collections.Generic;
 using VkApi;
 using System;
 using System.Linq;
@@ -8,7 +6,7 @@ using System.Linq;
 
 
 
-namespace groupbot_dev.Models
+namespace groupbot.Models
 {
     public class Group
     {
@@ -254,114 +252,6 @@ namespace groupbot_dev.Models
         public string GetNewRequest(ref VkApiInterface vk_interface)
         {
             return Request.Replace("}|{}|{04", vk_interface.token.value);
-        }
-    }
-
-
-
-
-    [DbConfigurationType(typeof(MySql.Data.Entity.MySqlEFConfiguration))]
-    public class GroupContext : DbContext
-    {
-        static public string connection_string = "";
-
-        public DbSet<Group> Groups { get; set; }
-        public DbSet<Admin> Admins { get; set; }
-        public DbSet<GroupAdmins> GroupAdmins { get; set; }
-        public DbSet<Post> Posts { get; set; }
-        public DbSet<DelayedRequest> DelayedRequests { get; set; }
-        public DbSet<Photo> Photos { get; set; }
-
-
-
-        public GroupContext() : base(connection_string)
-        { }
-
-
-        //возвращает группы с постами и отложенными запросам, но без фото
-        public Group[] GetAdminGroups(int user_id, string group_name)
-        {
-            Group[] groups = null;
-
-            if (group_name == "*")
-                groups = GroupAdmins
-                    .Where(ga => ga.Admin.VkId == user_id)
-                    .Select(ga => ga.Group)
-                    .Include(g => g.Posts)
-                    .Include(g => g.DelayedRequests).ToArray();
-            else if (group_name == "")
-                return Admins
-                    .Where(u => u.VkId == user_id)
-                    .Select(u => u.ActiveGroup)
-                    .Include(g => g.Posts)
-                    .Include(g => g.DelayedRequests).ToArray();
-            else
-                groups = GroupAdmins
-                    .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
-                    .Select(ga => ga.Group)
-                    .Include(g => g.Posts)
-                    .Include(g => g.DelayedRequests).ToArray();
-
-            return groups;
-        }
-
-
-        public Group GetAdminGroup(int user_id, string group_name, bool is_eager)
-        {
-            if (is_eager)
-                return GroupAdmins
-                    .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
-                    .Select(ga => ga.Group)
-                    .Include(g => g.Posts.Select(p => p.Photos))
-                    .Include(g => g.DelayedRequests).FirstOrDefault();
-            else
-                return GroupAdmins
-                    .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
-                    .Select(ga => ga.Group).FirstOrDefault();
-        }
-
-
-        public Group GetCurrentGroup(int user_id, bool is_eager)
-        {
-            if (!is_eager)
-                return Admins
-                    .Where(u => u.VkId == user_id)
-                    .Select(u => u.ActiveGroup)
-                    .FirstOrDefault();
-            else
-                return Admins
-                    .Where(u => u.VkId == user_id)
-                    .Select(u => u.ActiveGroup)
-                    .Include(g => g.Posts.Select(p => p.Photos))
-                    .Include(g => g.DelayedRequests).FirstOrDefault();
-        }
-
-
-        public Admin GetAdmin(int user_id, bool is_eager)
-        {
-            if (is_eager)
-                return Admins
-                    .Include(a => a.GroupAdmins)
-                    .Include(a => a.ActiveGroup)
-                    .Where(a => a.VkId == user_id).FirstOrDefault();
-            else
-                return Admins
-                    .Where(a => a.VkId == user_id).FirstOrDefault();
-        }
-
-
-        public Group[] GetDeployInfo(bool is_eager)
-        {
-            if(is_eager)
-            return Groups
-                .Include(g => g.GroupAdmins.Select(ga => ga.Admin))
-                .Include(g => g.Posts.Select(p => p.Photos))
-                //.Include(g => g.DelayedRequests)
-                .ToArray();
-            else
-                return Groups
-                    .Include(g => g.GroupAdmins.Select(ga => ga.Admin))
-                    .ToArray();
         }
     }
 }
