@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 
 
-namespace groupbot_dev.Infrastructure
+namespace groupbot.Core
 {
     public class BotSettings
     {
@@ -16,6 +16,7 @@ namespace groupbot_dev.Infrastructure
         public bool is_sync = false;
         public string bot_login;
         public string bot_pass;
+        public int bot_id;
         public string connection_string;
 
 
@@ -27,13 +28,12 @@ namespace groupbot_dev.Infrastructure
                 new XElement("saving_delay", saving_delay),
                 new XElement("listening_delay", listening_delay),
                 new XElement("vk_requests_period", vk_account.rp_controller.requests_period),
-                new XElement("max_logs_count", vk_account.vk_logs.logs_max_count),
                 new XElement("bot_login", bot_login),
                 new XElement("bot_pass", bot_pass),
+                new XElement("bot_pass", bot_id),
                 new XElement("connection_string", connection_string)));
 
             xdoc.Save(file);
-            Console.WriteLine("configs saved");
         }
 
 
@@ -48,9 +48,9 @@ namespace groupbot_dev.Infrastructure
                 saving_delay = Convert.ToInt32(xdoc.Element("saving_delay").Value);
                 listening_delay = Convert.ToInt32(xdoc.Element("listening_delay").Value);
                 vk_account.rp_controller.requests_period = Convert.ToInt32(xdoc.Element("vk_requests_period").Value);
-                vk_account.vk_logs.logs_max_count = Convert.ToInt32(xdoc.Element("max_logs_count").Value);
                 bot_login = Convert.ToString(xdoc.Element("bot_login").Value);
                 bot_pass = Convert.ToString(xdoc.Element("bot_pass").Value);
+                bot_id = Convert.ToInt32(xdoc.Element("bot_id").Value);
                 connection_string = Convert.ToString(xdoc.Element("connection_string").Value);
 
                 vk_account.login = bot_login;
