@@ -39,6 +39,9 @@ namespace groupbot.BotCore
         [JsonProperty("connection_string")]
         public static string ConnectionString { get; set; }
 
+        [JsonProperty("admin_id")]
+        public static string AdminId { get; set; }
+
         public static DateTime LastCheckTime { get; set; }
 
         private static BotSettings FromJson(string json) => JsonConvert.DeserializeObject<BotSettings>(json, groupbot.BotCore.Converter.Settings);

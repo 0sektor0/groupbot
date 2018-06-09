@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using groupbot.BotCore;
 using VkApi;
 using NLog;
 
@@ -18,7 +19,7 @@ namespace groupbot.Infrastructure
 
             try
             {
-                Core.BotSettings.LoadConfigs(config_file);
+                BotSettings.LoadConfigs(config_file);
                 logger.Trace("configs successfully loaded");
             }
             catch
@@ -27,8 +28,8 @@ namespace groupbot.Infrastructure
                 Console.WriteLine("Fatal");
             }
             
-            VkApiInterface vk_account = new VkApiInterface(Core.BotSettings.BotLogin, Core.BotSettings.BotPass, 274556, 1800, 3);
-            groupbot.Models.GroupContext.connection_string = Core.BotSettings.ConnectionString;
+            VkApiInterface vk_account = new VkApiInterface(BotSettings.BotLogin, BotSettings.BotPass, 274556, 1800, 3);
+            groupbot.Models.GroupContext.connection_string = BotSettings.ConnectionString;
 
             Executor executor = new Executor(vk_account);
             Parser parser = new Parser(executor);

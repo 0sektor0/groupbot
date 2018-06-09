@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Newtonsoft.Json.Linq;
-using groupbot.Core;
+using groupbot.BotCore;
 using NLog;
 using VkApi;
 
@@ -41,7 +41,7 @@ namespace groupbot.Infrastructure
                         logger.Trace("token updated");
                     }
 
-                    bool is_ttu = (int)((DateTime.UtcNow - Core.BotSettings.LastCheckTime).TotalSeconds) >= Core.BotSettings.SavingDelay;
+                    bool is_ttu = (int)((DateTime.UtcNow - BotSettings.LastCheckTime).TotalSeconds) >= BotSettings.SavingDelay;
                     response = vk_account.ApiMethodGet($"execute.messagesPull?");
                     messages = response.tokens;
 
@@ -49,7 +49,7 @@ namespace groupbot.Infrastructure
                         if ((string)messages[0] != "0" || is_ttu)
                             parser.Parse(messages, is_ttu);
 
-                    Thread.Sleep(Core.BotSettings.ListeningDelay);
+                    Thread.Sleep(BotSettings.ListeningDelay);
                 }
                 catch (Exception ex)
                 {

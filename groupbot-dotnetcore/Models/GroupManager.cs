@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using groupbot.Core;
+using groupbot.BotCore;
 using System.Linq;
 using System;
 using VkApi;

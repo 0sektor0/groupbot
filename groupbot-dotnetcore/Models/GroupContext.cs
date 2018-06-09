@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using groupbot.Core;
+using groupbot.BotCore;
 using System.Linq;
 
 

@@ -2,7 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using groupbot.Core;
+using groupbot.BotCore;
 
 
 
@@ -32,7 +32,7 @@ namespace groupbot.Infrastructure
 
             if (timer)
             {
-                Core.BotSettings.LastCheckTime = DateTime.UtcNow;
+                BotSettings.LastCheckTime = DateTime.UtcNow;
                 executor.ExecuteAsync(new Command("deployment", "", ultimate_admin_id, "all"));
                 executor.ExecuteAsync(new Command("save", "", ultimate_admin_id, ""));
             }
