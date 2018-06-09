@@ -20,7 +20,6 @@ namespace groupbot.Infrastructure
         private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
         private Dictionary<string, CommandExecution> functions;
         private VkApiInterface vk_account;
-        private BotSettings settings;
         const string help_file = "data/help.txt";
 
 
@@ -31,11 +30,9 @@ namespace groupbot.Infrastructure
         }
 
 
-        public Executor(BotSettings settings, VkApiInterface vk_account)
+        public Executor(VkApiInterface vk_account)
         {
-            this.settings = settings;
             this.vk_account = vk_account;
-
             InitHandlerTable();
         }
 
@@ -126,10 +123,10 @@ namespace groupbot.Infrastructure
         
         private void Info(ref Command command, ref IContext db, ref Admin admin)
         {
-            SendMessage($"last check time: {settings.last_checking_time}\r\n" +
-                $"is sync: {settings.is_sync}\r\n" +
+            SendMessage($"last check time: {Core.BotSettings.LastCheckTime}\r\n" +
+                $"is sync: { Core.BotSettings.IsSync }\r\n" +
                 $"vk req period: {vk_account.rp_controller.requests_period}\r\n" +
-                $"save delay: {settings.saving_delay}\r\n", command.uid);
+                $"save delay: {Core.BotSettings.SavingDelay}\r\n", command.uid);
         }
 
         
@@ -189,7 +186,7 @@ namespace groupbot.Infrastructure
                     case 1:
                         Group current_group = db.GetCurrentGroup(admin.VkId, false);
                         if (current_group != null)
-                            new GroupManager( settings.bot_id, current_group, vk_account).CreatePost(command.atachments, command.parametrs[0], true);
+                            new GroupManager( Core.BotSettings.BotId, current_group, vk_account).CreatePost(command.atachments, command.parametrs[0], true);
                         break;
 
                     case 2:
@@ -203,7 +200,7 @@ namespace groupbot.Infrastructure
                                     commands.Push(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/s"));
                             //как один пост
                             if (command.parametrs[1] == "s")
-                                new GroupManager( settings.bot_id, group, vk_account).CreatePost(command.atachments, "", true);
+                                new GroupManager( Core.BotSettings.BotId, group, vk_account).CreatePost(command.atachments, "", true);
                         }
                         break;
 
@@ -226,7 +223,7 @@ namespace groupbot.Infrastructure
                         case "sd":
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
-                                settings.saving_delay = new_val;
+                                Core.BotSettings.SavingDelay = new_val;
                                 logger.Info($"savedelay changed\r\nUser: {admin.VkId}");
                             }
                             break;
@@ -380,7 +377,7 @@ namespace groupbot.Infrastructure
             GroupManager current_group = null;
 
             if (group != null)
-                current_group = new GroupManager( settings.bot_id, admin.ActiveGroup, vk_account, db);
+                current_group = new GroupManager( Core.BotSettings.BotId, admin.ActiveGroup, vk_account, db);
             else
                 return;
 
@@ -418,7 +415,7 @@ namespace groupbot.Infrastructure
                 GroupManager current_group = null;
 
                 if (g != null)
-                    current_group = new GroupManager( settings.bot_id, g, vk_account, db);
+                    current_group = new GroupManager( Core.BotSettings.BotId, g, vk_account, db);
                 else
                     return;
 
@@ -440,7 +437,7 @@ namespace groupbot.Infrastructure
                             Group[] groups = db.GetDeployInfo(false);
                             foreach (Group group in groups)
                             {
-                                GroupManager gm = new GroupManager( settings.bot_id, group, vk_account, db);
+                                GroupManager gm = new GroupManager( Core.BotSettings.BotId, group, vk_account, db);
                                 int depinfo = gm.Deployment();
                                 if (depinfo < group.MinPostCount && group.Notify)
                                     foreach (GroupAdmins ga in group.GroupAdmins)
