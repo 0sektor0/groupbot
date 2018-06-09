@@ -1,5 +1,6 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using groupbot.Core;
 using System.Linq;
 
@@ -7,8 +8,6 @@ using System.Linq;
 
 namespace groupbot.Models
 {
-
-    [DbConfigurationType(typeof(MySql.Data.Entity.MySqlEFConfiguration))]
     public class GroupContext : DbContext, IContext
     {
         static public string connection_string = "";
@@ -22,8 +21,11 @@ namespace groupbot.Models
 
 
 
-        public GroupContext() : base(connection_string)
-        { }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite("Filename=groupbot.db");
+            //optionsBuilder.UseMySQL(connection_string);
+        }
 
 
         //возвращает группы с постами и отложенными запросам, но без фото
@@ -125,6 +127,16 @@ namespace groupbot.Models
         {
             return DelayedRequests.Where(d => d.Group.Id == group_id && !d.IsResended)
                 .ToList();
+        }
+
+        int IContext.SaveChanges()
+        {
+            return base.SaveChanges();
+        }
+
+        Task<int> IContext.SaveChangesAsync()
+        {
+            return SaveChangesAsync();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace groupbot.Core
 {
     public class BotSettings
     {
-        private string file = "data/botconfig.xml";
+        private string file = "./data/botconfig.xml";
         public DateTime last_checking_time;
         public int saving_delay = 14400;
         public int listening_delay = 600;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using VkApi;
 using NLog;
 
@@ -16,7 +17,7 @@ namespace groupbot.Infrastructure
             Core.BotSettings settings = new Core.BotSettings();
             VkApiInterface vk_account = new VkApiInterface("", "", 274556, 1800, 3);
 
-            if (settings.LoadConfigs(vk_account, "data/botconfig.xml"))
+            if (settings.LoadConfigs(vk_account, "./data/botconfig.xml"))
             {
                 logger.Trace("configs successfully loaded");
 
