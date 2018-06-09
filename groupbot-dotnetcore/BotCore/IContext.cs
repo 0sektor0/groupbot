@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 
-namespace groupbot.Core
+namespace groupbot.BotCore
 {
     public interface IContext
     {

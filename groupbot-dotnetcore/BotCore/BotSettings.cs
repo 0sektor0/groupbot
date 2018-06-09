@@ -7,7 +7,7 @@ using Newtonsoft.Json.Converters;
 
 
 
-namespace groupbot.Core
+namespace groupbot.BotCore
 {
 
     public class BotSettings
@@ -41,7 +41,7 @@ namespace groupbot.Core
 
         public static DateTime LastCheckTime { get; set; }
 
-        private static BotSettings FromJson(string json) => JsonConvert.DeserializeObject<BotSettings>(json, groupbot.Core.Converter.Settings);
+        private static BotSettings FromJson(string json) => JsonConvert.DeserializeObject<BotSettings>(json, groupbot.BotCore.Converter.Settings);
 
         public static void LoadConfigs(string path)
         {
@@ -57,7 +57,7 @@ namespace groupbot.Core
 
     public static class Serialize
     {
-        public static string ToJson(this BotSettings self) => JsonConvert.SerializeObject(self, groupbot.Core.Converter.Settings);
+        public static string ToJson(this BotSettings self) => JsonConvert.SerializeObject(self, groupbot.BotCore.Converter.Settings);
     }
 
     internal static class Converter
