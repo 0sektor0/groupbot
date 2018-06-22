@@ -49,7 +49,7 @@ namespace groupbot.Infrastructure
             try
             {
                 IContext db = new GroupContext();
-                Admin admin = db.GetAdmin(Convert.ToInt32(command.uid), true);
+                Admin admin = db.GetAdmin(Convert.ToInt32(command.uid), false);
 
                 if (admin != null)
                 {
