@@ -1,14 +1,14 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using groupbot.Core;
+using System.Threading.Tasks;
+using groupbot.BotCore;
 using System.Linq;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 
 
 namespace groupbot.Models
 {
-
-    [DbConfigurationType(typeof(MySql.Data.Entity.MySqlEFConfiguration))]
     public class GroupContext : DbContext, IContext
     {
         static public string connection_string = "";
@@ -22,8 +22,12 @@ namespace groupbot.Models
 
 
 
-        public GroupContext() : base(connection_string)
-        { }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            //optionsBuilder.UseNpgsql(connection_string);
+            //optionsBuilder.UseSqlite("Filename=groupbot.db");
+            optionsBuilder.UseMySql(connection_string);
+        }
 
 
         //возвращает группы с постами и отложенными запросам, но без фото
@@ -125,6 +129,16 @@ namespace groupbot.Models
         {
             return DelayedRequests.Where(d => d.Group.Id == group_id && !d.IsResended)
                 .ToList();
+        }
+
+        int IContext.SaveChanges()
+        {
+            return base.SaveChanges();
+        }
+
+        Task<int> IContext.SaveChangesAsync()
+        {
+            return SaveChangesAsync();
         }
     }
 }
