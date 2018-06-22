@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using groupbot.BotCore;
 using System.Linq;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 
 
@@ -23,8 +24,9 @@ namespace groupbot.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=groupbot.db");
-            //optionsBuilder.UseMySQL(connection_string);
+            //optionsBuilder.UseNpgsql(connection_string);
+            //optionsBuilder.UseSqlite("Filename=groupbot.db");
+            optionsBuilder.UseMySql("Server=194.87.144.249;Database=groupbot;Uid=sektor;Pwd=EGE_030697-ta;Convert Zero Datetime=True;Charset=utf8;Persist Security Info=True");
         }
 
 

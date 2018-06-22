@@ -1,9 +1,10 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace groupbot.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +13,7 @@ namespace groupbot.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     VkId = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     PseudoName = table.Column<string>(nullable: true),
@@ -37,7 +38,7 @@ namespace groupbot.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     VkId = table.Column<int>(nullable: false),
                     FName = table.Column<string>(nullable: true),
                     SName = table.Column<string>(nullable: true),
@@ -60,7 +61,7 @@ namespace groupbot.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Request = table.Column<string>(nullable: true),
                     IsResended = table.Column<bool>(nullable: false),
                     CreationTime = table.Column<DateTime>(nullable: false),
@@ -82,7 +83,7 @@ namespace groupbot.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Text = table.Column<string>(nullable: true),
                     IsPublished = table.Column<bool>(nullable: false),
                     CreationDate = table.Column<DateTime>(nullable: false),
@@ -104,7 +105,7 @@ namespace groupbot.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     GroupId = table.Column<int>(nullable: false),
                     AdminId = table.Column<int>(nullable: false),
                     Notify = table.Column<bool>(nullable: false)
@@ -131,7 +132,7 @@ namespace groupbot.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     PictureName = table.Column<string>(nullable: true),
                     XPictureAddress = table.Column<string>(nullable: true),
                     SPictureAddress = table.Column<string>(nullable: true),

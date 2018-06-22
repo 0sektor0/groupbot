@@ -9,14 +9,15 @@ using groupbot.Models;
 namespace groupbot.Migrations
 {
     [DbContext(typeof(GroupContext))]
-    [Migration("20180609182806_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20180622181726_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.0-rtm-30799");
+                .HasAnnotation("ProductVersion", "2.1.0-rtm-30799")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("groupbot.Models.Admin", b =>
                 {
