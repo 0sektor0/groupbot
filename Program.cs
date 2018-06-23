@@ -17,15 +17,25 @@ namespace groupbot.Infrastructure
             Logger logger = LogManager.GetCurrentClassLogger();
             VkResponse.debug = true;
 
+            if(args.Length != 0)
+            config_file = args[0];
+
             try
             {
                 BotSettings.LoadConfigs(config_file);
                 logger.Trace("configs successfully loaded");
             }
-            catch
+            catch(FileNotFoundException)
             {
                 logger.Fatal($"cannot find file {config_file}");
-                Console.WriteLine("Fatal");
+                Console.WriteLine($"cannot find file {config_file}");
+                return;
+            }
+            catch(Exception ex)
+            {
+                logger.Fatal(ex.Message);
+                Console.WriteLine(ex.Message);
+                return;
             }
             
             VkApiInterface vk_account = new VkApiInterface(BotSettings.BotLogin, BotSettings.BotPass, 274556, 1800, 3);
