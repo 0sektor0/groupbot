@@ -1,10 +1,15 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+<<<<<<< HEAD:Models/GroupManager.cs
 using System.Data.Entity;
 using groupbot.Core;
+=======
+using groupbot.BotCore;
+>>>>>>> mysql-core-problem:models/GroupManager.cs
 using System.Linq;
 using System;
 using VkApi;
+using NLog;
 
 
 
@@ -13,6 +18,10 @@ namespace groupbot.Models
 {
     public class GroupManager
     {
+<<<<<<< HEAD:Models/GroupManager.cs
+=======
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+>>>>>>> mysql-core-problem:models/GroupManager.cs
         private int bot_id;
         public VkApiInterface vk_user;
         public Group group_info;
@@ -64,7 +73,7 @@ namespace groupbot.Models
                 }
             else
             {
-                Console.WriteLine($"GROUPMANAGER: failed postponedinf \r\ntime: {DateTime.UtcNow}");
+                logger.Warn("failed postponedinf");
                 return group_info.Limit;
             }
         }
@@ -112,7 +121,7 @@ namespace groupbot.Models
             if (downloaded_photos.Count > 0)
                 post.Photos = downloaded_photos;
 
-            if(post.IsPostCorrect())
+            if (post.IsPostCorrect())
             {
                 if (group_info.Posts == null)
                     group_info.Posts = new List<Post>() { post };
@@ -124,7 +133,11 @@ namespace groupbot.Models
                     SendPost(ref post, true);
             }
             else
+<<<<<<< HEAD:Models/GroupManager.cs
                 Console.WriteLine($"GROUPMANAGER: Invalid post to {group_info.PseudoName}\r\ntime: {DateTime.UtcNow}\r\n");
+=======
+                logger.Warn($"Invalid post to {group_info.PseudoName}");
+>>>>>>> mysql-core-problem:models/GroupManager.cs
         }
 
 
@@ -143,7 +156,11 @@ namespace groupbot.Models
             }
             else
             {
+<<<<<<< HEAD:Models/GroupManager.cs
                 Console.WriteLine($"GROUPMANAGER: failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}\r\n");
+=======
+                logger.Warn($"failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}");
+>>>>>>> mysql-core-problem:models/GroupManager.cs
                 PostponedInf();
             }
         }
@@ -163,7 +180,11 @@ namespace groupbot.Models
 
                     if (post == null)
                     {
+<<<<<<< HEAD:Models/GroupManager.cs
                         Console.WriteLine($"GROUPMANAGER: failed to get post vkurl there is no posts at all\r\nGroup: {group_info.Id} \r\ntime: {DateTime.UtcNow}\r\n");
+=======
+                        logger.Warn($"failed to get post vkurl there is no posts at all\r\nGroup: {group_info.Id}");
+>>>>>>> mysql-core-problem:models/GroupManager.cs
                         return false;
                     }
 
@@ -180,12 +201,20 @@ namespace groupbot.Models
                 {
                     group_info.PostTime = group_info.PostTime + group_info.Offset;
                     post.IsPublished = true;
+<<<<<<< HEAD:Models/GroupManager.cs
                     Console.WriteLine($"GROUPMANAGER: post successfully created\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}\r\n");
+=======
+                    logger.Info($"post successfully created\r\nGroup: {group_info.Id} Post: {post.Id}");
+>>>>>>> mysql-core-problem:models/GroupManager.cs
                     return true;
                 }
                 else
                 {
+<<<<<<< HEAD:Models/GroupManager.cs
                     Console.WriteLine($"GROUPMANAGER: failed to send post\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}\r\n");
+=======
+                    logger.Warn($"failed to send post\r\nGroup: {group_info.Id} Post: {post.Id}");
+>>>>>>> mysql-core-problem:models/GroupManager.cs
                     PostponedInf();
                     return false;
                 }
@@ -224,7 +253,7 @@ namespace groupbot.Models
                         }
                         else
                         {
-                            Console.WriteLine($"GROUPMANAGER: failed to resend photo\r\nGroup: {group_info.Id} DelayedRequest: {drequests[i].Id}\r\ntime: {DateTime.UtcNow}");
+                            logger.Warn($"failed to resend photo\r\nGroup: {group_info.Id} DelayedRequest: {drequests[i].Id}\r\ntime: {DateTime.UtcNow}");
                             break;
                         }
 
@@ -242,7 +271,11 @@ namespace groupbot.Models
                 }
             }
             else
+<<<<<<< HEAD:Models/GroupManager.cs
                 Console.WriteLine($"GROUPMANAGER: there is no photo to resend\r\nGroup: {group_info.Id} \r\ntime: {DateTime.UtcNow}");
+=======
+                logger.Warn($"there is no photo to resend\r\nGroup: {group_info.Id}");
+>>>>>>> mysql-core-problem:models/GroupManager.cs
         }        
 
 
@@ -257,10 +290,14 @@ namespace groupbot.Models
                     for (int i = postsCounter; i <= group_info.Limit; i++)
                         if (!SendPost())
                             break;
+<<<<<<< HEAD:Models/GroupManager.cs
 
                     Console.WriteLine($"GROUPMANAGER: Deployment Ended\r\nGroup: {group_info.Id}\r\ntime: {DateTime.UtcNow}\r\n");
                     //log += "_DeploymentEnd\n";
+=======
+>>>>>>> mysql-core-problem:models/GroupManager.cs
 
+                    logger.Info($"Deployment Ended\r\nGroup: {group_info.Id}");
                     RepeatFailedRequests();
                     return postsCounter + group_info.Posts.Where(p => p.IsPublished == false).Count();
                 }
@@ -278,9 +315,7 @@ namespace groupbot.Models
 
             if (response.isCorrect)
             {
-                //Console.Write($"alignment started {DateTime.UtcNow}");
                 text = $"alignment started {DateTime.UtcNow}";
-                //log += $"alignment started {DateTime.UtcNow}\n";
 
                 int errorCount = (int)jo[0];
                 int postsCount = (int)jo[1] - 1;
@@ -305,20 +340,14 @@ namespace groupbot.Models
                             }
                         }
                     }
-
-                    //Console.Write("alignment ended");
+                    
                     text += "alignment ended";
-                    //log += "alignment ended\n";
-                    group_info.PostTime = temppost_time;
-
-                    //vk_user.vk_logs.AddToLogs(response, 2, text, group_info.Name);
+                    group_info.PostTime = temppost_time;                    
                     return new int[] { 0 };
                 }
-                //Console.Write("alignment ended");
-                text += "alignment ended";
-                //log += "alignment ended\n";
 
-                //vk_user.vk_logs.AddToLogs(response, 2, text, group_info.Name);
+                text += "alignment ended";
+                logger.Info(text);
                 return new int[] { errorCount, postsCount };
             }
 

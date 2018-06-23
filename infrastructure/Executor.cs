@@ -1,24 +1,38 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using groupbot.Models;
+<<<<<<< HEAD:Infrastructure/Executor.cs
 using groupbot.Core;
+=======
+using groupbot.BotCore;
+>>>>>>> mysql-core-problem:infrastructure/Executor.cs
 using System.Linq;
 using System.Text;
 using System.IO;
 using System;
 using VkApi;
+using NLog;
 
 
 
 
 namespace groupbot.Infrastructure
 {
+<<<<<<< HEAD:Infrastructure/Executor.cs
     class Executor : IExecutor
     {
         private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
         private Dictionary<string, CommandExecution> functions;
         private VkApiInterface vk_account;
         private BotSettings settings;
+=======
+    public class Executor : IExecutor
+    {
+        private Logger logger = LogManager.GetCurrentClassLogger();
+        private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
+        private Dictionary<string, CommandExecution> functions;
+        private VkApiInterface vk_account;
+>>>>>>> mysql-core-problem:infrastructure/Executor.cs
         const string help_file = "data/help.txt";
 
 
@@ -29,11 +43,9 @@ namespace groupbot.Infrastructure
         }
 
 
-        public Executor(BotSettings settings, VkApiInterface vk_account)
+        public Executor(VkApiInterface vk_account)
         {
-            this.settings = settings;
             this.vk_account = vk_account;
-
             InitHandlerTable();
         }
 
@@ -50,11 +62,19 @@ namespace groupbot.Infrastructure
             try
             {
                 IContext db = new GroupContext();
+<<<<<<< HEAD:Infrastructure/Executor.cs
                 Admin admin = db.GetAdmin(Convert.ToInt32(command.uid), true);
+=======
+                Admin admin = db.GetAdmin(Convert.ToInt32(command.uid), false);
+>>>>>>> mysql-core-problem:infrastructure/Executor.cs
 
                 if (admin != null)
+                {
                     if (functions.Keys.Contains(command.type))
                         functions[command.type]?.Invoke(ref command, ref db, ref admin);
+                }
+                else
+                    logger.Warn($"unknown user: {command.uid}");
 
                 db.SaveChanges();
                 db.Dispose();
@@ -62,8 +82,13 @@ namespace groupbot.Infrastructure
             catch (Exception e)
             {
 
+<<<<<<< HEAD:Infrastructure/Executor.cs
                 SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}", "29334144");
                 Console.WriteLine($"ERROR: {e.Message}");
+=======
+                SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}", BotSettings.AdminId.ToString());
+                logger.Error(e.Message);
+>>>>>>> mysql-core-problem:infrastructure/Executor.cs
             }
         }
 
@@ -120,13 +145,10 @@ namespace groupbot.Infrastructure
         
         private void Info(ref Command command, ref IContext db, ref Admin admin)
         {
-            SendMessage($"last check time: {settings.last_checking_time}\r\n" +
-                $"is sync: {settings.is_sync}\r\n" +
+            SendMessage($"last check time: {BotSettings.LastCheckTime}\r\n" +
+                $"is sync: { BotSettings.IsSync }\r\n" +
                 $"vk req period: {vk_account.rp_controller.requests_period}\r\n" +
-                $"save delay: {settings.saving_delay}\r\n" +
-                $"S: {vk_account.vk_logs.success_counts}\r\n" +
-                $"E: {vk_account.vk_logs.errors_count}\r\n" +
-                $"Max logs: {vk_account.vk_logs.logs_max_count}", command.uid);
+                $"save delay: {BotSettings.SavingDelay}\r\n", command.uid);
         }
 
         
@@ -186,7 +208,11 @@ namespace groupbot.Infrastructure
                     case 1:
                         Group current_group = db.GetCurrentGroup(admin.VkId, false);
                         if (current_group != null)
+<<<<<<< HEAD:Infrastructure/Executor.cs
                             new GroupManager( settings.bot_id, current_group, vk_account).CreatePost(command.atachments, command.parametrs[0], true);
+=======
+                            new GroupManager( BotSettings.BotId, current_group, vk_account).CreatePost(command.atachments, command.parametrs[0], true);
+>>>>>>> mysql-core-problem:infrastructure/Executor.cs
                         break;
 
                     case 2:
@@ -200,7 +226,11 @@ namespace groupbot.Infrastructure
                                     commands.Push(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/s"));
                             //как один пост
                             if (command.parametrs[1] == "s")
+<<<<<<< HEAD:Infrastructure/Executor.cs
                                 new GroupManager( settings.bot_id, group, vk_account).CreatePost(command.atachments, "", true);
+=======
+                                new GroupManager( BotSettings.BotId, group, vk_account).CreatePost(command.atachments, "", true);
+>>>>>>> mysql-core-problem:infrastructure/Executor.cs
                         }
                         break;
 
@@ -223,10 +253,8 @@ namespace groupbot.Infrastructure
                         case "sd":
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
-                                settings.saving_delay = new_val;
-                                Console.WriteLine($"EXECUTOR: savedelay changed\r\nUser: {admin.VkId}\r\ntime: {DateTime.UtcNow}");
-                                /*logs*/
-                                //vk_account.vk_logs.AddToLogs(true, "", 1, $"save delay set to {new_val}", "bot");
+                                BotSettings.SavingDelay = new_val;
+                                logger.Info($"savedelay changed\r\nUser: {admin.VkId}");
                             }
                             break;
 
@@ -234,9 +262,7 @@ namespace groupbot.Infrastructure
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
                                 vk_account.rp_controller.requests_period = new_val;
-                                Console.WriteLine($"EXECUTOR: rp changed\r\nUser: {admin.VkId}\r\ntime: {DateTime.UtcNow}");
-                                /*logs*/
-                                //vk_account.vk_logs.AddToLogs(true, "", 1, $"vk tl set to {new_val}", "bot");
+                                logger.Info($"rp changed\r\nUser: {admin.VkId}");
                             }
                             break;
 
@@ -345,12 +371,12 @@ namespace groupbot.Infrastructure
                 if (command.parametrs[0] == "on")
                 {
                     admin.ActiveGroup.IsWt = true;
-                    Console.WriteLine($"EXECUTOR: auto enabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}\r\ntime: {DateTime.UtcNow}");
+                    logger.Info($"auto mode enabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
                 }
                 if (command.parametrs[0] == "off")
                 {
                     admin.ActiveGroup.IsWt = false;
-                    Console.WriteLine($"EXECUTOR: auto disabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}\r\ntime: {DateTime.UtcNow}");
+                    logger.Info($"auto mode disabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
                 }
             }
         }
@@ -366,7 +392,7 @@ namespace groupbot.Infrastructure
                 if (letters.Count<char>() == 0)
                 {
                     admin.ActiveGroup.Offset = Convert.ToInt32(command.parametrs[0]);
-                    Console.WriteLine($"EXECUTOR: offset changed at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}\r\ntime: {DateTime.UtcNow}");
+                    logger.Info($"offset changed at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
                 }
                 else
                     SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
@@ -381,7 +407,11 @@ namespace groupbot.Infrastructure
             GroupManager current_group = null;
 
             if (group != null)
+<<<<<<< HEAD:Infrastructure/Executor.cs
                 current_group = new GroupManager( settings.bot_id, admin.ActiveGroup, vk_account, db);
+=======
+                current_group = new GroupManager( BotSettings.BotId, admin.ActiveGroup, vk_account, db);
+>>>>>>> mysql-core-problem:infrastructure/Executor.cs
             else
                 return;
 
@@ -419,7 +449,11 @@ namespace groupbot.Infrastructure
                 GroupManager current_group = null;
 
                 if (g != null)
+<<<<<<< HEAD:Infrastructure/Executor.cs
                     current_group = new GroupManager( settings.bot_id, g, vk_account, db);
+=======
+                    current_group = new GroupManager( BotSettings.BotId, g, vk_account, db);
+>>>>>>> mysql-core-problem:infrastructure/Executor.cs
                 else
                     return;
 
@@ -441,7 +475,11 @@ namespace groupbot.Infrastructure
                             Group[] groups = db.GetDeployInfo(false);
                             foreach (Group group in groups)
                             {
+<<<<<<< HEAD:Infrastructure/Executor.cs
                                 GroupManager gm = new GroupManager( settings.bot_id, group, vk_account, db);
+=======
+                                GroupManager gm = new GroupManager( BotSettings.BotId, group, vk_account, db);
+>>>>>>> mysql-core-problem:infrastructure/Executor.cs
                                 int depinfo = gm.Deployment();
                                 if (depinfo < group.MinPostCount && group.Notify)
                                     foreach (GroupAdmins ga in group.GroupAdmins)
@@ -453,12 +491,12 @@ namespace groupbot.Infrastructure
 
                     case "off":
                         current_group.group_info.PostponeEnabled = false;
-                        vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.Name}'s postponedOn = {current_group.group_info.PostponeEnabled}", current_group.group_info.Name);
+                        logger.Info($"{command.ToString()}\r\n{current_group.group_info.Name}'s postponedOn = {current_group.group_info.PostponeEnabled}");
                         break;
 
                     case "on":
                         current_group.group_info.PostponeEnabled = true;
-                        vk_account.vk_logs.AddToLogs(true, "", 1, $"{command.ToString()}\r\n{current_group.group_info.Name}'s postponedOn = {current_group.group_info.PostponeEnabled}", current_group.group_info.Name);
+                        logger.Info($"{command.ToString()}\r\n{current_group.group_info.Name}'s postponedOn = {current_group.group_info.PostponeEnabled}");
                         break;
 
                     default:
