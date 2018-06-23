@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using groupbot.Models;
-<<<<<<< HEAD:Infrastructure/Executor.cs
-using groupbot.Core;
-=======
 using groupbot.BotCore;
->>>>>>> mysql-core-problem:infrastructure/Executor.cs
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -18,21 +14,12 @@ using NLog;
 
 namespace groupbot.Infrastructure
 {
-<<<<<<< HEAD:Infrastructure/Executor.cs
-    class Executor : IExecutor
-    {
-        private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
-        private Dictionary<string, CommandExecution> functions;
-        private VkApiInterface vk_account;
-        private BotSettings settings;
-=======
     public class Executor : IExecutor
     {
         private Logger logger = LogManager.GetCurrentClassLogger();
         private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
         private Dictionary<string, CommandExecution> functions;
         private VkApiInterface vk_account;
->>>>>>> mysql-core-problem:infrastructure/Executor.cs
         const string help_file = "data/help.txt";
 
 
@@ -62,11 +49,7 @@ namespace groupbot.Infrastructure
             try
             {
                 IContext db = new GroupContext();
-<<<<<<< HEAD:Infrastructure/Executor.cs
-                Admin admin = db.GetAdmin(Convert.ToInt32(command.uid), true);
-=======
                 Admin admin = db.GetAdmin(Convert.ToInt32(command.uid), false);
->>>>>>> mysql-core-problem:infrastructure/Executor.cs
 
                 if (admin != null)
                 {
@@ -82,13 +65,8 @@ namespace groupbot.Infrastructure
             catch (Exception e)
             {
 
-<<<<<<< HEAD:Infrastructure/Executor.cs
-                SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}", "29334144");
-                Console.WriteLine($"ERROR: {e.Message}");
-=======
                 SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}", BotSettings.AdminId.ToString());
                 logger.Error(e.Message);
->>>>>>> mysql-core-problem:infrastructure/Executor.cs
             }
         }
 
@@ -208,11 +186,7 @@ namespace groupbot.Infrastructure
                     case 1:
                         Group current_group = db.GetCurrentGroup(admin.VkId, false);
                         if (current_group != null)
-<<<<<<< HEAD:Infrastructure/Executor.cs
-                            new GroupManager( settings.bot_id, current_group, vk_account).CreatePost(command.atachments, command.parametrs[0], true);
-=======
                             new GroupManager( BotSettings.BotId, current_group, vk_account).CreatePost(command.atachments, command.parametrs[0], true);
->>>>>>> mysql-core-problem:infrastructure/Executor.cs
                         break;
 
                     case 2:
@@ -226,11 +200,7 @@ namespace groupbot.Infrastructure
                                     commands.Push(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/s"));
                             //как один пост
                             if (command.parametrs[1] == "s")
-<<<<<<< HEAD:Infrastructure/Executor.cs
-                                new GroupManager( settings.bot_id, group, vk_account).CreatePost(command.atachments, "", true);
-=======
                                 new GroupManager( BotSettings.BotId, group, vk_account).CreatePost(command.atachments, "", true);
->>>>>>> mysql-core-problem:infrastructure/Executor.cs
                         }
                         break;
 
@@ -407,11 +377,7 @@ namespace groupbot.Infrastructure
             GroupManager current_group = null;
 
             if (group != null)
-<<<<<<< HEAD:Infrastructure/Executor.cs
-                current_group = new GroupManager( settings.bot_id, admin.ActiveGroup, vk_account, db);
-=======
                 current_group = new GroupManager( BotSettings.BotId, admin.ActiveGroup, vk_account, db);
->>>>>>> mysql-core-problem:infrastructure/Executor.cs
             else
                 return;
 
@@ -449,11 +415,7 @@ namespace groupbot.Infrastructure
                 GroupManager current_group = null;
 
                 if (g != null)
-<<<<<<< HEAD:Infrastructure/Executor.cs
-                    current_group = new GroupManager( settings.bot_id, g, vk_account, db);
-=======
                     current_group = new GroupManager( BotSettings.BotId, g, vk_account, db);
->>>>>>> mysql-core-problem:infrastructure/Executor.cs
                 else
                     return;
 
@@ -475,11 +437,7 @@ namespace groupbot.Infrastructure
                             Group[] groups = db.GetDeployInfo(false);
                             foreach (Group group in groups)
                             {
-<<<<<<< HEAD:Infrastructure/Executor.cs
-                                GroupManager gm = new GroupManager( settings.bot_id, group, vk_account, db);
-=======
                                 GroupManager gm = new GroupManager( BotSettings.BotId, group, vk_account, db);
->>>>>>> mysql-core-problem:infrastructure/Executor.cs
                                 int depinfo = gm.Deployment();
                                 if (depinfo < group.MinPostCount && group.Notify)
                                     foreach (GroupAdmins ga in group.GroupAdmins)

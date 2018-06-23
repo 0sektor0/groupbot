@@ -1,11 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-<<<<<<< HEAD:Models/GroupManager.cs
-using System.Data.Entity;
-using groupbot.Core;
-=======
 using groupbot.BotCore;
->>>>>>> mysql-core-problem:models/GroupManager.cs
 using System.Linq;
 using System;
 using VkApi;
@@ -18,10 +13,7 @@ namespace groupbot.Models
 {
     public class GroupManager
     {
-<<<<<<< HEAD:Models/GroupManager.cs
-=======
         private static Logger logger = LogManager.GetCurrentClassLogger();
->>>>>>> mysql-core-problem:models/GroupManager.cs
         private int bot_id;
         public VkApiInterface vk_user;
         public Group group_info;
@@ -133,11 +125,7 @@ namespace groupbot.Models
                     SendPost(ref post, true);
             }
             else
-<<<<<<< HEAD:Models/GroupManager.cs
-                Console.WriteLine($"GROUPMANAGER: Invalid post to {group_info.PseudoName}\r\ntime: {DateTime.UtcNow}\r\n");
-=======
                 logger.Warn($"Invalid post to {group_info.PseudoName}");
->>>>>>> mysql-core-problem:models/GroupManager.cs
         }
 
 
@@ -156,11 +144,7 @@ namespace groupbot.Models
             }
             else
             {
-<<<<<<< HEAD:Models/GroupManager.cs
-                Console.WriteLine($"GROUPMANAGER: failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}\r\n");
-=======
                 logger.Warn($"failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}");
->>>>>>> mysql-core-problem:models/GroupManager.cs
                 PostponedInf();
             }
         }
@@ -180,11 +164,7 @@ namespace groupbot.Models
 
                     if (post == null)
                     {
-<<<<<<< HEAD:Models/GroupManager.cs
-                        Console.WriteLine($"GROUPMANAGER: failed to get post vkurl there is no posts at all\r\nGroup: {group_info.Id} \r\ntime: {DateTime.UtcNow}\r\n");
-=======
                         logger.Warn($"failed to get post vkurl there is no posts at all\r\nGroup: {group_info.Id}");
->>>>>>> mysql-core-problem:models/GroupManager.cs
                         return false;
                     }
 
@@ -201,20 +181,12 @@ namespace groupbot.Models
                 {
                     group_info.PostTime = group_info.PostTime + group_info.Offset;
                     post.IsPublished = true;
-<<<<<<< HEAD:Models/GroupManager.cs
-                    Console.WriteLine($"GROUPMANAGER: post successfully created\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}\r\n");
-=======
                     logger.Info($"post successfully created\r\nGroup: {group_info.Id} Post: {post.Id}");
->>>>>>> mysql-core-problem:models/GroupManager.cs
                     return true;
                 }
                 else
                 {
-<<<<<<< HEAD:Models/GroupManager.cs
-                    Console.WriteLine($"GROUPMANAGER: failed to send post\r\nGroup: {group_info.Id} Post: {post.Id}\r\ntime: {DateTime.UtcNow}\r\n");
-=======
                     logger.Warn($"failed to send post\r\nGroup: {group_info.Id} Post: {post.Id}");
->>>>>>> mysql-core-problem:models/GroupManager.cs
                     PostponedInf();
                     return false;
                 }
@@ -271,11 +243,7 @@ namespace groupbot.Models
                 }
             }
             else
-<<<<<<< HEAD:Models/GroupManager.cs
-                Console.WriteLine($"GROUPMANAGER: there is no photo to resend\r\nGroup: {group_info.Id} \r\ntime: {DateTime.UtcNow}");
-=======
                 logger.Warn($"there is no photo to resend\r\nGroup: {group_info.Id}");
->>>>>>> mysql-core-problem:models/GroupManager.cs
         }        
 
 
@@ -290,12 +258,6 @@ namespace groupbot.Models
                     for (int i = postsCounter; i <= group_info.Limit; i++)
                         if (!SendPost())
                             break;
-<<<<<<< HEAD:Models/GroupManager.cs
-
-                    Console.WriteLine($"GROUPMANAGER: Deployment Ended\r\nGroup: {group_info.Id}\r\ntime: {DateTime.UtcNow}\r\n");
-                    //log += "_DeploymentEnd\n";
-=======
->>>>>>> mysql-core-problem:models/GroupManager.cs
 
                     logger.Info($"Deployment Ended\r\nGroup: {group_info.Id}");
                     RepeatFailedRequests();

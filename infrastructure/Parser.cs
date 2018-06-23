@@ -2,11 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-<<<<<<< HEAD:Infrastructure/Parser.cs
-using groupbot.Core;
-=======
 using groupbot.BotCore;
->>>>>>> mysql-core-problem:infrastructure/Parser.cs
 
 
 
@@ -16,21 +12,11 @@ namespace groupbot.Infrastructure
     class Parser : AParser
     {
         const string ultimate_admin_id = "29334144";
-<<<<<<< HEAD:Infrastructure/Parser.cs
-        BotSettings settings;
-
-
-
-        public Parser(BotSettings settings, IExecutor executor) : base(executor)
-        {
-            this.settings = settings;
-=======
 
 
 
         public Parser(IExecutor executor) : base(executor) 
         {
->>>>>>> mysql-core-problem:infrastructure/Parser.cs
         }
 
 

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Threading;
 using Newtonsoft.Json.Linq;
-<<<<<<< HEAD:Infrastructure/RListener.cs
-using groupbot.Core;
-=======
 using groupbot.BotCore;
 using NLog;
->>>>>>> mysql-core-problem:infrastructure/RListener.cs
 using VkApi;
 
 
@@ -17,19 +13,11 @@ namespace groupbot.Infrastructure
     class RListener : AListener
     {
         public VkApiInterface vk_account;
-<<<<<<< HEAD:Infrastructure/RListener.cs
-        private BotSettings settings;
-
-        
-
-        public RListener(BotSettings settings, AParser parser, VkApiInterface vk_account) : base(parser)
-=======
         private Logger logger;
 
         
 
         public RListener(AParser parser, VkApiInterface vk_account) : base(parser)
->>>>>>> mysql-core-problem:infrastructure/RListener.cs
         {
             this.vk_account = vk_account;
             this.parser = parser;
