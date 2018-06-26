@@ -11,6 +11,7 @@ namespace groupbot.Infrastructure
 {
     class Parser : AParser
     {
+        BotSettings settings = BotSettings.GetSettings();
         const string ultimate_admin_id = "29334144";
 
 
@@ -32,7 +33,7 @@ namespace groupbot.Infrastructure
 
             if (timer)
             {
-                BotSettings.LastCheckTime = DateTime.UtcNow;
+                settings.LastCheckTime = DateTime.UtcNow;
                 executor.ExecuteAsync(new Command("deployment", "", ultimate_admin_id, "all"));
                 executor.ExecuteAsync(new Command("save", "", ultimate_admin_id, ""));
             }

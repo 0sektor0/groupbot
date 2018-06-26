@@ -20,9 +20,11 @@ namespace groupbot.Infrastructure
             if(args.Length != 0)
             config_file = args[0];
 
+            BotSettings settings;
             try
             {
-                BotSettings.LoadConfigs(config_file);
+                BotSettings.SetPath(config_file);
+                settings = BotSettings.GetSettings();
                 logger.Trace("configs successfully loaded");
             }
             catch(FileNotFoundException)
@@ -38,8 +40,8 @@ namespace groupbot.Infrastructure
                 return;
             }
             
-            VkApiInterface vk_account = new VkApiInterface(BotSettings.BotLogin, BotSettings.BotPass, 274556, 1800, 3);
-            groupbot.Models.GroupContext.connection_string = BotSettings.ConnectionString;
+            VkApiInterface vk_account = new VkApiInterface(settings.BotLogin, settings.BotPass, 274556, 1800, 3);
+            groupbot.Models.GroupContext.connection_string = settings.ConnectionString;
 
             Executor executor = new Executor(vk_account);
             Parser parser = new Parser(executor);

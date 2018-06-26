@@ -12,6 +12,7 @@ namespace groupbot.Infrastructure
 {
     class RListener : AListener
     {
+        BotSettings settings = BotSettings.GetSettings();
         public VkApiInterface vk_account;
         private Logger logger;
 
@@ -41,7 +42,7 @@ namespace groupbot.Infrastructure
                         logger.Trace("token updated");
                     }
 
-                    bool is_ttu = (int)((DateTime.UtcNow - BotSettings.LastCheckTime).TotalSeconds) >= BotSettings.SavingDelay;
+                    bool is_ttu = (int)((DateTime.UtcNow - settings.LastCheckTime).TotalSeconds) >= settings.SavingDelay;
                     response = vk_account.ApiMethodGet($"execute.messagesPull?");
                     messages = response.tokens;
 
@@ -49,7 +50,7 @@ namespace groupbot.Infrastructure
                         if ((string)messages[0] != "0" || is_ttu)
                             parser.Parse(messages, is_ttu);
 
-                    Thread.Sleep(BotSettings.ListeningDelay);
+                    Thread.Sleep(settings.ListeningDelay);
                 }
                 catch (Exception ex)
                 {

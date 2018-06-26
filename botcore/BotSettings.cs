@@ -12,56 +12,76 @@ namespace groupbot.BotCore
 
     public class BotSettings
     {
+        private static readonly BotSettings instanse = LoadConfigs(path);
+
+        private static string path = "./data/botconfig.json";
+
         [JsonProperty("is_sync")]
-        public static bool IsSync = false;
+        public bool IsSync { get; set; }
 
         [JsonProperty("max_req_in_thread")]
-        public static int MaxReqInThread = 4;
+        public int MaxReqInThread { get; set; }
 
         [JsonProperty("saving_delay")]
-        public static int SavingDelay = 14400;
+        public int SavingDelay { get; set; }
 
         [JsonProperty("listening_delay")]
-        public static int ListeningDelay = 800;
+        public int ListeningDelay { get; set; }
 
         [JsonProperty("vk_requests_period")]
-        public static int VkRequestsPeriod { get; set; }
+        public int VkRequestsPeriod { get; set; }
 
         [JsonProperty("bot_login")]
-        public static string BotLogin { get; set; }
+        public string BotLogin { get; set; }
 
         [JsonProperty("bot_pass")]
-        public static string BotPass { get; set; }
+        public string BotPass { get; set; }
 
         [JsonProperty("bot_id")]
-        public static int BotId { get; set; }
+        public int BotId { get; set; }
 
         [JsonProperty("connection_string")]
-        public static string ConnectionString { get; set; }
+        public string ConnectionString { get; set; }
 
         [JsonProperty("admin_id")]
-        public static string AdminId { get; set; }
+        public string AdminId { get; set; }
 
-        public static DateTime LastCheckTime { get; set; }
+        public DateTime LastCheckTime { get; set; }
+
+
+
+        public static void SetPath(string path) => BotSettings.path = path;
+
+
+        public static BotSettings GetSettings() => instanse;
+
 
         private static BotSettings FromJson(string json) => JsonConvert.DeserializeObject<BotSettings>(json, groupbot.BotCore.Converter.Settings);
 
-        public static void LoadConfigs(string path)
+
+        private static BotSettings LoadConfigs(string path)
         {
+            BotSettings s;
+
             if(!File.Exists(path))
                 throw new FileNotFoundException($"{path} not found");
 
             using(StreamReader reader = new StreamReader(path))
-                FromJson(reader.ReadToEnd());
+                s = FromJson(reader.ReadToEnd());
 
-            LastCheckTime = DateTime.UtcNow;
+            s.LastCheckTime = DateTime.UtcNow;
+            return s;
         }
     }
 
-    public static class Serialize
+
+
+    internal static class Serialize
     {
         public static string ToJson(this BotSettings self) => JsonConvert.SerializeObject(self, groupbot.BotCore.Converter.Settings);
     }
+
+
 
     internal static class Converter
     {
