@@ -12,9 +12,9 @@ namespace groupbot.BotCore
 
     public class BotSettings
     {
+        public static string path = "./data/botconfig.json";
+        
         private static readonly BotSettings instanse = LoadConfigs(path);
-
-        private static string path = "./data/botconfig.json";
 
         [JsonProperty("is_sync")]
         public bool IsSync { get; set; }
