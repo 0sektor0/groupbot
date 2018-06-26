@@ -12,7 +12,7 @@ namespace groupbot.BotCore
 
     public class BotSettings
     {
-        public static string path = "./data/botconfig.json";
+        public static string path = Directory.GetCurrentDirectory()+"/data/botconfig.json";
         
         private static readonly BotSettings instanse = LoadConfigs(path);
 
