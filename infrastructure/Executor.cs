@@ -16,18 +16,13 @@ namespace groupbot.Infrastructure
 {
     public class Executor : IExecutor
     {
-        private BotSettings settings = BotSettings.GetSettings();
-        private Logger logger = LogManager.GetCurrentClassLogger();
         private VkApiInterface vk_account;
         const string help_file = "data/help.txt";
         private Dictionary<string, CommandExecution> functions;
+        private BotSettings settings = BotSettings.GetSettings();
+        private Logger logger = LogManager.GetCurrentClassLogger();
         private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
 
-
-        private Executor()
-        {
-
-        }
 
 
         public Executor(VkApiInterface vk_account)
@@ -64,7 +59,6 @@ namespace groupbot.Infrastructure
             }
             catch (Exception e)
             {
-
                 SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}", settings.AdminId.ToString());
                 logger.Error(e.Message);
             }

@@ -33,20 +33,16 @@ namespace VkApi
                 {
                     requests_counter = 1;
                     first_request_time = DateTime.UtcNow;
-                    //Console.WriteLine("next period");
                 }
 
                 if (requests_counter > max_requests_count)
                 {
                     int ttw = (int)(first_request_time.AddMilliseconds(requests_period) - last_request_time).TotalMilliseconds;
-                    //Console.WriteLine($"token blocked for: {ttw}");
                     Thread.Sleep(ttw);
 
                     first_request_time = DateTime.UtcNow;
                     requests_counter = 1;
                 }
-
-                //Console.WriteLine($"requests sended per window: {requests_counter}\n");
             }
         }
     }
