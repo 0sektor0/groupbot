@@ -7,6 +7,7 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 
 
+//TODO delete this shitty code 
 namespace groupbot.Models
 {
     public class GroupContext : DbContext, IContext
@@ -40,19 +41,22 @@ namespace groupbot.Models
                     .Where(ga => ga.Admin.VkId == user_id)
                     .Select(ga => ga.Group)
                     .Include(g => g.Posts)
-                    .Include(g => g.DelayedRequests).ToArray();
+                    .Include(g => g.DelayedRequests)
+                    .ToArray();
             else if (group_name == "")
                 return Admins
                     .Where(u => u.VkId == user_id)
                     .Select(u => u.ActiveGroup)
                     .Include(g => g.Posts)
-                    .Include(g => g.DelayedRequests).ToArray();
+                    .Include(g => g.DelayedRequests)
+                    .ToArray();
             else
                 groups = GroupAdmins
                     .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
                     .Select(ga => ga.Group)
                     .Include(g => g.Posts)
-                    .Include(g => g.DelayedRequests).ToArray();
+                    .Include(g => g.DelayedRequests)
+                    .ToArray();
 
             return groups;
         }
@@ -89,16 +93,12 @@ namespace groupbot.Models
         }
 
 
-        public Admin GetAdmin(int user_id, bool is_eager)
+        public Admin GetAdmin(int user_id)
         {
-            if (is_eager)
-                return Admins
-                    .Include(a => a.GroupAdmins)
-                    .Include(a => a.ActiveGroup)
-                    .Where(a => a.VkId == user_id).FirstOrDefault();
-            else
-                return Admins
-                    .Where(a => a.VkId == user_id).FirstOrDefault();
+            return Admins
+                .Include(a => a.GroupAdmins)
+                .Include(a => a.ActiveGroup)
+                .Where(a => a.VkId == user_id).FirstOrDefault();
         }
 
 

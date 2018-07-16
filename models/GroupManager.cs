@@ -28,6 +28,7 @@ namespace groupbot.Models
 
         }
 
+
         public GroupManager(int bot_id, Group group_info, VkApiInterface vk_user, IContext db)
         {
             this.group_info = group_info;
@@ -38,13 +39,6 @@ namespace groupbot.Models
 
             this.group_info.DelayedRequests = db.GetDelayedRequests(this.group_info.Id);
         }
-
-
-        private GroupManager()
-        {
-
-        }
-
 
 
         //информация об отложенных постах
@@ -196,7 +190,7 @@ namespace groupbot.Models
         }
 
 
-        //повтор загрузки пикч, которые вызвали ошибку при первой загрузке
+        //TODO change this method with group context
         public void RepeatFailedRequests()
         {
             VkResponse response = null;
@@ -210,8 +204,8 @@ namespace groupbot.Models
                 if (drequests != null)
                 {
                     for (int i = 0; i < drequests.Count; i++)
+                    if(!drequests[i].IsResended)
                     {
-
                         response = vk_user.ApiMethodGet(drequests[i].GetNewRequest(ref vk_user));
                         if (response.isCorrect)
                         {
@@ -225,7 +219,7 @@ namespace groupbot.Models
                         }
                         else
                         {
-                            logger.Warn($"failed to resend photo\r\nGroup: {group_info.Id} DelayedRequest: {drequests[i].Id}\r\ntime: {DateTime.UtcNow}");
+                            logger.Warn($"failed to resend photo\r\nGroup: {group_info.Id}\nDelayedRequest: {drequests[i].Id}\r\ntime: {DateTime.UtcNow}");
                             break;
                         }
 

@@ -55,7 +55,7 @@ namespace groupbot.Models
         {
             int delayed_requests_count = 0;
             if (DelayedRequests != null)
-                delayed_requests_count = DelayedRequests.Count;
+                delayed_requests_count = DelayedRequests.Where(dr => dr.IsResended==false).Count();
 
             int posts_count = 0;
             if (Posts != null)

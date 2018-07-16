@@ -19,7 +19,7 @@ namespace groupbot.BotCore
 
         Group GetCurrentGroup(int user_id, bool is_eager);
 
-        Admin GetAdmin(int user_id, bool is_eager);
+        Admin GetAdmin(int user_id);
 
         Group[] GetDeployInfo();
 

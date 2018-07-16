@@ -44,7 +44,7 @@ namespace groupbot.Infrastructure
             try
             {
                 IContext db = new GroupContext();
-                Admin admin = db.GetAdmin(Convert.ToInt32(command.uid), false);
+                Admin admin = db.GetAdmin(Convert.ToInt32(command.uid));
 
                 if (admin != null)
                 {
@@ -85,6 +85,7 @@ namespace groupbot.Infrastructure
             functions["deployment"] = Deployment;   //++
             functions["auto"] = Auto;               //++
             functions["offset"] = Offset;           //++
+            functions["repeat"] = RepeatFailedRequests; 
         }
 
 
@@ -455,6 +456,20 @@ namespace groupbot.Infrastructure
                         break;
                 }
             }
+        }
+
+
+        private void RepeatFailedRequests(ref Command command, ref IContext db, ref Admin admin)
+        {
+            Group g = db.GetCurrentGroup(admin.VkId, false);
+            GroupManager current_group;
+
+            if (g != null)
+                current_group = new GroupManager( settings.BotId, g, vk_account, db);
+            else
+                return;
+
+            current_group.RepeatFailedRequests();
         }
     }
 }
