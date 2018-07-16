@@ -259,8 +259,8 @@ namespace groupbot.Models
                         if (!SendPost())
                             break;
 
-                    logger.Info($"Deployment Ended\r\nGroup: {group_info.Id}");
                     RepeatFailedRequests();
+                    logger.Info($"Deployment Ended\r\nGroup: {group_info.Id}");
                     return postsCounter + group_info.Posts.Where(p => p.IsPublished == false).Count();
                 }
             }
@@ -269,7 +269,7 @@ namespace groupbot.Models
         }
 
 
-        public int[] Alignment(bool getInf) //[изменял]
+        public int[] Alignment(bool getInf)
         {
             VkResponse response = vk_user.ApiMethodGet($"execute.delaySearch?gid=-{group_info.VkId}&offset={group_info.Offset}");
             JToken jo = response.tokens;

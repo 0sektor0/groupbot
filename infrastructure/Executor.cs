@@ -273,7 +273,7 @@ namespace groupbot.Infrastructure
 
         private void Api(ref Command command, ref IContext db, ref Admin admin)
         {
-            if (command.uid == "29334144")
+            if (command.uid == settings.AdminId.ToString())
             {
                 string request = $"{command.parametrs[0]}";
                 request = request.Replace("amp;", "");
@@ -426,9 +426,9 @@ namespace groupbot.Infrastructure
                         break;
 
                     case "all":
-                        if (command.uid == "29334144")
+                        if (command.uid == settings.AdminId.ToString())
                         {
-                            Group[] groups = db.GetDeployInfo(false);
+                            Group[] groups = db.GetDeployInfo();
                             foreach (Group group in groups)
                             {
                                 GroupManager gm = new GroupManager( settings.BotId, group, vk_account, db);

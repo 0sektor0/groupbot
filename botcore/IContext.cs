@@ -21,7 +21,7 @@ namespace groupbot.BotCore
 
         Admin GetAdmin(int user_id, bool is_eager);
 
-        Group[] GetDeployInfo(bool is_eager);
+        Group[] GetDeployInfo();
 
         List<Post> GetUnpublishedPosts(int group_id);
 
