@@ -2,7 +2,7 @@
 
 
 
-namespace groupbot_dev.Infrastructure
+namespace groupbot.BotCore
 {
     public class Command
     {

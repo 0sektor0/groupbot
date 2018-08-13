@@ -2,34 +2,27 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using groupbot.BotCore;
 
 
 
 
-namespace groupbot_dev.Infrastructure
+namespace groupbot.Infrastructure
 {
-    class Parser
+    class Parser : AParser
     {
+        BotSettings settings = BotSettings.GetSettings();
         const string ultimate_admin_id = "29334144";
-        BotSettings settings;
-        Executor executor;
 
 
-        private Parser()
+
+        public Parser(IExecutor executor) : base(executor) 
         {
-
-        }
-
-
-        public Parser(BotSettings settings, Executor executor)
-        {
-            this.settings = settings;
-            this.executor = executor;
         }
 
 
 
-        public void Parse(JToken messages, bool timer)
+        public override void Parse(JToken messages, bool timer)
         {
             string uid;
             int comType;
@@ -40,7 +33,7 @@ namespace groupbot_dev.Infrastructure
 
             if (timer)
             {
-                settings.last_checking_time = DateTime.UtcNow;
+                settings.LastCheckTime = DateTime.UtcNow;
                 executor.ExecuteAsync(new Command("deployment", "", ultimate_admin_id, "all"));
                 executor.ExecuteAsync(new Command("save", "", ultimate_admin_id, ""));
             }

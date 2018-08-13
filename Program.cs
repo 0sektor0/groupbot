@@ -1,36 +1,49 @@
-﻿using System.IO;
-using System;
+﻿using System;
+using System.IO;
+using groupbot.BotCore;
 using VkApi;
+using NLog;
 
 
 
-
-namespace groupbot_dev.Infrastructure
+namespace groupbot.Infrastructure
 {
     class Program
     {
         static void Main(string[] args)
-        {
+        {            
+            Logger logger = LogManager.GetCurrentClassLogger();
             VkResponse.debug = true;
 
-            BotSettings settings = new BotSettings();
-            VkApiInterface vk_account = new VkApiInterface("", "", "274556", 1800, 3);
-
-            if (settings.LoadConfigs(vk_account, "data/botconfig.xml"))
+            BotSettings settings;
+            try
             {
-                Console.WriteLine("configs successfully loaded");
-                groupbot_dev.Models.GroupContext.connection_string = settings.connection_string;
-                settings.last_checking_time = DateTime.UtcNow;
-
-                Executor executor = new Executor(settings, vk_account);
-                Parser parser = new Parser(settings, executor);
-                RListener listener = new RListener(settings, parser, vk_account);
-
-                Console.WriteLine("Listening");
-                listener.Run();
+                settings = BotSettings.GetSettings();
+                logger.Trace("configs successfully loaded");
             }
-            else
-                Console.WriteLine("cannot find file botconfig.xml!");
+            catch(FileNotFoundException)
+            {
+                logger.Fatal($"cannot find file {BotSettings.path}");
+                Console.WriteLine($"cannot find file {BotSettings.path}");
+                return;
+            }
+            catch(Exception ex)
+            {
+                logger.Fatal(ex.Message);
+                Console.WriteLine(ex.Message);
+                return;
+            }
+            
+            VkApiInterface vk_account = new VkApiInterface(settings.BotLogin, settings.BotPass, 274556, 1800, 3);
+            groupbot.Models.GroupContext.connection_string = settings.ConnectionString;
+
+            Executor executor = new Executor(vk_account);
+            Parser parser = new Parser(executor);
+            RListener listener = new RListener(parser, vk_account);
+
+            logger.Trace("Listening");
+            Console.WriteLine("Started");
+            listener.Run();
         }
     }
 }
