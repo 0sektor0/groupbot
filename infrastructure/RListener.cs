@@ -42,13 +42,18 @@ namespace groupbot.Infrastructure
                         logger.Trace("token updated");
                     }
 
+                    // TODO remake auth
                     bool is_ttu = (int)((DateTime.UtcNow - settings.LastCheckTime).TotalSeconds) >= settings.SavingDelay;
-                    response = vk_account.ApiMethodGet($"execute.messagesPull?");
-                    messages = response.tokens;
+                    /*response = vk_account.ApiMethodGet($"execute.messagesPull?");
+                    messages = response.tokens;\
 
                     if (response.isCorrect)
                         if ((string)messages[0] != "0" || is_ttu)
                             parser.Parse(messages, is_ttu);
+                    */
+
+                    if (is_ttu)
+                        parser.Parse(null, is_ttu);
 
                     Thread.Sleep(settings.ListeningDelay);
                 }
@@ -64,6 +69,7 @@ namespace groupbot.Infrastructure
         {            
             vk_account.Auth();
             logger.Trace($"Acces granted\r\nlogin: {vk_account.login}");
+            Console.WriteLine("authorized");
 
             Listen();
         }
