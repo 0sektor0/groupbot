@@ -15,8 +15,6 @@ using System.Runtime.Serialization;
 
 namespace VkApi
 {
-
-
     public class VkApiInterface
     {
         public VkRpController rp_controller;
@@ -27,9 +25,13 @@ namespace VkApi
         public int scope;
         public bool is_loging = true;
 
-        private Logger logger = LogManager.GetCurrentClassLogger();
+        private Logger _logger = LogManager.GetCurrentClassLogger();
 
+        #region ecmaCode
 
+        private const string _getMessagesCode = @"var messages= API.messages.search({    ""q"":""#"",    ""count"":""20"",    ""access_token"":Args.token,    ""v"":""V5.53""});var messagesToDelete="""";var i=1;while(i<messages.length){    messagesToDelete=messagesToDelete+messages[i].mid+"","";    i=i+1;}/*if (messages[0]!=0){var deleteResponse=API.messages.delete({    ""message_ids"":messagesToDelete,    ""count"":""20"",    ""access_token"":Args.token,    ""v"":""V5.53""});*/}return messages;";
+
+        #endregion
 
 
         public VkApiInterface(string login, string password, int scope, int req_period, int max_req_count)
@@ -42,7 +44,7 @@ namespace VkApi
             sender = new VkRequestSender(rp_controller, token);
         }
 
-
+        /*
         public bool Auth(string login, string password, int scope)
         {
             string html;
@@ -96,7 +98,29 @@ namespace VkApi
 
             return true;
         }
+        */
 
+        public void Auth(string login, string password)
+        {
+            var html = "";
+            
+            var url = $"https://oauth.vk.com/token?grant_type=password&client_id=2274003&client_secret=hHbZxrka2uZ6jB1inYsH&username={login}&password={password}";
+            var request = HttpWebRequest.CreateHttp(url);
+            var response = request.GetResponse();
+            
+            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                html = reader.ReadToEnd();
+
+            var responseParts = html.Split('"');
+            if (responseParts.Length == 9)
+            {
+                token = new VkToken(responseParts[3], 86400);
+            }
+            else
+            {
+                throw new AuthException(html);
+            }
+        }
 
         //core 2.0 rise exception on 302 response
         private HttpWebResponse GetResponse302(HttpWebRequest request)
@@ -120,33 +144,27 @@ namespace VkApi
             }
         }
 
-
-        public bool Auth()
+        public void Auth()
         {
-            bool status = Auth(login, password, scope);
-            logger.Trace("auth completed");
-            return status;
+            Auth(login, password);
+            //bool status = Auth(login, password, scope);
+            _logger.Trace("auth completed");
         }
         
-
-
-
         public VkResponse ApiMethod(VkRequest request)
         {
             VkResponse response = new VkResponse(sender.Send(request, false), request);
 
             if (!response.isEmpty && is_loging)
-                logger.Info(response.tokens.ToString());
+                _logger.Info(response.tokens.ToString());
 
             return response;
         }
-
 
         public void ApiMethodEmpty(VkRequest request)
         {
             sender.Send(request, true);
         }
-
 
         public VkResponse ApiMethodGet(string url)
         {
@@ -154,11 +172,10 @@ namespace VkApi
             VkResponse response = new VkResponse(sender.Send(request, false), request);
 
             if (!response.isEmpty && is_loging)
-                logger.Info(response.tokens.ToString());
+                _logger.Info(response.tokens.ToString());
 
             return response;
         }
-
 
         public VkResponse ApiMethodPost(Dictionary<string, string> post_params, string url)
         {
@@ -166,20 +183,16 @@ namespace VkApi
             VkResponse response = new VkResponse(sender.Send(request, false), request);
 
             if (!response.isEmpty && is_loging)
-                logger.Info(response.tokens.ToString());
+                _logger.Info(response.tokens.ToString());
 
             return response;
         }
-
 
         public void ApiMethodPostEmpty(Dictionary<string, string> post_params, string url)
         {
             VkRequest request = new VkRequest(url, post_params, token);
             sender.Send(request, true);
         }
-
-
-
 
         public string UploadPhoto(Stream stream, string fname)
         {
@@ -210,7 +223,7 @@ namespace VkApi
                 response.tokens = json;
                 
                 if (!response.isEmpty && is_loging)
-                    logger.Info(response.tokens.ToString());
+                    _logger.Info(response.tokens.ToString());
 
                 if (response.isCorrect)
                     response = ApiMethodGet($"photos.saveMessagesPhoto?server={response.tokens["server"]}&hash={response.tokens["hash"]}&photo={Convert.ToString(response.tokens["photo"]).Replace("\\", "")}&v=V5.63");
@@ -226,7 +239,6 @@ namespace VkApi
                 throw new Exception("failed to get the address to download the photos");
         }
 
-
         public string UploadPhoto(string picAdr)
         {
             string res;
@@ -237,7 +249,6 @@ namespace VkApi
             return res;
         }
 
-
         public void SendPhotos(List<string> photos, int start, int stop, string message, int uid)
         {
             string attachments = "";
@@ -247,7 +258,6 @@ namespace VkApi
 
             SendPhotos(attachments, message, uid);
         }
-
 
         public void SendPhotos(string photos, string message, int uid)
         {
@@ -263,18 +273,22 @@ namespace VkApi
                     "https://api.vk.com/method/messages.send");
         }
 
-
-
-
         public void EnableLogs()
         {
             is_loging = true;
         }
 
-
         public void DisableLogs()
         {
             is_loging = false;
+        }
+
+        public VkResponse GetMessages()
+        {
+            var postParams = new Dictionary<string, string>();
+            postParams["code"] = _getMessagesCode;
+            
+            return ApiMethodPost(postParams,"execute");
         }
     }
 
@@ -283,53 +297,22 @@ namespace VkApi
     {
         public AuthException()
         {
+            
         }
 
         public AuthException(string message) : base(message)
         {
+            
         }
 
         public AuthException(string message, Exception innerException) : base(message, innerException)
         {
+            
         }
 
         protected AuthException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-        }
-
-        public override IDictionary Data => base.Data;
-
-        public override string HelpLink { get => base.HelpLink; set => base.HelpLink = value; }
-
-        public override string Message => base.Message;
-
-        public override string Source { get => base.Source; set => base.Source = value; }
-
-        public override string StackTrace => base.StackTrace;
-
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
-
-        public override Exception GetBaseException()
-        {
-            return base.GetBaseException();
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-        }
-
-        public override string ToString()
-        {
-            return base.ToString();
+            
         }
     }
 }

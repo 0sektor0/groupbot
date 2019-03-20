@@ -12,17 +12,17 @@ namespace groupbot.Infrastructure
 {
     class RListener : AListener
     {
-        BotSettings settings = BotSettings.GetSettings();
-        public VkApiInterface vk_account;
-        private Logger logger;
+        private BotSettings _settings = BotSettings.GetSettings();
+        private VkApiInterface _vkAccount;
+        private Logger _logger;
 
         
 
         public RListener(AParser parser, VkApiInterface vk_account) : base(parser)
         {
-            this.vk_account = vk_account;
+            this._vkAccount = vk_account;
             this.parser = parser;
-            logger = LogManager.GetCurrentClassLogger();
+            _logger = LogManager.GetCurrentClassLogger();
         }
         
 
@@ -36,30 +36,29 @@ namespace groupbot.Infrastructure
             {
                 try
                 {
-                    if (!vk_account.token.is_alive)
+                    if (!_vkAccount.token.is_alive)
                     {
-                        vk_account.Auth();
-                        logger.Trace("token updated");
+                        _vkAccount.Auth();
+                        _logger.Trace("token updated");
                     }
 
                     // TODO remake auth
-                    bool is_ttu = (int)((DateTime.UtcNow - settings.LastCheckTime).TotalSeconds) >= settings.SavingDelay;
-                    /*response = vk_account.ApiMethodGet($"execute.messagesPull?");
-                    messages = response.tokens;\
+                    bool is_ttu = (int)((DateTime.UtcNow - _settings.LastCheckTime).TotalSeconds) >= _settings.SavingDelay;
+                    response = _vkAccount.GetMessages();
+                    messages = response.tokens;
 
                     if (response.isCorrect)
                         if ((string)messages[0] != "0" || is_ttu)
                             parser.Parse(messages, is_ttu);
-                    */
 
                     if (is_ttu)
                         parser.Parse(null, is_ttu);
 
-                    Thread.Sleep(settings.ListeningDelay);
+                    Thread.Sleep(_settings.ListeningDelay);
                 }
                 catch (Exception ex)
                 {
-                    logger.Error(ex);
+                    _logger.Error(ex);
                 }
             }
         }
@@ -67,8 +66,8 @@ namespace groupbot.Infrastructure
 
         public override void Run()
         {            
-            vk_account.Auth();
-            logger.Trace($"Acces granted\r\nlogin: {vk_account.login}");
+            _vkAccount.Auth();
+            _logger.Trace($"Acces granted\r\nlogin: {_vkAccount.login}");
             Console.WriteLine("authorized");
 
             Listen();
