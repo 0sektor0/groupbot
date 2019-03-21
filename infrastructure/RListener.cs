@@ -44,7 +44,7 @@ namespace groupbot.Infrastructure
 
                     // TODO remake auth
                     bool is_ttu = (int)((DateTime.UtcNow - _settings.LastCheckTime).TotalSeconds) >= _settings.SavingDelay;
-                    response = _vkAccount.GetMessages();
+                    response = _vkAccount.PullMessages();
                     messages = response.tokens;
 
                     if (response.isCorrect)

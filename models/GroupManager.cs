@@ -44,7 +44,7 @@ namespace groupbot.Models
         //информация об отложенных постах
         private int PostponedInf()
         {
-            VkResponse response = vkUser.ApiMethodGet($"execute.postponedInf?gid=-{groupInfo.VkId}");
+            VkResponse response = vkUser.GetPostponedInformation(groupInfo.VkId);
 
             if (response.isCorrect)
                 if (Convert.ToString(response.tokens[1]) != "")
@@ -71,33 +71,33 @@ namespace groupbot.Models
             VkResponse response = null;
             Post post = new Post();
             List<Photo> downloaded_photos = new List<Photo>();
-            string[] photo_params;
+            string[] photoParams;
 
 
             foreach (string photo in photos)
             {
-                photo_params = Convert.ToString(photo).Split('_');
+                photoParams = Convert.ToString(photo).Split('_');
                 //копируем фото в альбом бота
-                response = vkUser.ApiMethodGet($"execute.CopyPhoto?owner_id={photo_params[0]}&photo_id={photo_params[1]}&access_key={photo_params[2]}");
+                response = vkUser.CopyPhoto(photoParams[0], photoParams[1], photoParams[2]);
 
                 //записываем адресса сохраненных пикч
                 if (response.isCorrect)
                 {
-                    Photo downloaed_photo = new Photo();
-                    downloaed_photo.PictureName = $"photo{botId}_{(string)response.tokens[0]["pid"]}";
-                    downloaed_photo.SPictureAddress = $"{(string)response.tokens[0]["src_big"]}";
-                    downloaed_photo.XPictureAddress = $"{(string)response.tokens[0]["src_xbig"]}";
+                    Photo downloaedPhoto = new Photo();
+                    downloaedPhoto.PictureName = $"photo{botId}_{(string)response.tokens[0]["pid"]}";
+                    downloaedPhoto.SPictureAddress = $"{(string)response.tokens[0]["src_big"]}";
+                    downloaedPhoto.XPictureAddress = $"{(string)response.tokens[0]["src_xbig"]}";
 
-                    downloaded_photos.Add(downloaed_photo);
+                    downloaded_photos.Add(downloaedPhoto);
                 }
                 else
                 {
-                    DelayedRequest delayed_request = new DelayedRequest(ref response.request.url, ref groupInfo, ref vkUser);
+                    DelayedRequest delayedRequest = new DelayedRequest(ref response.request.Url, ref groupInfo, ref vkUser);
 
                     if (groupInfo.DelayedRequests == null)
                         groupInfo.DelayedRequests = new List<DelayedRequest>();
 
-                    groupInfo.DelayedRequests.Add(delayed_request);
+                    groupInfo.DelayedRequests.Add(delayedRequest);
                 }
             }
 
@@ -265,7 +265,7 @@ namespace groupbot.Models
 
         public int[] Alignment(bool getInf)
         {
-            VkResponse response = vkUser.ApiMethodGet($"execute.delaySearch?gid=-{groupInfo.VkId}&offset={groupInfo.Offset}");
+            VkResponse response = vkUser.SearchDelayInPosts(groupInfo.VkId, groupInfo.Offset);
             JToken jo = response.tokens;
             string text = "";
 

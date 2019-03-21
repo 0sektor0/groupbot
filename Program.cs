@@ -34,7 +34,7 @@ namespace groupbot.Infrastructure
                 return;
             }
             
-            VkApiInterface vk_account = new VkApiInterface(settings.BotLogin, settings.BotPass, 270460, 1800, 3);
+            VkApiInterface vk_account = new VkApiInterface(settings.BotLogin, settings.BotPass, 274556, 1800, 3);
             groupbot.Models.GroupContext.connection_string = settings.ConnectionString;
 
             Executor executor = new Executor(vk_account);

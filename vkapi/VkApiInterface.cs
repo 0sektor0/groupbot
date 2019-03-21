@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Runtime.Serialization;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
@@ -8,8 +8,6 @@ using System.Net;
 using System.IO;
 using System;
 using NLog;
-using System.Collections;
-using System.Runtime.Serialization;
 
 
 
@@ -29,8 +27,18 @@ namespace VkApi
 
         #region ecmaCode
 
-        private const string _getMessagesCode = @"var messages= API.messages.search({    ""q"":""#"",    ""count"":""20"",    ""access_token"":Args.token,    ""v"":""V5.53""});var messagesToDelete="""";var i=1;while(i<messages.length){    messagesToDelete=messagesToDelete+messages[i].mid+"","";    i=i+1;}/*if (messages[0]!=0){var deleteResponse=API.messages.delete({    ""message_ids"":messagesToDelete,    ""count"":""20"",    ""access_token"":Args.token,    ""v"":""V5.53""});*/}return messages;";
+        private const string SCRIPT_GET_MESSAGES_FILE = "./data/scripts/messages_pull.js";
+        private readonly string _getMessagesScript;
 
+        private const string SCRIPT_GET_POSTPONED_INFO_FILE = "./data/scripts/postponed_inf.js";
+        private readonly string _getPostponedInfoScript;
+
+        private const string SCRIPT_COPY_PHOTO_FILE = "./data/scripts/postponed_inf.js";
+        private readonly string _copyPhotoScript;
+
+        private const string SCRIPT_DELAY_SEARCH_FILE = "./data/scripts/delay_search.js";
+        private readonly string _delaySearchScript;
+        
         #endregion
 
 
@@ -42,69 +50,27 @@ namespace VkApi
             
             rp_controller = new VkRpController(req_period, max_req_count);
             sender = new VkRequestSender(rp_controller, token);
+
+            _getMessagesScript = ReadScriptFromFile(SCRIPT_GET_MESSAGES_FILE);
+            _getPostponedInfoScript = ReadScriptFromFile(SCRIPT_GET_POSTPONED_INFO_FILE);
+            _copyPhotoScript = ReadScriptFromFile(SCRIPT_COPY_PHOTO_FILE);
+            _delaySearchScript = ReadScriptFromFile(SCRIPT_DELAY_SEARCH_FILE);
         }
 
-        /*
-        public bool Auth(string login, string password, int scope)
+        private string ReadScriptFromFile(string path)
         {
-            string html;
-            string post_data;
-            string[] res = null;
-            HttpWebRequest request;
-            HttpWebResponse response;
-            CookieContainer cookie_container = new CookieContainer();
-
-            //переходим на страницу авторизации
-            request = (HttpWebRequest)HttpWebRequest.Create($"https://oauth.vk.com/authorize?client_id=5635484&redirect_uri=https://oauth.vk.com/blank.html&scope={scope}&response_type=token&v=5.53&display=wap");
-            request.AllowAutoRedirect = false;
-            request.CookieContainer = cookie_container;
-            response = (HttpWebResponse)request.GetResponse();
-
-            //считывем код страницы 
-            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-                html = reader.ReadToEnd();
-            //составляем пост данные и выдираем csrf токены
-            post_data = $"email={login}&pass={password}";
-            foreach (Match m in Regex.Matches(html, @"\B<input\stype=""hidden""\sname=""(.+)""\svalue=""(.+)"""))
-                post_data += $"&{m.Groups[1]}={m.Groups[2]}";
-
-            //отправляем логин и пароль
-            request = (HttpWebRequest)HttpWebRequest.Create("https://login.vk.com/?act=login&soft=1");
-            request.CookieContainer = cookie_container;
-            request.AllowAutoRedirect = false;
-            request.Method = "POST";
-            using (StreamWriter writer = new StreamWriter(request.GetRequestStream()))
-                writer.Write(post_data);
-            response = GetResponse302(request);
-
-            if (response.Cookies.Count == 0)
-                throw new AuthException("Invalid login or password");
-
-            //переходим по Location в ответе
-            request = (HttpWebRequest)HttpWebRequest.Create(response.Headers["Location"]);
-            request.CookieContainer = cookie_container;
-            request.AllowAutoRedirect = false;
-            response = GetResponse302(request);
-
-            //и еще раз
-            request = (HttpWebRequest)HttpWebRequest.Create(response.Headers["Location"]);
-            request.CookieContainer = cookie_container;
-            request.AllowAutoRedirect = false;
-            response = GetResponse302(request);
-
-            res = response.Headers["Location"].Split('=', '&');
-            //res = new string[] { res[1], res[3], res[5] };
-            token = new VkToken(res[1], Convert.ToInt32(res[3]));
-
-            return true;
+            using (var reader = new StreamReader(path))
+            {
+                var code = reader.ReadToEnd();
+                return System.Web.HttpUtility.UrlEncode(code);
+            }
         }
-        */
 
-        public void Auth(string login, string password)
+        public void Auth(string login, string password, int scope)
         {
             var html = "";
             
-            var url = $"https://oauth.vk.com/token?grant_type=password&client_id=2274003&client_secret=hHbZxrka2uZ6jB1inYsH&username={login}&password={password}";
+            var url = $"https://oauth.vk.com/token?grant_type=password&client_id=2274003&client_secret=hHbZxrka2uZ6jB1inYsH&username={login}&password={password}&scope={scope}";
             var request = HttpWebRequest.CreateHttp(url);
             var response = request.GetResponse();
             
@@ -122,31 +88,9 @@ namespace VkApi
             }
         }
 
-        //core 2.0 rise exception on 302 response
-        private HttpWebResponse GetResponse302(HttpWebRequest request)
-        {
-            HttpWebResponse response;
-
-            try
-            {
-                response = (HttpWebResponse)request.GetResponse();
-                return response;
-            }
-            catch (WebException e)
-            {
-                if (e.Message.Contains("302"))
-                {
-                    response = (HttpWebResponse)e.Response;
-                    return response;
-                }
-
-                throw e;
-            }
-        }
-
         public void Auth()
         {
-            Auth(login, password);
+            Auth(login, password, scope);
             //bool status = Auth(login, password, scope);
             _logger.Trace("auth completed");
         }
@@ -283,12 +227,24 @@ namespace VkApi
             is_loging = false;
         }
 
-        public VkResponse GetMessages()
+        public VkResponse PullMessages()
         {
-            var postParams = new Dictionary<string, string>();
-            postParams["code"] = _getMessagesCode;
-            
-            return ApiMethodPost(postParams,"execute");
+            return ApiMethodGet($"execute?code={_getMessagesScript}");
+        }
+
+        public VkResponse GetPostponedInformation(int groupId)
+        {
+            return ApiMethodGet($"execute?gid=-{groupId}&code={_getPostponedInfoScript}");
+        }
+
+        public VkResponse CopyPhoto(string ownerId, string photoId, string accessKey)
+        {
+            return ApiMethodGet($"execute?owner_id={ownerId}&photo_id={photoId}&access_key={accessKey}&code={_copyPhotoScript}");
+        }
+
+        public VkResponse SearchDelayInPosts(int groupId, int postOffset)
+        {
+            return ApiMethodGet($"execute?gid=-{groupId}&offset={postOffset}&code={_delaySearchScript}");
         }
     }
 
