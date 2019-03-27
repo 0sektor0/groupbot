@@ -4,7 +4,6 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Net;
 using System.IO;
 using System;
 using NLog;
@@ -13,17 +12,32 @@ using NLog;
 
 namespace VkApi
 {
-    public class VkApiInterface
+    public abstract class VkApiInterfaceBase
     {
-        public VkRpController rp_controller;
-        public VkRequestSender sender;
-        public VkToken token;
-        public string password = "";
-        public string login = "";
-        public int scope;
-        public bool is_loging = true;
+        public readonly string login;
+        public readonly VkRpController paceController;
+        
+        protected VkToken _token;
+        private bool _isLogging = true;
+        private readonly int _scope;
+        private readonly string password;
+        private readonly VkRequestSender sender;
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        public VkToken Token
+        {
+            get
+            {
+                if (_token == null || !_token.is_alive)
+                {
+                    Auth();
+                    _logger.Trace("token updated");
+                }
+
+                return _token;
+            }
+        }
+
 
         #region ecmaCode
 
@@ -42,14 +56,14 @@ namespace VkApi
         #endregion
 
 
-        public VkApiInterface(string login, string password, int scope, int req_period, int max_req_count)
+        public VkApiInterfaceBase(string login, string password, int scope, int req_period, int max_req_count)
         {
             this.login = login;
             this.password = password;
-            this.scope = scope;
+            this._scope = scope;
             
-            rp_controller = new VkRpController(req_period, max_req_count);
-            sender = new VkRequestSender(rp_controller, token);
+            paceController = new VkRpController(req_period, max_req_count);
+            sender = new VkRequestSender(paceController, Token);
 
             _getMessagesScript = ReadScriptFromFile(SCRIPT_GET_MESSAGES_FILE);
             _getPostponedInfoScript = ReadScriptFromFile(SCRIPT_GET_POSTPONED_INFO_FILE);
@@ -66,32 +80,11 @@ namespace VkApi
             }
         }
 
-        public void Auth(string login, string password, int scope)
-        {
-            var html = "";
-            
-            var url = $"https://oauth.vk.com/token?grant_type=password&client_id=2274003&client_secret=hHbZxrka2uZ6jB1inYsH&username={login}&password={password}&scope={scope}";
-            var request = HttpWebRequest.CreateHttp(url);
-            var response = request.GetResponse();
-            
-            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-                html = reader.ReadToEnd();
-
-            var responseParts = html.Split('"');
-            if (responseParts.Length == 9)
-            {
-                token = new VkToken(responseParts[3], 86400);
-            }
-            else
-            {
-                throw new AuthException(html);
-            }
-        }
+        protected abstract void Auth(string login, string password, int scope);
 
         public void Auth()
         {
-            Auth(login, password, scope);
-            //bool status = Auth(login, password, scope);
+            Auth(login, password, _scope);
             _logger.Trace("auth completed");
         }
         
@@ -99,7 +92,7 @@ namespace VkApi
         {
             VkResponse response = new VkResponse(sender.Send(request, false), request);
 
-            if (!response.isEmpty && is_loging)
+            if (!response.isEmpty && _isLogging)
                 _logger.Info(response.tokens.ToString());
 
             return response;
@@ -112,10 +105,10 @@ namespace VkApi
 
         public VkResponse ApiMethodGet(string url)
         {
-            VkRequest request = new VkRequest(url, token);
+            VkRequest request = new VkRequest(url, Token);
             VkResponse response = new VkResponse(sender.Send(request, false), request);
 
-            if (!response.isEmpty && is_loging)
+            if (!response.isEmpty && _isLogging)
                 _logger.Info(response.tokens.ToString());
 
             return response;
@@ -123,10 +116,10 @@ namespace VkApi
 
         public VkResponse ApiMethodPost(Dictionary<string, string> post_params, string url)
         {
-            VkRequest request = new VkRequest(url, post_params, token);
+            VkRequest request = new VkRequest(url, post_params, Token);
             VkResponse response = new VkResponse(sender.Send(request, false), request);
 
-            if (!response.isEmpty && is_loging)
+            if (!response.isEmpty && _isLogging)
                 _logger.Info(response.tokens.ToString());
 
             return response;
@@ -134,7 +127,7 @@ namespace VkApi
 
         public void ApiMethodPostEmpty(Dictionary<string, string> post_params, string url)
         {
-            VkRequest request = new VkRequest(url, post_params, token);
+            VkRequest request = new VkRequest(url, post_params, Token);
             sender.Send(request, true);
         }
 
@@ -143,44 +136,42 @@ namespace VkApi
             VkResponse response = ApiMethodGet($"photos.getMessagesUploadServer");
             string adr = (string)response.tokens["upload_url"];
             JObject json;
-
-            if (response.isCorrect) //загрузка пикч в вк
-            {
-                HttpClient client = new HttpClient();
-                MultipartContent content = new MultipartFormDataContent();
-
-                var streamContent = new StreamContent(stream);
-                streamContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                {
-                    Name = "photo",
-                    FileName = Path.GetFileName(fname)
-                };
-                content.Add(streamContent);
-
-                HttpResponseMessage httpResponse = client.PostAsync(new Uri(adr), content).Result;
-                using (StreamReader readStream = new StreamReader(httpResponse.Content.ReadAsStreamAsync().Result, Encoding.UTF8))
-                    json = JObject.Parse(readStream.ReadToEnd());
-
-                response = new VkResponse();
-                response.request = new VkRequest(adr, token);
-                response.isCorrect = (string)json["photo"] != "[]";
-                response.tokens = json;
-                
-                if (!response.isEmpty && is_loging)
-                    _logger.Info(response.tokens.ToString());
-
-                if (response.isCorrect)
-                    response = ApiMethodGet($"photos.saveMessagesPhoto?server={response.tokens["server"]}&hash={response.tokens["hash"]}&photo={Convert.ToString(response.tokens["photo"]).Replace("\\", "")}&v=V5.63");
-                else
-                    throw new Exception("error while processing photos on the server");
-
-                if (response.isCorrect)
-                    return (string)response.tokens[0]["id"];
-                else
-                    throw new Exception("failed to obtain the address of the photo");
-            }
-            else
+            
+            if(!response.isCorrect)
                 throw new Exception("failed to get the address to download the photos");
+            
+            HttpClient client = new HttpClient();
+            MultipartContent content = new MultipartFormDataContent();
+
+            var streamContent = new StreamContent(stream);
+            streamContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+            {
+                Name = "photo",
+                FileName = Path.GetFileName(fname)
+            };
+            content.Add(streamContent);
+
+            HttpResponseMessage httpResponse = client.PostAsync(new Uri(adr), content).Result;
+            using (StreamReader readStream = new StreamReader(httpResponse.Content.ReadAsStreamAsync().Result, Encoding.UTF8))
+                json = JObject.Parse(readStream.ReadToEnd());
+
+            response = new VkResponse();
+            response.request = new VkRequest(adr, Token);
+            response.isCorrect = (string)json["photo"] != "[]";
+            response.tokens = json;
+                
+            if (!response.isEmpty && _isLogging)
+                _logger.Info(response.tokens.ToString());
+
+            if (response.isCorrect)
+                response = ApiMethodGet($"photos.saveMessagesPhoto?server={response.tokens["server"]}&hash={response.tokens["hash"]}&photo={Convert.ToString(response.tokens["photo"]).Replace("\\", "")}&v=V5.63");
+            else
+                throw new Exception("error while processing photos on the server");
+
+            if (response.isCorrect)
+                return (string)response.tokens[0]["id"];
+            else
+                throw new Exception("failed to obtain the address of the photo");
         }
 
         public string UploadPhoto(string picAdr)
@@ -211,7 +202,7 @@ namespace VkApi
                     { "message",message},
                     { "uid",uid.ToString()},
                     { "attachment", photos.Remove(0,1) },
-                    { "access_token",token.value},
+                    { "access_token",Token.value},
                     { "v","V5.53"}
                 },
                     "https://api.vk.com/method/messages.send");
@@ -219,12 +210,12 @@ namespace VkApi
 
         public void EnableLogs()
         {
-            is_loging = true;
+            _isLogging = true;
         }
 
         public void DisableLogs()
         {
-            is_loging = false;
+            _isLogging = false;
         }
 
         public VkResponse PullMessages()

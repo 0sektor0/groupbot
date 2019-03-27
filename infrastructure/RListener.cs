@@ -13,14 +13,14 @@ namespace groupbot.Infrastructure
     class RListener : AListener
     {
         private BotSettings _settings = BotSettings.GetSettings();
-        private VkApiInterface _vkAccount;
+        private VkApiInterfaceBase _vkAccount;
         private Logger _logger;
 
         
 
-        public RListener(AParser parser, VkApiInterface vk_account) : base(parser)
+        public RListener(AParser parser, VkApiInterfaceBase vk_account) : base(parser)
         {
-            this._vkAccount = vk_account;
+            _vkAccount = vk_account;
             this.parser = parser;
             _logger = LogManager.GetCurrentClassLogger();
         }
@@ -36,12 +36,6 @@ namespace groupbot.Infrastructure
             {
                 try
                 {
-                    if (!_vkAccount.token.is_alive)
-                    {
-                        _vkAccount.Auth();
-                        _logger.Trace("token updated");
-                    }
-
                     // TODO remake auth
                     bool is_ttu = (int)((DateTime.UtcNow - _settings.LastCheckTime).TotalSeconds) >= _settings.SavingDelay;
                     response = _vkAccount.PullMessages();

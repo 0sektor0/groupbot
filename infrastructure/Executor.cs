@@ -16,7 +16,8 @@ namespace groupbot.Infrastructure
     public class Executor : IExecutor
     {
         private const string _helpFile = "data/help.txt";
-        private VkApiInterface _vkAccount;
+        private VkApiInterfaceBase _vkAccountCustom;
+        private VkApiInterfaceBase _vkAccountOfficial;
         private Dictionary<string, CommandExecution> _handlers;
         private BotSettings _settings = BotSettings.GetSettings();
         private Logger _logger = LogManager.GetCurrentClassLogger();
@@ -24,9 +25,10 @@ namespace groupbot.Infrastructure
         private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
 
 
-        public Executor(VkApiInterface vk_account)
+        public Executor(VkApiInterfaceBase vkAccountCustom, VkApiInterfaceBase vkAccountOfficial)
         {
-            this._vkAccount = vk_account;
+            _vkAccountCustom = vkAccountCustom;
+            _vkAccountOfficial = vkAccountOfficial;
             InitHandlerTable();
         }
 
@@ -38,9 +40,10 @@ namespace groupbot.Infrastructure
 
         public void Execute(Command command)
         {
+            IContext db = new GroupContext();
+
             try
             {
-                IContext db = new GroupContext();
                 Admin admin = db.GetAdmin(Convert.ToInt32(command.uid));
 
                 if (admin != null)
@@ -52,12 +55,16 @@ namespace groupbot.Infrastructure
                     _logger.Warn($"unknown user: {command.uid}");
 
                 db.SaveChanges();
-                db.Dispose();
             }
             catch (Exception e)
             {
-                SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}", _settings.AdminId.ToString());
+                SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}",
+                    _settings.AdminId.ToString());
                 _logger.Error(e.Message);
+            }
+            finally
+            {
+                db.Dispose();
             }
         }
 
@@ -86,7 +93,7 @@ namespace groupbot.Infrastructure
 
         private void SendMessage(string message, string uid)
         {
-            _vkAccount.ApiMethodPost(new Dictionary<string, string>()
+            _vkAccountOfficial.ApiMethodPost(new Dictionary<string, string>()
                 {
                     { "message",message},
                     { "uid",uid}
@@ -111,7 +118,7 @@ namespace groupbot.Infrastructure
         {
             SendMessage($"last check time: {_settings.LastCheckTime}\r\n" +
                 $"is sync: { _settings.IsSync }\r\n" +
-                $"vk req period: {_vkAccount.rp_controller.requests_period}\r\n" +
+                $"vk req period: {_vkAccountCustom.paceController.requests_period}\r\n" +
                 $"save delay: {_settings.SavingDelay}\r\n", command.uid);
         }
         
@@ -168,7 +175,7 @@ namespace groupbot.Infrastructure
                     case 1:
                         Group current_group = db.GetCurrentGroup(admin.VkId, false);
                         if (current_group != null)
-                            new GroupManager( _settings.BotId, current_group, _vkAccount).CreatePost(command.atachments, command.parametrs[0], true);
+                            new GroupManager( _settings.BotId, current_group, _vkAccountCustom).CreatePost(command.atachments, command.parametrs[0], true);
                         break;
 
                     case 2:
@@ -182,7 +189,7 @@ namespace groupbot.Infrastructure
                                     commands.Push(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/s"));
                             //как один пост
                             if (command.parametrs[1] == "s")
-                                new GroupManager( _settings.BotId, group, _vkAccount).CreatePost(command.atachments, "", true);
+                                new GroupManager( _settings.BotId, group, _vkAccountCustom).CreatePost(command.atachments, "", true);
                         }
                         break;
 
@@ -212,7 +219,7 @@ namespace groupbot.Infrastructure
                         case "rp":
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
-                                _vkAccount.rp_controller.requests_period = new_val;
+                                _vkAccountCustom.paceController.requests_period = new_val;
                                 _logger.Info($"rp changed\r\nUser: {admin.VkId}");
                             }
                             break;
@@ -262,7 +269,7 @@ namespace groupbot.Infrastructure
             {
                 string request = $"{command.parametrs[0]}";
                 request = request.Replace("amp;", "");
-                SendMessage(Convert.ToString(_vkAccount.ApiMethodGet(request).tokens), command.uid);
+                SendMessage(Convert.ToString(_vkAccountCustom.ApiMethodGet(request).tokens), command.uid);
             }
         }
 
@@ -345,10 +352,10 @@ namespace groupbot.Infrastructure
         {
             int[] res;
             Group group = db.GetCurrentGroup(admin.VkId, false);
-            GroupManager current_group = null;
+            GroupManager current_group;
 
             if (group != null)
-                current_group = new GroupManager( _settings.BotId, admin.ActiveGroup, _vkAccount, db);
+                current_group = new GroupManager( _settings.BotId, admin.ActiveGroup, _vkAccountCustom, db);
             else
                 return;
 
@@ -366,10 +373,10 @@ namespace groupbot.Infrastructure
 
                 case "last":
                     TimeSpan unixTime = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
-                    double lastPostTime = (current_group.groupInfo.PostTime - unixTime.TotalSeconds - current_group.groupInfo.Offset + current_group.groupInfo.PostsCounter * current_group.groupInfo.Offset) / 3600;
+                    double lastPostTime = (current_group.GroupInfo.PostTime - unixTime.TotalSeconds - current_group.GroupInfo.Offset + current_group.GroupInfo.PostsCounter * current_group.GroupInfo.Offset) / 3600;
                     if (lastPostTime < 0)
                         lastPostTime = 0;
-                    SendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {current_group.groupInfo.Offset} секунд вам осталось \n{(int)lastPostTime / 24}д:{(int)(lastPostTime - ((int)lastPostTime / 24) * 24)}ч", command.uid);
+                    SendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {current_group.GroupInfo.Offset} секунд вам осталось \n{(int)lastPostTime / 24}д:{(int)(lastPostTime - ((int)lastPostTime / 24) * 24)}ч", command.uid);
                     break;
 
                 default:
@@ -382,17 +389,17 @@ namespace groupbot.Infrastructure
             if (command.parametrs.Count == 1)
             {
                 Group g = db.GetCurrentGroup(admin.VkId, false);
-                GroupManager current_group = null;
+                GroupManager current_group;
 
                 if (g != null)
-                    current_group = new GroupManager( _settings.BotId, g, _vkAccount, db);
+                    current_group = new GroupManager( _settings.BotId, g, _vkAccountCustom, db);
                 else
                     return;
 
                 switch (command.parametrs[0])
                 {
                     case "":
-                        if (current_group.groupInfo.PostponeEnabled)
+                        if (current_group.GroupInfo.PostponeEnabled)
                         {
                             SendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
                             current_group.Deployment();
@@ -402,12 +409,12 @@ namespace groupbot.Infrastructure
                         break;
 
                     case "all":
-                        if (command.uid == _settings.AdminId.ToString())
+                        if (command.uid == _settings.AdminId)
                         {
                             Group[] groups = db.GetDeployInfo();
                             foreach (Group group in groups)
                             {
-                                GroupManager gm = new GroupManager( _settings.BotId, group, _vkAccount, db);
+                                GroupManager gm = new GroupManager( _settings.BotId, group, _vkAccountCustom, db);
                                 int depinfo = gm.Deployment();
                                 if (depinfo < group.MinPostCount && group.Notify)
                                     foreach (GroupAdmins ga in group.GroupAdmins)
@@ -418,13 +425,13 @@ namespace groupbot.Infrastructure
                         break;
 
                     case "off":
-                        current_group.groupInfo.PostponeEnabled = false;
-                        _logger.Info($"{command.ToString()}\r\n{current_group.groupInfo.Name}'s postponedOn = {current_group.groupInfo.PostponeEnabled}");
+                        current_group.GroupInfo.PostponeEnabled = false;
+                        _logger.Info($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
                         break;
 
                     case "on":
-                        current_group.groupInfo.PostponeEnabled = true;
-                        _logger.Info($"{command.ToString()}\r\n{current_group.groupInfo.Name}'s postponedOn = {current_group.groupInfo.PostponeEnabled}");
+                        current_group.GroupInfo.PostponeEnabled = true;
+                        _logger.Info($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
                         break;
 
                     default:
@@ -439,7 +446,7 @@ namespace groupbot.Infrastructure
             GroupManager current_group;
 
             if (g != null)
-                current_group = new GroupManager( _settings.BotId, g, _vkAccount, db);
+                current_group = new GroupManager( _settings.BotId, g, _vkAccountCustom, db);
             else
                 return;
 

@@ -242,16 +242,16 @@ namespace groupbot.Models
         }
 
 
-        public DelayedRequest(ref string req, ref Group group, ref VkApiInterface vk_interface)
+        public DelayedRequest(ref string req, ref Group group, ref VkApiInterfaceBase vkInterfaceBase)
         {
-            Request = req.Replace(vk_interface.token.value, "}|{}|{04");
+            Request = req.Replace(vkInterfaceBase.Token.value, "}|{}|{04");
             IsResended = false;
         }
 
 
-        public string GetNewRequest(ref VkApiInterface vk_interface)
+        public string GetNewRequest(ref VkApiInterfaceBase vkInterfaceBase)
         {
-            return Request.Replace("}|{}|{04", vk_interface.token.value);
+            return Request.Replace("}|{}|{04", vkInterfaceBase.Token.value);
         }
     }
 }
