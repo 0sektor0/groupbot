@@ -253,7 +253,7 @@ namespace groupbot.Models
                         if (!SendPost())
                             break;
 
-                    RepeatFailedRequests();
+                    //RepeatFailedRequests();
                     _logger.Info($"Deployment Ended\r\nGroup: {GroupInfo.Id}");
                     return postsCounter + GroupInfo.Posts.Where(p => p.IsPublished == false).Count();
                 }

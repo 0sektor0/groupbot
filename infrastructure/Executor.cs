@@ -59,7 +59,7 @@ namespace groupbot.Infrastructure
             catch (Exception e)
             {
                 SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}",
-                    _settings.AdminId.ToString());
+                    _settings.AdminId);
                 _logger.Error(e.Message);
             }
             finally
