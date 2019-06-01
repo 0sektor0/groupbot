@@ -42,8 +42,8 @@ namespace groupbot.Infrastructure
                     messages = response.tokens;
 
                     if (response.isCorrect)
-                        if ((string)messages[0] != "0" || is_ttu)
-                            parser.Parse(messages, is_ttu);
+                        if ((string)messages[0] != "0")
+                            parser.Parse(messages, false);
 
                     if (is_ttu)
                         parser.Parse(null, is_ttu);
