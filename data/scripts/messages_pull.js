@@ -3,18 +3,20 @@ var messages= API.messages.search({
     "count":"20",
     "access_token":Args.token,
     "v":"5.53"
-});
+}).items;
 
-var messagesToDelete="";
+messages.unshift(messages.length);
+
 var i=1;
+var messagesToDelete="";
 while(i<messages.length)
 {
-    messagesToDelete=messagesToDelete+messages[i].mid+",";
+    messagesToDelete=messagesToDelete+messages[i].id+",";
     i=i+1;
 }
 
 if (messages[0]!=0){
-    var deleteResponse=API.messages.delete({
+    API.messages.delete({
         "message_ids":messagesToDelete,
         "count":"20",
         "access_token":Args.token,

@@ -96,7 +96,7 @@ namespace groupbot.Infrastructure
             _vkAccountOfficial.ApiMethodPost(new Dictionary<string, string>()
                 {
                     { "message",message},
-                    { "uid",uid}
+                    { "user_id",uid}
                 }, "messages.send");
         }
 

@@ -40,7 +40,7 @@ namespace groupbot.Infrastructure
 
             for (int i = 1; i < messages.Count(); i++)
             {
-                uid = (string)messages[i]["uid"];
+                uid = (string)messages[i]["user_id"];
                 inputCommands = Convert.ToString(messages[i]["body"]).Replace("<br>", "").Split(';');
 
                 for (int j = 0; j < inputCommands.Length; j++)
@@ -100,7 +100,7 @@ namespace groupbot.Infrastructure
                     if ((string)jo["type"] == "photo")
                     {
                         JToken photo = jo["photo"];
-                        photos.Add(photo["owner_id"] + "_" + photo["pid"] + "_" + photo["access_key"]);
+                        photos.Add(photo["owner_id"] + "_" + photo["id"] + "_" + photo["access_key"]);
                     }
             }
             return photos;

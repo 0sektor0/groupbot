@@ -85,9 +85,9 @@ namespace groupbot.Models
                 if (response.isCorrect)
                 {
                     Photo downloaedPhoto = new Photo();
-                    downloaedPhoto.PictureName = $"photo{_botId}_{(string)response.tokens[0]["pid"]}";
-                    downloaedPhoto.SPictureAddress = $"{(string)response.tokens[0]["src_big"]}";
-                    downloaedPhoto.XPictureAddress = $"{(string)response.tokens[0]["src_xbig"]}";
+                    downloaedPhoto.PictureName = $"photo{_botId}_{(string)response.tokens[0]["id"]}";
+                    downloaedPhoto.SPictureAddress = $"{(string)response.tokens[0]["photo_807"]}";
+                    downloaedPhoto.XPictureAddress = $"{(string)response.tokens[0]["photo_1280"]}";
 
                     downloaded_photos.Add(downloaedPhoto);
                 }
@@ -213,9 +213,9 @@ namespace groupbot.Models
                         {
                             photo = new Photo
                             {
-                                PictureName = $"photo{_botId}_{(string)response.tokens[0]["pid"]}",
-                                SPictureAddress = $"{(string)response.tokens[0]["src_big"]}",
-                                XPictureAddress = $"{(string)response.tokens[0]["src_xbig"]}"
+                                PictureName = $"photo{_botId}_{(string)response.tokens[0]["id"]}",
+                                SPictureAddress = $"{(string)response.tokens[0]["photo_807"]}",
+                                XPictureAddress = $"{(string)response.tokens[0]["photo_1280"]}"
                             };
                             drequests[i].IsResended = true;
                         }
