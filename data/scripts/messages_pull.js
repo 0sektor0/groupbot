@@ -2,7 +2,7 @@ var messages= API.messages.search({
     "q":"#",
     "count":"20",
     "access_token":Args.token,
-    "v":"V5.53"
+    "v":"5.53"
 });
 
 var messagesToDelete="";
@@ -18,7 +18,7 @@ if (messages[0]!=0){
         "message_ids":messagesToDelete,
         "count":"20",
         "access_token":Args.token,
-        "v":"V5.53"
+        "v":"5.53"
     });
 }
 

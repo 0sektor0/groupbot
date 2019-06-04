@@ -203,7 +203,6 @@ namespace VkApi
                     { "uid",uid.ToString()},
                     { "attachment", photos.Remove(0,1) },
                     { "access_token",Token.value},
-                    { "v","V5.53"}
                 },
                     "https://api.vk.com/method/messages.send");
         }

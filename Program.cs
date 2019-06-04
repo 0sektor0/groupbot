@@ -44,6 +44,7 @@ namespace groupbot.Infrastructure
 
             logger.Trace("Listening");
             Console.WriteLine("Started");
+            VkRequest.SetDefaultVersion(BotSettings.GetSettings().ApiVersion);
             listener.Run();
         }
     }
