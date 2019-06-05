@@ -4,7 +4,9 @@ var postponedPosts= API.wall.get({
     "filter":"postponed",
     "access_token":Args.token,
     "v":"5.53"
-});
+}).items;
+
+postponedPosts.unshift(postponedPosts.length);
 
 if (postponedPosts[0]>100)
 {

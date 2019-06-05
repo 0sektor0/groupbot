@@ -4,7 +4,9 @@ var postponedPosts= API.wall.get({
     "filter":"postponed",
     "access_token":Args.token,
     "v":"5.53"
-});
+}).items;
+
+postponedPosts.unshift(postponedPosts.length);
 
 if (postponedPosts[0]>100)
 {
@@ -15,7 +17,8 @@ if (postponedPosts[0]>100)
         "filter":"postponed",
         "access_token":Args.token,
         "v":"5.53"
-    });
+    }).items;
+    postponedPosts2.unshift(postponedPosts2.length);
     postponedPosts2.splice(0,1);
     postponedPosts=postponedPosts+postponedPosts2;
 }
