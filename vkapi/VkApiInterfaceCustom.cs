@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.IO;
 using System;
+using System.Web;
 using groupbot.BotCore;
 
 
@@ -25,7 +26,8 @@ namespace VkApi
             CookieContainer cookie_container = new CookieContainer();
 
             //переходим на страницу авторизации
-            request = (HttpWebRequest)HttpWebRequest.Create($"https://oauth.vk.com/authorize?client_id=5635484&redirect_uri=https://oauth.vk.com/blank.html&scope={scope}&response_type=token&v={BotSettings.GetSettings().ApiVersion}&display=wap");
+            var url = $"https://oauth.vk.com/authorize?client_id=5635484&redirect_uri=https://oauth.vk.com/blank.html&scope={scope}&response_type=token&v={BotSettings.GetSettings().ApiVersion}&display=wap";
+            request = (HttpWebRequest)HttpWebRequest.Create(url);
             request.AllowAutoRedirect = false;
             request.CookieContainer = cookie_container;
             response = (HttpWebResponse)request.GetResponse();
@@ -63,10 +65,11 @@ namespace VkApi
             response = GetResponse302(request);
 
             res = response.Headers["Location"].Split('=', '&');
+            // I hate this shitty project and myself
             //res = new string[] { res[1], res[3], res[5] };
-            _token = new VkToken(res[1], Convert.ToInt32(res[3]));
+            _token = new VkToken(res[3]);
+            //_token = new VkToken(res[1], Convert.ToInt32(res[3]));
         }
-
 
         //core 2.0 rise exception on 302 response
         private HttpWebResponse GetResponse302(HttpWebRequest request)
