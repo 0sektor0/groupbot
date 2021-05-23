@@ -11,94 +11,94 @@ using NLog;
 
 
 
-
 namespace groupbot.Infrastructure
 {
     public class Executor : IExecutor
     {
-        private VkApiInterface vk_account;
-        const string help_file = "data/help.txt";
-        private Dictionary<string, CommandExecution> functions;
-        private BotSettings settings = BotSettings.GetSettings();
-        private Logger logger = LogManager.GetCurrentClassLogger();
+        private const string _helpFile = "data/help.txt";
+        private VkApiInterfaceBase _vkAccountCustom;
+        private VkApiInterfaceBase _vkAccountOfficial;
+        private Dictionary<string, CommandExecution> _handlers;
+        private BotSettings _settings = BotSettings.GetSettings();
+        private Logger _logger = LogManager.GetCurrentClassLogger();
+        
         private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
 
 
-
-        public Executor(VkApiInterface vk_account)
+        public Executor(VkApiInterfaceBase vkAccountCustom, VkApiInterfaceBase vkAccountOfficial)
         {
-            this.vk_account = vk_account;
+            _vkAccountCustom = vkAccountCustom;
+            _vkAccountOfficial = vkAccountOfficial;
             InitHandlerTable();
         }
 
-
         public async void ExecuteAsync(Command command)
         {
-            if (functions.Keys.Contains(command.type))
+            if (_handlers.Keys.Contains(command.type))
                 await Task.Run(() => Execute(command));
         }
 
-
         public void Execute(Command command)
         {
+            IContext db = new GroupContext();
+
             try
             {
-                IContext db = new GroupContext();
                 Admin admin = db.GetAdmin(Convert.ToInt32(command.uid));
 
                 if (admin != null)
                 {
-                    if (functions.Keys.Contains(command.type))
-                        functions[command.type]?.Invoke(ref command, ref db, ref admin);
+                    if (_handlers.Keys.Contains(command.type))
+                        _handlers[command.type]?.Invoke(ref command, ref db, ref admin);
                 }
                 else
-                    logger.Warn($"unknown user: {command.uid}");
+                    _logger.Warn($"unknown user: {command.uid}");
 
                 db.SaveChanges();
-                db.Dispose();
             }
             catch (Exception e)
             {
-                SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}", settings.AdminId.ToString());
-                logger.Error(e.Message);
+                SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}",
+                    _settings.AdminId);
+                _logger.Error(e.Message);
+            }
+            finally
+            {
+                db.Dispose();
             }
         }
 
-
         private void InitHandlerTable()
         {
-            functions = new Dictionary<string, CommandExecution>();
+            _handlers = new Dictionary<string, CommandExecution>();
 
-            functions["info"] = Info;               //++
-            functions["test"] = Test;               //++
-            functions["group"] = Group;             //++
-            functions["null"] = NullCommand;        //+?
-            functions["post"] = Post;               //++
-            functions["set"] = Set;                 //++
-            functions["limit"] = Limit;             //++
-            functions["api"] = Api;                 //??
-            functions["help"] = Help;               //++
-            functions["alert"] = Alert;             //++
-            functions["text"] = Text;               //++
-            functions["tag"] = Tag;                 //++
-            functions["alignment"] = Alignment;     //++
-            functions["deployment"] = Deployment;   //++
-            functions["auto"] = Auto;               //++
-            functions["offset"] = Offset;           //++
-            functions["repeat"] = RepeatFailedRequests; 
+            _handlers["info"] = Info;               //++
+            _handlers["test"] = Test;               //++
+            _handlers["group"] = Group;             //++
+            _handlers["null"] = NullCommand;        //+?
+            _handlers["post"] = Post;               //++
+            _handlers["set"] = Set;                 //++
+            _handlers["limit"] = Limit;             //++
+            _handlers["api"] = Api;                 //??
+            _handlers["help"] = Help;               //++
+            _handlers["alert"] = Alert;             //++
+            _handlers["text"] = Text;               //++
+            _handlers["tag"] = Tag;                 //++
+            _handlers["alignment"] = Alignment;     //++
+            _handlers["deployment"] = Deployment;   //++
+            _handlers["auto"] = Auto;               //++
+            _handlers["offset"] = Offset;           //++
+            _handlers["repeat"] = RepeatFailedRequests; 
         }
-
-
 
         private void SendMessage(string message, string uid)
         {
-            vk_account.ApiMethodPost(new Dictionary<string, string>()
+            _vkAccountOfficial.ApiMethodPost(new Dictionary<string, string>()
                 {
                     { "message",message},
-                    { "uid",uid}
+                    { "user_id",uid}
                 }, "messages.send");
         }
-
 
         public static string RandomString(int size)
         {
@@ -113,23 +113,19 @@ namespace groupbot.Infrastructure
             }
             return builder.ToString();
         }
-
-
-        
+       
         private void Info(ref Command command, ref IContext db, ref Admin admin)
         {
-            SendMessage($"last check time: {settings.LastCheckTime}\r\n" +
-                $"is sync: { settings.IsSync }\r\n" +
-                $"vk req period: {vk_account.rp_controller.requests_period}\r\n" +
-                $"save delay: {settings.SavingDelay}\r\n", command.uid);
+            SendMessage($"last check time: {_settings.LastCheckTime}\r\n" +
+                $"is sync: { _settings.IsSync }\r\n" +
+                $"vk req period: {_vkAccountCustom.paceController.requests_period}\r\n" +
+                $"save delay: {_settings.SavingDelay}\r\n", command.uid);
         }
-
         
         private void Test(ref Command command, ref IContext db, ref Admin admin)
         {
             SendMessage(RandomString(15), command.uid);
         }
-
 
         private void Group(ref Command command, ref IContext db, ref Admin admin)
         {
@@ -153,7 +149,6 @@ namespace groupbot.Infrastructure
             }
         }
 
-
         //пустая команда (без текста, но с картинками)
         private void NullCommand(ref Command command, ref IContext db, ref Admin admin)
         {
@@ -164,7 +159,6 @@ namespace groupbot.Infrastructure
                     Execute(new Command("post", atachment, command.uid, ""));
             }
         }
-
 
         private void Post(ref Command command, ref IContext db, ref Admin admin)
         {
@@ -181,7 +175,7 @@ namespace groupbot.Infrastructure
                     case 1:
                         Group current_group = db.GetCurrentGroup(admin.VkId, false);
                         if (current_group != null)
-                            new GroupManager( settings.BotId, current_group, vk_account).CreatePost(command.atachments, command.parametrs[0], true);
+                            new GroupManager( _settings.BotId, current_group, _vkAccountCustom).CreatePost(command.atachments, command.parametrs[0], true);
                         break;
 
                     case 2:
@@ -195,7 +189,7 @@ namespace groupbot.Infrastructure
                                     commands.Push(new Command("post", atachment, command.uid, $"{command.parametrs[0]}/s"));
                             //как один пост
                             if (command.parametrs[1] == "s")
-                                new GroupManager( settings.BotId, group, vk_account).CreatePost(command.atachments, "", true);
+                                new GroupManager( _settings.BotId, group, _vkAccountCustom).CreatePost(command.atachments, "", true);
                         }
                         break;
 
@@ -204,7 +198,6 @@ namespace groupbot.Infrastructure
                 }
             }
         }
-
 
         private void Set(ref Command command, ref IContext db, ref Admin admin)
         {
@@ -218,16 +211,16 @@ namespace groupbot.Infrastructure
                         case "sd":
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
-                                settings.SavingDelay = new_val;
-                                logger.Info($"savedelay changed\r\nUser: {admin.VkId}");
+                                _settings.SavingDelay = new_val;
+                                _logger.Info($"savedelay changed\r\nUser: {admin.VkId}");
                             }
                             break;
 
                         case "rp":
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
-                                vk_account.rp_controller.requests_period = new_val;
-                                logger.Info($"rp changed\r\nUser: {admin.VkId}");
+                                _vkAccountCustom.paceController.requests_period = new_val;
+                                _logger.Info($"rp changed\r\nUser: {admin.VkId}");
                             }
                             break;
 
@@ -255,7 +248,6 @@ namespace groupbot.Infrastructure
             }
         }
 
-
         private void Limit(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count == 1)
@@ -271,27 +263,24 @@ namespace groupbot.Infrastructure
             }
         }
 
-
         private void Api(ref Command command, ref IContext db, ref Admin admin)
         {
-            if (command.uid == settings.AdminId.ToString())
+            if (command.uid == _settings.AdminId.ToString())
             {
                 string request = $"{command.parametrs[0]}";
                 request = request.Replace("amp;", "");
-                SendMessage(Convert.ToString(vk_account.ApiMethodGet(request).tokens), command.uid);
+                SendMessage(Convert.ToString(_vkAccountCustom.ApiMethodGet(request).tokens), command.uid);
             }
         }
 
-
         private void Help(ref Command command, ref IContext db, ref Admin admin)
         {
-            if (File.Exists(help_file))
-                using (StreamReader reader = new StreamReader(help_file))
+            if (File.Exists(_helpFile))
+                using (StreamReader reader = new StreamReader(_helpFile))
                     SendMessage(reader.ReadToEnd(), command.uid);
             else
                 SendMessage("help file dosent exist", command.uid);
         }
-
 
         //добавить отключение для различных групп
         private void Alert(ref Command command, ref IContext db, ref Admin admin)
@@ -305,7 +294,6 @@ namespace groupbot.Infrastructure
             }
         }
 
-
         private void Text(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count == 1)
@@ -315,7 +303,6 @@ namespace groupbot.Infrastructure
                     currnet_group.Text = command.parametrs[0];
             }
         }
-
 
         private void Tag(ref Command command, ref IContext db, ref Admin admin)
         {
@@ -327,8 +314,6 @@ namespace groupbot.Infrastructure
             }
         }
 
-
-
         private void Auto(ref Command command, ref IContext db, ref Admin admin)
         {
             if (admin.ActiveGroup != null)
@@ -336,16 +321,15 @@ namespace groupbot.Infrastructure
                 if (command.parametrs[0] == "on")
                 {
                     admin.ActiveGroup.IsWt = true;
-                    logger.Info($"auto mode enabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
+                    _logger.Info($"auto mode enabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
                 }
                 if (command.parametrs[0] == "off")
                 {
                     admin.ActiveGroup.IsWt = false;
-                    logger.Info($"auto mode disabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
+                    _logger.Info($"auto mode disabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
                 }
             }
         }
-
 
         void Offset(ref Command command, ref IContext db, ref Admin admin)
         {
@@ -357,22 +341,21 @@ namespace groupbot.Infrastructure
                 if (letters.Count<char>() == 0)
                 {
                     admin.ActiveGroup.Offset = Convert.ToInt32(command.parametrs[0]);
-                    logger.Info($"offset changed at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
+                    _logger.Info($"offset changed at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
                 }
                 else
                     SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
             }
         }
 
-
         private void Alignment(ref Command command, ref IContext db, ref Admin admin)
         {
             int[] res;
             Group group = db.GetCurrentGroup(admin.VkId, false);
-            GroupManager current_group = null;
+            GroupManager current_group;
 
             if (group != null)
-                current_group = new GroupManager( settings.BotId, admin.ActiveGroup, vk_account, db);
+                current_group = new GroupManager( _settings.BotId, admin.ActiveGroup, _vkAccountCustom, db);
             else
                 return;
 
@@ -390,10 +373,10 @@ namespace groupbot.Infrastructure
 
                 case "last":
                     TimeSpan unixTime = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
-                    double lastPostTime = (current_group.group_info.PostTime - unixTime.TotalSeconds - current_group.group_info.Offset + current_group.group_info.PostsCounter * current_group.group_info.Offset) / 3600;
+                    double lastPostTime = (current_group.GroupInfo.PostTime - unixTime.TotalSeconds - current_group.GroupInfo.Offset + current_group.GroupInfo.PostsCounter * current_group.GroupInfo.Offset) / 3600;
                     if (lastPostTime < 0)
                         lastPostTime = 0;
-                    SendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {current_group.group_info.Offset} секунд вам осталось \n{(int)lastPostTime / 24}д:{(int)(lastPostTime - ((int)lastPostTime / 24) * 24)}ч", command.uid);
+                    SendMessage($"Семпай, из вашего неумения считать моему создателю пришлось учить меня это делать. Так вот, при текущем временом сдвиге {current_group.GroupInfo.Offset} секунд вам осталось \n{(int)lastPostTime / 24}д:{(int)(lastPostTime - ((int)lastPostTime / 24) * 24)}ч", command.uid);
                     break;
 
                 default:
@@ -401,23 +384,22 @@ namespace groupbot.Infrastructure
             }
         }
 
-
         private void Deployment(ref Command command, ref IContext db, ref Admin admin)
         {
             if (command.parametrs.Count == 1)
             {
                 Group g = db.GetCurrentGroup(admin.VkId, false);
-                GroupManager current_group = null;
+                GroupManager current_group;
 
                 if (g != null)
-                    current_group = new GroupManager( settings.BotId, g, vk_account, db);
+                    current_group = new GroupManager( _settings.BotId, g, _vkAccountCustom, db);
                 else
                     return;
 
                 switch (command.parametrs[0])
                 {
                     case "":
-                        if (current_group.group_info.PostponeEnabled)
+                        if (current_group.GroupInfo.PostponeEnabled)
                         {
                             SendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
                             current_group.Deployment();
@@ -427,12 +409,12 @@ namespace groupbot.Infrastructure
                         break;
 
                     case "all":
-                        if (command.uid == settings.AdminId.ToString())
+                        if (command.uid == _settings.AdminId)
                         {
                             Group[] groups = db.GetDeployInfo();
                             foreach (Group group in groups)
                             {
-                                GroupManager gm = new GroupManager( settings.BotId, group, vk_account, db);
+                                GroupManager gm = new GroupManager( _settings.BotId, group, _vkAccountCustom, db);
                                 int depinfo = gm.Deployment();
                                 if (depinfo < group.MinPostCount && group.Notify)
                                     foreach (GroupAdmins ga in group.GroupAdmins)
@@ -443,13 +425,13 @@ namespace groupbot.Infrastructure
                         break;
 
                     case "off":
-                        current_group.group_info.PostponeEnabled = false;
-                        logger.Info($"{command.ToString()}\r\n{current_group.group_info.Name}'s postponedOn = {current_group.group_info.PostponeEnabled}");
+                        current_group.GroupInfo.PostponeEnabled = false;
+                        _logger.Info($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
                         break;
 
                     case "on":
-                        current_group.group_info.PostponeEnabled = true;
-                        logger.Info($"{command.ToString()}\r\n{current_group.group_info.Name}'s postponedOn = {current_group.group_info.PostponeEnabled}");
+                        current_group.GroupInfo.PostponeEnabled = true;
+                        _logger.Info($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
                         break;
 
                     default:
@@ -458,14 +440,13 @@ namespace groupbot.Infrastructure
             }
         }
 
-
         private void RepeatFailedRequests(ref Command command, ref IContext db, ref Admin admin)
         {
             Group g = db.GetCurrentGroup(admin.VkId, false);
             GroupManager current_group;
 
             if (g != null)
-                current_group = new GroupManager( settings.BotId, g, vk_account, db);
+                current_group = new GroupManager( _settings.BotId, g, _vkAccountCustom, db);
             else
                 return;
 

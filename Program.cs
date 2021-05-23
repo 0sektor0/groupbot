@@ -12,7 +12,7 @@ namespace groupbot.Infrastructure
     {
         static void Main(string[] args)
         {            
-            Logger logger = LogManager.GetCurrentClassLogger();
+            var logger = LogManager.GetCurrentClassLogger();
             VkResponse.debug = true;
 
             BotSettings settings;
@@ -34,15 +34,17 @@ namespace groupbot.Infrastructure
                 return;
             }
             
-            VkApiInterface vk_account = new VkApiInterface(settings.BotLogin, settings.BotPass, 270460, 1800, 3);
-            groupbot.Models.GroupContext.connection_string = settings.ConnectionString;
+            var vkClientCustom = new VkApiInterfaceCustom(settings.BotLogin, settings.BotPass, 270460, 1800, 3);
+            var vkClientOfficial = new VkApiInterfaceOfficial(settings.BotLogin, settings.BotPass, 274556, 1800, 3);
+            Models.GroupContext.connection_string = settings.ConnectionString;
 
-            Executor executor = new Executor(vk_account);
-            Parser parser = new Parser(executor);
-            RListener listener = new RListener(parser, vk_account);
+            var executor = new Executor(vkClientCustom, vkClientOfficial);
+            var parser = new Parser(executor);
+            var listener = new RListener(parser, vkClientOfficial);
 
             logger.Trace("Listening");
             Console.WriteLine("Started");
+            VkRequest.SetDefaultVersion(BotSettings.GetSettings().ApiVersion);
             listener.Run();
         }
     }

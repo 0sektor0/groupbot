@@ -13,54 +13,54 @@ namespace groupbot.Models
 {
     public class GroupManager
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        private int bot_id;
-        public VkApiInterface vk_user;
-        public Group group_info;
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private VkApiInterfaceBase _vkClient;
+        private readonly int _botId;
+        public Group GroupInfo;
 
 
 
-        public GroupManager(int bot_id, Group group_info, VkApiInterface vk_user)
+        public GroupManager(int botId, Group groupInfo, VkApiInterfaceBase vkClient)
         {
-            this.group_info = group_info;
-            this.vk_user = vk_user;
-            this.bot_id = bot_id;
+            GroupInfo = groupInfo;
+            _vkClient = vkClient;
+            _botId = botId;
 
         }
 
 
-        public GroupManager(int bot_id, Group group_info, VkApiInterface vk_user, IContext db)
+        public GroupManager(int botId, Group groupInfo, VkApiInterfaceBase vkClient, IContext db)
         {
-            this.group_info = group_info;
-            this.vk_user = vk_user;
-            this.bot_id = bot_id;
+            GroupInfo = groupInfo;
+            _vkClient = vkClient;
+            _botId = botId;
 
-            this.group_info.Posts = db.GetUnpublishedPosts(this.group_info.Id);
-
-            this.group_info.DelayedRequests = db.GetDelayedRequests(this.group_info.Id);
+            GroupInfo.Posts = db.GetUnpublishedPosts(GroupInfo.Id);
+            GroupInfo.DelayedRequests = db.GetDelayedRequests(GroupInfo.Id);
         }
 
 
         //информация об отложенных постах
         private int PostponedInf()
         {
-            VkResponse response = vk_user.ApiMethodGet($"execute.postponedInf?gid=-{group_info.VkId}");
+            //VkResponse response = _vkClient.GetPostponedInformation(GroupInfo.VkId);
+            VkResponse response = _vkClient.ApiMethodGet($"execute.postponedInf?gid=-{GroupInfo.VkId}");
 
             if (response.isCorrect)
                 if (Convert.ToString(response.tokens[1]) != "")
                 {
-                    group_info.PostTime = (int)response.tokens[1] + group_info.Offset; //время последнего 
+                    GroupInfo.PostTime = (int)response.tokens[1] + GroupInfo.Offset; //время последнего 
                     return (int)response.tokens[0];
                 }
                 else
                 {
-                    group_info.PostTime += group_info.Offset;
+                    GroupInfo.PostTime += GroupInfo.Offset;
                     return 0;
                 }
             else
             {
-                logger.Warn("failed postponedinf");
-                return group_info.Limit;
+                _logger.Warn("failed postponedinf");
+                return GroupInfo.Limit;
             }
         }
 
@@ -71,55 +71,56 @@ namespace groupbot.Models
             VkResponse response = null;
             Post post = new Post();
             List<Photo> downloaded_photos = new List<Photo>();
-            string[] photo_params;
+            string[] photoParams;
 
 
             foreach (string photo in photos)
             {
-                photo_params = Convert.ToString(photo).Split('_');
+                photoParams = Convert.ToString(photo).Split('_');
                 //копируем фото в альбом бота
-                response = vk_user.ApiMethodGet($"execute.CopyPhoto?owner_id={photo_params[0]}&photo_id={photo_params[1]}&access_key={photo_params[2]}");
+                //response = _vkClient.CopyPhoto(photoParams[0], photoParams[1], photoParams[2]);
+                response = _vkClient.ApiMethodGet($"execute.CopyPhoto?owner_id={photoParams[0]}&photo_id={photoParams[1]}&access_key={photoParams[2]}");
 
                 //записываем адресса сохраненных пикч
                 if (response.isCorrect)
                 {
-                    Photo downloaed_photo = new Photo();
-                    downloaed_photo.PictureName = $"photo{bot_id}_{(string)response.tokens[0]["pid"]}";
-                    downloaed_photo.SPictureAddress = $"{(string)response.tokens[0]["src_big"]}";
-                    downloaed_photo.XPictureAddress = $"{(string)response.tokens[0]["src_xbig"]}";
+                    Photo downloaedPhoto = new Photo();
+                    downloaedPhoto.PictureName = $"photo{_botId}_{(string)response.tokens[0]["id"]}";
+                    downloaedPhoto.SPictureAddress = $"{(string)response.tokens[0]["photo_807"]}";
+                    downloaedPhoto.XPictureAddress = $"{(string)response.tokens[0]["photo_1280"]}";
 
-                    downloaded_photos.Add(downloaed_photo);
+                    downloaded_photos.Add(downloaedPhoto);
                 }
                 else
                 {
-                    DelayedRequest delayed_request = new DelayedRequest(ref response.request.url, ref group_info, ref vk_user);
+                    DelayedRequest delayedRequest = new DelayedRequest(ref response.request.Url, ref GroupInfo, ref _vkClient);
 
-                    if (group_info.DelayedRequests == null)
-                        group_info.DelayedRequests = new List<DelayedRequest>();
+                    if (GroupInfo.DelayedRequests == null)
+                        GroupInfo.DelayedRequests = new List<DelayedRequest>();
 
-                    group_info.DelayedRequests.Add(delayed_request);
+                    GroupInfo.DelayedRequests.Add(delayedRequest);
                 }
             }
 
-            post.Group = group_info;
-            post.Text = $"{group_info.Text} {message}";
+            post.Group = GroupInfo;
+            post.Text = $"{GroupInfo.Text} {message}";
 
             if (downloaded_photos.Count > 0)
                 post.Photos = downloaded_photos;
 
             if (post.IsPostCorrect())
             {
-                if (group_info.Posts == null)
-                    group_info.Posts = new List<Post>() { post };
+                if (GroupInfo.Posts == null)
+                    GroupInfo.Posts = new List<Post>() { post };
                 else
-                    group_info.Posts.Add(post);
+                    GroupInfo.Posts.Add(post);
 
                 //сквозной пост (заливается сразу)
-                if (group_info.IsWt)
+                if (GroupInfo.IsWt)
                     SendPost(ref post, true);
             }
             else
-                logger.Warn($"Invalid post to {group_info.PseudoName}");
+                _logger.Warn($"Invalid post to {GroupInfo.PseudoName}");
         }
 
 
@@ -128,17 +129,17 @@ namespace groupbot.Models
         {
             TimeSpan date = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
 
-            if ((group_info.PostTime < (int)date.TotalSeconds) && fixtime)
-                group_info.PostTime = (int)date.TotalSeconds + group_info.Offset;
+            if ((GroupInfo.PostTime < (int)date.TotalSeconds) && fixtime)
+                GroupInfo.PostTime = (int)date.TotalSeconds + GroupInfo.Offset;
 
-            if (vk_user.ApiMethodGet(post.ToVkUrl()).isCorrect)
+            if (_vkClient.ApiMethodGet(post.ToVkUrl()).isCorrect)
             {
-                group_info.PostTime = group_info.PostTime + group_info.Offset;
+                GroupInfo.PostTime = GroupInfo.PostTime + GroupInfo.Offset;
                 post.IsPublished = true;
             }
             else
             {
-                logger.Warn($"failed to get post vkurl\r\nGroup: {group_info.Id} Post: {post.Id}");
+                _logger.Warn($"failed to get post vkurl\r\nGroup: {GroupInfo.Id} Post: {post.Id}");
                 PostponedInf();
             }
         }
@@ -146,7 +147,7 @@ namespace groupbot.Models
 
         private bool SendPost()
         {
-            if (group_info.Posts != null)
+            if (GroupInfo.Posts != null)
             {
                 TimeSpan date = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
                 Post post = null;
@@ -154,11 +155,11 @@ namespace groupbot.Models
 
                 while (!is_correct)
                 {
-                    post = group_info.Posts.Where(p => p.IsPublished == false).FirstOrDefault();
+                    post = GroupInfo.Posts.Where(p => p.IsPublished == false).FirstOrDefault();
 
                     if (post == null)
                     {
-                        logger.Warn($"failed to get post vkurl there is no posts at all\r\nGroup: {group_info.Id}");
+                        _logger.Warn($"failed to get post vkurl there is no posts at all\r\nGroup: {GroupInfo.Id}");
                         return false;
                     }
 
@@ -168,19 +169,19 @@ namespace groupbot.Models
                         post.IsPublished = true;
                 }
 
-                if ((group_info.PostTime < (int)date.TotalSeconds))
-                    group_info.PostTime = (int)date.TotalSeconds + group_info.Offset;
+                if ((GroupInfo.PostTime < (int)date.TotalSeconds))
+                    GroupInfo.PostTime = (int)date.TotalSeconds + GroupInfo.Offset;
 
-                if (vk_user.ApiMethodGet(post.ToVkUrl()).isCorrect)
+                if (_vkClient.ApiMethodGet(post.ToVkUrl()).isCorrect)
                 {
-                    group_info.PostTime = group_info.PostTime + group_info.Offset;
+                    GroupInfo.PostTime = GroupInfo.PostTime + GroupInfo.Offset;
                     post.IsPublished = true;
-                    logger.Info($"post successfully created\r\nGroup: {group_info.Id} Post: {post.Id}");
+                    _logger.Info($"post successfully created\r\nGroup: {GroupInfo.Id} Post: {post.Id}");
                     return true;
                 }
                 else
                 {
-                    logger.Warn($"failed to send post\r\nGroup: {group_info.Id} Post: {post.Id}");
+                    _logger.Warn($"failed to send post\r\nGroup: {GroupInfo.Id} Post: {post.Id}");
                     PostponedInf();
                     return false;
                 }
@@ -196,66 +197,67 @@ namespace groupbot.Models
             VkResponse response = null;
             Photo photo;
 
-            if (group_info.DelayedRequests != null)
+            if (GroupInfo.DelayedRequests != null)
             {
                 List<DelayedRequest> drequests = null;
-                drequests = group_info.DelayedRequests.Where(d => d.IsResended == false).ToList();
+                drequests = GroupInfo.DelayedRequests.Where(d => d.IsResended == false).ToList();
 
                 if (drequests != null)
                 {
                     for (int i = 0; i < drequests.Count; i++)
                     if(!drequests[i].IsResended)
                     {
-                        response = vk_user.ApiMethodGet(drequests[i].GetNewRequest(ref vk_user));
+                        var request = drequests[i].GetNewRequest(ref _vkClient);
+                        response = _vkClient.ApiMethodGet(request);
                         if (response.isCorrect)
                         {
                             photo = new Photo
                             {
-                                PictureName = $"photo{bot_id}_{(string)response.tokens[0]["pid"]}",
-                                SPictureAddress = $"{(string)response.tokens[0]["src_big"]}",
-                                XPictureAddress = $"{(string)response.tokens[0]["src_xbig"]}"
+                                PictureName = $"photo{_botId}_{(string)response.tokens[0]["id"]}",
+                                SPictureAddress = $"{(string)response.tokens[0]["photo_807"]}",
+                                XPictureAddress = $"{(string)response.tokens[0]["photo_1280"]}"
                             };
                             drequests[i].IsResended = true;
                         }
                         else
                         {
-                            logger.Warn($"failed to resend photo\r\nGroup: {group_info.Id}\nDelayedRequest: {drequests[i].Id}\r\ntime: {DateTime.UtcNow}");
+                            _logger.Warn($"failed to resend photo\r\nGroup: {GroupInfo.Id}\nDelayedRequest: {drequests[i].Id}\r\ntime: {DateTime.UtcNow}");
                             break;
                         }
 
                         Post post = new Post();
                         post.Photos.Add(photo);
-                        post.Group = group_info;
+                        post.Group = GroupInfo;
 
-                        group_info.PostsCounter++;
+                        GroupInfo.PostsCounter++;
 
-                        if (group_info.Posts == null)
-                            group_info.Posts = new List<Post>();
+                        if (GroupInfo.Posts == null)
+                            GroupInfo.Posts = new List<Post>();
 
-                        group_info.Posts.Add(post);
+                        GroupInfo.Posts.Add(post);
                     }
                 }
             }
             else
-                logger.Warn($"there is no photo to resend\r\nGroup: {group_info.Id}");
+                _logger.Warn($"there is no photo to resend\r\nGroup: {GroupInfo.Id}");
         }        
 
 
         public int Deployment()
         {
-            if (group_info.PostponeEnabled)
+            if (GroupInfo.PostponeEnabled)
             {
-                if (group_info.Posts != null)
+                if (GroupInfo.Posts != null)
                 {
                     int postsCounter = PostponedInf();
 
-                    for (int i = postsCounter; i <= group_info.Limit; i++)
+                    for (int i = postsCounter; i <= GroupInfo.Limit; i++)
                         if (!SendPost())
                             break;
 
-                    RepeatFailedRequests();
-                    logger.Info($"Deployment Ended\r\nGroup: {group_info.Id}");
-                    return postsCounter + group_info.Posts.Where(p => p.IsPublished == false).Count();
+                    //RepeatFailedRequests();
+                    _logger.Info($"Deployment Ended\r\nGroup: {GroupInfo.Id}");
+                    return postsCounter + GroupInfo.Posts.Where(p => p.IsPublished == false).Count();
                 }
             }
 
@@ -265,9 +267,10 @@ namespace groupbot.Models
 
         public int[] Alignment(bool getInf)
         {
-            VkResponse response = vk_user.ApiMethodGet($"execute.delaySearch?gid=-{group_info.VkId}&offset={group_info.Offset}");
+            //VkResponse response = _vkClient.SearchDelayInPosts(GroupInfo.VkId, GroupInfo.Offset);
+            VkResponse response = _vkClient.ApiMethodGet($"execute.delaySearch?gid=-{GroupInfo.VkId}&offset={GroupInfo.Offset}");
             JToken jo = response.tokens;
-            string text = "";
+            string text ;
 
             if (response.isCorrect)
             {
@@ -276,34 +279,34 @@ namespace groupbot.Models
                 int errorCount = (int)jo[0];
                 int postsCount = (int)jo[1] - 1;
                 jo = jo[2];
-                int temppost_time = group_info.PostTime;
+                int temppost_time = GroupInfo.PostTime;
 
                 if (!getInf)
                 {
                     foreach (JToken delay in jo)
                     {
-                        group_info.PostTime = (int)delay["start"];
+                        GroupInfo.PostTime = (int)delay["start"];
                         for (int i = 0; i < (int)delay["count"]; i++)
                         {
-                            if (postsCount >= group_info.Limit)
+                            if (postsCount >= GroupInfo.Limit)
                                 break;
                             else
                             {
-                                group_info.PostTime += group_info.Offset;
+                                GroupInfo.PostTime += GroupInfo.Offset;
                                 SendPost();
-                                group_info.PostTime -= group_info.Offset;
+                                GroupInfo.PostTime -= GroupInfo.Offset;
                                 postsCount++;
                             }
                         }
                     }
                     
                     text += "alignment ended";
-                    group_info.PostTime = temppost_time;                    
+                    GroupInfo.PostTime = temppost_time;                    
                     return new int[] { 0 };
                 }
 
                 text += "alignment ended";
-                logger.Info(text);
+                _logger.Info(text);
                 return new int[] { errorCount, postsCount };
             }
 

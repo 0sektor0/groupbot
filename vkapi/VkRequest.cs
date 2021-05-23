@@ -7,45 +7,37 @@ namespace VkApi
 {
     public class VkRequest
     {
-        const string default_version = "V5.53";
-        public string api_version = "V5.53";
-        public string post_data = "";
-        public bool is_post = false;
-        public string url = "";
+        public static string DefaultApiVersion = "5.53";
+        public string ApiVersion = "5.53";
+        public string PostData = "";
+        public bool IsPost = false;
+        public string Url = "";
 
 
 
-
-        public VkRequest(string url, string api_version, bool is_post, Dictionary<string, string> post_params, VkToken token)
+        public static void SetDefaultVersion(string version)
         {
-            this.is_post = is_post;
-            this.api_version = api_version;
+            DefaultApiVersion = version;
+        }
+        
+        public VkRequest(string url, string apiVersion, bool isPost, Dictionary<string, string> postParams, VkToken token)
+        {
+            IsPost = isPost;
+            ApiVersion = apiVersion;
 
-            this.url = CreateUrl(url, token);
-            if (is_post)
-                this.post_data = CreatePostData(post_params, token);
+            Url = CreateUrl(url, token);
+            if (isPost)
+                PostData = CreatePostData(postParams, token);
         }
 
 
-        public VkRequest(string url, string api_version, Dictionary<string, string> post_params, VkToken token) : this(url, api_version, true, post_params, token)
-        {
-
-        }
-
-
-        public VkRequest(string url, Dictionary<string, string> post_params, VkToken token) : this(url, default_version, true, post_params, token)
+        public VkRequest(string url, Dictionary<string, string> post_params, VkToken token) : this(url, DefaultApiVersion, true, post_params, token)
         {
 
         }
 
 
-        public VkRequest(string url, string api_version, VkToken token) : this(url, api_version, false, null, token)
-        {
-
-        }
-
-
-        public VkRequest(string url, VkToken token) : this(url, default_version, false, null, token)
+        public VkRequest(string url, VkToken token) : this(url, DefaultApiVersion, false, null, token)
         {
 
         }
@@ -63,28 +55,28 @@ namespace VkApi
                     else
                         url = $"https://api.vk.com/method{url}";
 
-                    if(!is_post)
+                    if(!IsPost)
                         if (!url.Contains("?"))
-                            url = $"{url}?access_token={token.value}&v={api_version}";
+                            url = $"{url}?access_token={token.value}&v={ApiVersion}";
                         else
-                            url = $"{url}&access_token={token.value}&v={api_version}";
+                            url = $"{url}&access_token={token.value}&v={ApiVersion}";
                 }
 
             return url;
         }
 
 
-        string CreatePostData(Dictionary<string, string> post_params, VkToken token)
+        string CreatePostData(Dictionary<string, string> postParams, VkToken token)
         {
-            string post_data = "";
+            string postData = "";
 
-            post_params["access_token"] = token.value;
-            post_params["v"] = api_version;
+            postParams["access_token"] = token.value;
+            postParams["v"] = ApiVersion;
 
-            foreach (string key in post_params.Keys)
-                post_data += $"{key}={post_params[key]}&";
+            foreach (string key in postParams.Keys)
+                postData += $"{key}={postParams[key]}&";
 
-            return post_data.Remove(post_data.Length - 1, 1);
+            return postData.Remove(postData.Length - 1, 1);
         }
     }
 }

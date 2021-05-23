@@ -15,7 +15,10 @@ namespace groupbot.BotCore
         public static string path = Directory.GetCurrentDirectory()+"/data/botconfig.json";
         
         private static readonly BotSettings instanse = LoadConfigs(path);
-
+        
+        [JsonProperty("api_version")]
+        public string ApiVersion { get; set; }
+        
         [JsonProperty("is_sync")]
         public bool IsSync { get; set; }
 
