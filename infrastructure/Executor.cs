@@ -21,6 +21,7 @@ namespace groupbot.Infrastructure
         private Dictionary<string, CommandExecution> _handlers;
         private BotSettings _settings = BotSettings.GetSettings();
         private Logger _logger = LogManager.GetCurrentClassLogger();
+        private Random _random = new Random();
         
         private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
 
@@ -95,8 +96,9 @@ namespace groupbot.Infrastructure
         {
             _vkAccountOfficial.ApiMethodPost(new Dictionary<string, string>()
                 {
-                    { "message",message},
-                    { "user_id",uid}
+                    { "message", message},
+                    { "user_id", uid},
+                    { "random_id", _random.Next().ToString()},
                 }, "messages.send");
         }
 
