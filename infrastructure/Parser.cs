@@ -40,8 +40,8 @@ namespace groupbot.Infrastructure
 
             for (int i = 1; i < messages.Count(); i++)
             {
-                uid = (string)messages[i]["user_id"];
-                inputCommands = Convert.ToString(messages[i]["body"]).Replace("<br>", "").Split(';');
+                uid = (string)messages[i]["from_id"];
+                inputCommands = Convert.ToString(messages[i]["text"]).Replace("<br>", "").Split(';');
 
                 for (int j = 0; j < inputCommands.Length; j++)
                 {

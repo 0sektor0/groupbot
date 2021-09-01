@@ -7,8 +7,8 @@ namespace VkApi
 {
     public class VkRequest
     {
-        public static string DefaultApiVersion = "5.53";
-        public string ApiVersion = "5.53";
+        public static string DefaultApiVersion = "5.131";
+        public string ApiVersion = "5.131";
         public string PostData = "";
         public bool IsPost = false;
         public string Url = "";

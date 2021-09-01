@@ -3,7 +3,7 @@ var postponedPosts= API.wall.get({
     "count":"100",
     "filter":"postponed",
     "access_token":Args.token,
-    "v":"5.53"
+    "v":"5.131"
 }).items;
 
 postponedPosts.unshift(postponedPosts.length);
@@ -16,7 +16,7 @@ if (postponedPosts[0]>100)
         "count":"100",
         "filter":"postponed",
         "access_token":Args.token,
-        "v":"5.53"
+        "v":"5.131"
     }).items;
     postponedPosts2.unshift(postponedPosts2.length);
     postponedPosts2.splice(0,1);
