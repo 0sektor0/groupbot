@@ -7,7 +7,6 @@ var photoId= API.photos.copy({
 });
 
 var selfId= API.users.get({"v":"5.131"})[0]["id"];
-return photoId + "_" + selfId; 
 
 var photoAdr= API.photos.getById({
     "photos":selfId+"_"+photoId,

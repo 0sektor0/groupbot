@@ -47,7 +47,7 @@ namespace VkApi
         private const string SCRIPT_GET_POSTPONED_INFO_FILE = "./data/scripts/postponed_inf.js";
         private readonly string _getPostponedInfoScript;
 
-        private const string SCRIPT_COPY_PHOTO_FILE = "./data/scripts/postponed_inf.js";
+        private const string SCRIPT_COPY_PHOTO_FILE = "./data/scripts/copy_photo.js";
         private readonly string _copyPhotoScript;
 
         private const string SCRIPT_DELAY_SEARCH_FILE = "./data/scripts/delay_search.js";
