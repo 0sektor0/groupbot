@@ -44,7 +44,6 @@ namespace groupbot.Models
         private int PostponedInf()
         {
             VkResponse response = _vkClient.GetPostponedInformation(GroupInfo.VkId);
-            //VkResponse response = _vkClient.ApiMethodGet($"execute.postponedInf?gid=-{GroupInfo.VkId}");
 
             if (response.isCorrect)
                 if (Convert.ToString(response.tokens[1]) != "")
@@ -79,8 +78,7 @@ namespace groupbot.Models
                 photoParams = Convert.ToString(photo).Split('_');
                 //копируем фото в альбом бота
                 response = _vkClient.CopyPhoto(photoParams[0], photoParams[1], photoParams[2]);
-                //response = _vkClient.ApiMethodGet($"execute.CopyPhoto?owner_id={photoParams[0]}&photo_id={photoParams[1]}&access_key={photoParams[2]}");
-
+               
                 //записываем адресса сохраненных пикч
                 if (response.isCorrect)
                 {
@@ -268,7 +266,6 @@ namespace groupbot.Models
         public int[] Alignment(bool getInf)
         {
             VkResponse response = _vkClient.SearchDelayInPosts(GroupInfo.VkId, GroupInfo.Offset);
-            //VkResponse response = _vkClient.ApiMethodGet($"execute.delaySearch?gid=-{GroupInfo.VkId}&offset={GroupInfo.Offset}");
             JToken jo = response.tokens;
             string text ;
 
