@@ -53,7 +53,7 @@ namespace groupbot.Infrastructure
                         _handlers[command.type]?.Invoke(ref command, ref db, ref admin);
                 }
                 else
-                    _logger.Warn($"unknown user: {command.uid}");
+                    Console.WriteLine($"unknown user: {command.uid}");
 
                 db.SaveChanges();
             }
@@ -61,7 +61,7 @@ namespace groupbot.Infrastructure
             {
                 SendMessage($"Семпай, поаккуратнее быть нужно, я чуть не упала (\n{e.Message}",
                     _settings.AdminId);
-                _logger.Error(e.Message);
+                Console.WriteLine(e.Message);
             }
             finally
             {
@@ -214,7 +214,7 @@ namespace groupbot.Infrastructure
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
                                 _settings.SavingDelay = new_val;
-                                _logger.Info($"savedelay changed\r\nUser: {admin.VkId}");
+                                Console.WriteLine($"savedelay changed\r\nUser: {admin.VkId}");
                             }
                             break;
 
@@ -222,7 +222,7 @@ namespace groupbot.Infrastructure
                             if (Int32.TryParse(command.parametrs[i], out new_val))
                             {
                                 _vkAccountCustom.paceController.requests_period = new_val;
-                                _logger.Info($"rp changed\r\nUser: {admin.VkId}");
+                                Console.WriteLine($"rp changed\r\nUser: {admin.VkId}");
                             }
                             break;
 
@@ -323,12 +323,12 @@ namespace groupbot.Infrastructure
                 if (command.parametrs[0] == "on")
                 {
                     admin.ActiveGroup.IsWt = true;
-                    _logger.Info($"auto mode enabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
+                    Console.WriteLine($"auto mode enabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
                 }
                 if (command.parametrs[0] == "off")
                 {
                     admin.ActiveGroup.IsWt = false;
-                    _logger.Info($"auto mode disabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
+                    Console.WriteLine($"auto mode disabled at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
                 }
             }
         }
@@ -343,7 +343,7 @@ namespace groupbot.Infrastructure
                 if (letters.Count<char>() == 0)
                 {
                     admin.ActiveGroup.Offset = Convert.ToInt32(command.parametrs[0]);
-                    _logger.Info($"offset changed at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
+                    Console.WriteLine($"offset changed at Group: {admin.ActiveGroup.Id} {admin.ActiveGroup.Name}\r\nby Admin: {admin.Id} {admin.VkId}");
                 }
                 else
                     SendMessage("Семпай, вы настолько глупый, что даже время не можете правильно указать, да?", command.uid);
@@ -428,12 +428,12 @@ namespace groupbot.Infrastructure
 
                     case "off":
                         current_group.GroupInfo.PostponeEnabled = false;
-                        _logger.Info($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
+                        Console.WriteLine($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
                         break;
 
                     case "on":
                         current_group.GroupInfo.PostponeEnabled = true;
-                        _logger.Info($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
+                        Console.WriteLine($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
                         break;
 
                     default:

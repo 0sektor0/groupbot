@@ -58,7 +58,7 @@ namespace groupbot.Models
                 }
             else
             {
-                _logger.Warn("failed postponedinf");
+                Console.WriteLine("failed postponedinf");
                 return GroupInfo.Limit;
             }
         }
@@ -118,7 +118,7 @@ namespace groupbot.Models
                     SendPost(ref post, true);
             }
             else
-                _logger.Warn($"Invalid post to {GroupInfo.PseudoName}");
+                Console.WriteLine($"Invalid post to {GroupInfo.PseudoName}");
         }
 
 
@@ -137,7 +137,7 @@ namespace groupbot.Models
             }
             else
             {
-                _logger.Warn($"failed to get post vkurl\r\nGroup: {GroupInfo.Id} Post: {post.Id}");
+                Console.WriteLine($"failed to get post vkurl Group: {GroupInfo.Name} Post: {post.Id}");
                 PostponedInf();
             }
         }
@@ -157,7 +157,7 @@ namespace groupbot.Models
 
                     if (post == null)
                     {
-                        _logger.Warn($"failed to get post vkurl there is no posts at all\r\nGroup: {GroupInfo.Id}");
+                        Console.WriteLine($"failed to get post vkurl there is no posts at all Group: {GroupInfo.Name}");
                         return false;
                     }
 
@@ -174,12 +174,12 @@ namespace groupbot.Models
                 {
                     GroupInfo.PostTime = GroupInfo.PostTime + GroupInfo.Offset;
                     post.IsPublished = true;
-                    _logger.Info($"post successfully created\r\nGroup: {GroupInfo.Id} Post: {post.Id}");
+                    Console.WriteLine($"post successfully created Group: {GroupInfo.Name} Post: {post.Id}");
                     return true;
                 }
                 else
                 {
-                    _logger.Warn($"failed to send post\r\nGroup: {GroupInfo.Id} Post: {post.Id}");
+                    Console.WriteLine($"failed to send post Group: {GroupInfo.Name} Post: {post.Id}");
                     PostponedInf();
                     return false;
                 }
@@ -219,7 +219,7 @@ namespace groupbot.Models
                         }
                         else
                         {
-                            _logger.Warn($"failed to resend photo\r\nGroup: {GroupInfo.Id}\nDelayedRequest: {drequests[i].Id}\r\ntime: {DateTime.UtcNow}");
+                            Console.WriteLine($"failed to resend photo Group: {GroupInfo.Name}\nDelayedRequest: {drequests[i].Id} time: {DateTime.UtcNow}");
                             break;
                         }
 
@@ -237,7 +237,7 @@ namespace groupbot.Models
                 }
             }
             else
-                _logger.Warn($"there is no photo to resend\r\nGroup: {GroupInfo.Id}");
+                Console.WriteLine($"there is no photo to resend Group: {GroupInfo.Name}");
         }        
 
 
@@ -253,8 +253,7 @@ namespace groupbot.Models
                         if (!SendPost())
                             break;
 
-                    //RepeatFailedRequests();
-                    _logger.Info($"Deployment Ended\r\nGroup: {GroupInfo.Id}");
+                    Console.WriteLine($"Deployment Ended Group: {GroupInfo.Name}");
                     return postsCounter + GroupInfo.Posts.Where(p => p.IsPublished == false).Count();
                 }
             }
@@ -303,7 +302,7 @@ namespace groupbot.Models
                 }
 
                 text += "alignment ended";
-                _logger.Info(text);
+                Console.WriteLine(text);
                 return new int[] { errorCount, postsCount };
             }
 

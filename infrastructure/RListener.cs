@@ -52,7 +52,7 @@ namespace groupbot.Infrastructure
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex);
+                    Console.WriteLine(ex);
                 }
             }
         }

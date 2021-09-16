@@ -30,13 +30,14 @@ namespace groupbot.Infrastructure
             string[] inputCommands;
             List<string> photos = new List<string>();
 
-
             if (timer)
             {
                 settings.LastCheckTime = DateTime.UtcNow;
                 executor.ExecuteAsync(new Command("deployment", "", ultimate_admin_id, "all"));
                 executor.ExecuteAsync(new Command("save", "", ultimate_admin_id, ""));
             }
+
+            if (messages == null) return;
 
             for (int i = 1; i < messages.Count(); i++)
             {
