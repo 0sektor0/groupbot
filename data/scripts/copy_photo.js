@@ -3,15 +3,14 @@ var photoId= API.photos.copy({
     "photo_id":Args.photo_id,
     "access_token":Args.token,
     "access_key":Args.access_key,
-    "v":"5.53"
+    "v":"5.131"
 });
 
-var selfId= API.users.get({"v":"5.53"})[0]["id"];
-return photoId + "_" + selfId; 
+var selfId= API.users.get({"v":"5.131"})[0]["id"];
 
 var photoAdr= API.photos.getById({
     "photos":selfId+"_"+photoId,
-    "v":"5.53"
+    "v":"5.131"
 });
 
 return photoAdr;

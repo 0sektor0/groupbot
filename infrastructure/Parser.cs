@@ -30,7 +30,6 @@ namespace groupbot.Infrastructure
             string[] inputCommands;
             List<string> photos = new List<string>();
 
-
             if (timer)
             {
                 settings.LastCheckTime = DateTime.UtcNow;
@@ -38,10 +37,12 @@ namespace groupbot.Infrastructure
                 executor.ExecuteAsync(new Command("save", "", ultimate_admin_id, ""));
             }
 
+            if (messages == null) return;
+
             for (int i = 1; i < messages.Count(); i++)
             {
-                uid = (string)messages[i]["user_id"];
-                inputCommands = Convert.ToString(messages[i]["body"]).Replace("<br>", "").Split(';');
+                uid = (string)messages[i]["from_id"];
+                inputCommands = Convert.ToString(messages[i]["text"]).Replace("<br>", "").Split(';');
 
                 for (int j = 0; j < inputCommands.Length; j++)
                 {

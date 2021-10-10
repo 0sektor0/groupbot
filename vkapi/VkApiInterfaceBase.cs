@@ -47,7 +47,7 @@ namespace VkApi
         private const string SCRIPT_GET_POSTPONED_INFO_FILE = "./data/scripts/postponed_inf.js";
         private readonly string _getPostponedInfoScript;
 
-        private const string SCRIPT_COPY_PHOTO_FILE = "./data/scripts/postponed_inf.js";
+        private const string SCRIPT_COPY_PHOTO_FILE = "./data/scripts/copy_photo.js";
         private readonly string _copyPhotoScript;
 
         private const string SCRIPT_DELAY_SEARCH_FILE = "./data/scripts/delay_search.js";
@@ -93,7 +93,7 @@ namespace VkApi
             VkResponse response = new VkResponse(sender.Send(request, false), request);
 
             if (!response.isEmpty && _isLogging)
-                _logger.Info(response.tokens.ToString());
+                Console.WriteLine(response.tokens.ToString());
 
             return response;
         }
@@ -109,7 +109,7 @@ namespace VkApi
             VkResponse response = new VkResponse(sender.Send(request, false), request);
 
             if (!response.isEmpty && _isLogging)
-                _logger.Info(response.tokens.ToString());
+                Console.WriteLine(response.tokens.ToString());
 
             return response;
         }
@@ -120,7 +120,7 @@ namespace VkApi
             VkResponse response = new VkResponse(sender.Send(request, false), request);
 
             if (!response.isEmpty && _isLogging)
-                _logger.Info(response.tokens.ToString());
+                Console.WriteLine(response.tokens.ToString());
 
             return response;
         }
@@ -161,7 +161,7 @@ namespace VkApi
             response.tokens = json;
                 
             if (!response.isEmpty && _isLogging)
-                _logger.Info(response.tokens.ToString());
+                Console.WriteLine(response.tokens.ToString());
 
             if (response.isCorrect)
                 response = ApiMethodGet($"photos.saveMessagesPhoto?server={response.tokens["server"]}&hash={response.tokens["hash"]}&photo={Convert.ToString(response.tokens["photo"]).Replace("\\", "")}&v=V5.63");
