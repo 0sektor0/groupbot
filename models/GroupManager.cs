@@ -46,6 +46,9 @@ namespace groupbot.Models
             VkResponse response = _vkClient.GetPostponedInformation(GroupInfo.VkId);
 
             if (response.isCorrect)
+            {
+                //TODO null check
+                var firstToken = response.tokens[1];
                 if (Convert.ToString(response.tokens[1]) != "")
                 {
                     GroupInfo.PostTime = (int)response.tokens[1] + GroupInfo.Offset; //время последнего 
@@ -56,6 +59,7 @@ namespace groupbot.Models
                     GroupInfo.PostTime += GroupInfo.Offset;
                     return 0;
                 }
+            }
             else
             {
                 Console.WriteLine("failed postponedinf");
