@@ -6,7 +6,7 @@ using System.Linq;
 
 
 
-namespace groupbot.Models
+namespace GroupBot.Models
 {
     public class Group
     {

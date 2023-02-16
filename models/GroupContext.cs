@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using groupbot.BotCore;
 using System.Linq;
+using GroupBot.BotCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 
 
 //TODO delete this shitty code 
-namespace groupbot.Models
+namespace GroupBot.Models
 {
     public class GroupContext : DbContext, IContext
     {

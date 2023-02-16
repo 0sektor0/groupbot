@@ -1,70 +1,75 @@
 ﻿using System;
 using System.Threading;
 using Newtonsoft.Json.Linq;
-using groupbot.BotCore;
+using GroupBot.BotCore;
 using NLog;
 using VkApi;
 
+namespace GroupBot.Infrastructure;
 
-
-
-namespace groupbot.Infrastructure
+class RListener : AListener
 {
-    class RListener : AListener
+    private BotSettings _settings = BotSettings.GetSettings();
+    private VkApiInterfaceBase _vkAccount;
+    private Logger _logger;
+    
+    
+    public RListener(AParser parser, VkApiInterfaceBase vk_account) : base(parser)
     {
-        private BotSettings _settings = BotSettings.GetSettings();
-        private VkApiInterfaceBase _vkAccount;
-        private Logger _logger;
+        _vkAccount = vk_account;
+        this.parser = parser;
+        _logger = LogManager.GetCurrentClassLogger();
+    }
 
-        
+    public override void Run()
+    {            
+        _vkAccount.Auth();
+        _logger.Trace($"Acces granted\r\nlogin: {_vkAccount.login}");
+        Console.WriteLine("authorized");
 
-        public RListener(AParser parser, VkApiInterfaceBase vk_account) : base(parser)
+        Listen();
+    }
+    
+    protected override void Listen()
+    {
+        VkResponse response;
+        JToken messages;
+
+        if (_settings.ShouldDeployOnStart)
         {
-            _vkAccount = vk_account;
-            this.parser = parser;
-            _logger = LogManager.GetCurrentClassLogger();
+            Console.WriteLine("Sleep before deploy on start");
+            Thread.Sleep(_settings.ListeningDelay);
+            Console.WriteLine("Deploy on start");
+            parser.Parse(null, true);
         }
         
-
-
-        protected override void Listen()
+        while (true)
         {
-            VkResponse response;
-            JToken messages;
-            
-            while (true)
+            try
             {
-                try
+                // TODO remake auth
+                // HAHA. NO.
+                bool is_ttu = (int) (DateTime.UtcNow - _settings.LastCheckTime).TotalSeconds >= _settings.SavingDelay;
+
+                if (_settings.IsMessagesEnabled)
                 {
-                    // TODO remake auth
-                    bool is_ttu = (int)((DateTime.UtcNow - _settings.LastCheckTime).TotalSeconds) >= _settings.SavingDelay;
                     response = _vkAccount.PullMessages();
                     messages = response.tokens;
 
                     if (response.isCorrect)
                         if ((string)messages[0] != "0")
                             parser.Parse(messages, false);
-
-                    if (is_ttu)
-                        parser.Parse(null, is_ttu);
-
-                    Thread.Sleep(_settings.ListeningDelay);
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
+
+                if (is_ttu)
+                    parser.Parse(null, is_ttu);
+
+                Thread.Sleep(_settings.ListeningDelay);
             }
-        }
-
-
-        public override void Run()
-        {            
-            _vkAccount.Auth();
-            _logger.Trace($"Acces granted\r\nlogin: {_vkAccount.login}");
-            Console.WriteLine("authorized");
-
-            Listen();
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
     }
 }

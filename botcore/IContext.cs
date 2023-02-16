@@ -1,9 +1,9 @@
-﻿using groupbot.Models;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Collections.Generic;
+using GroupBot.Models;
 
 
-namespace groupbot.BotCore
+namespace GroupBot.BotCore
 {
     public interface IContext
     {

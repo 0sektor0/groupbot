@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using groupbot.BotCore;
 using System.Linq;
 using System;
+using GroupBot.BotCore;
 using VkApi;
 using NLog;
 
 
 
 
-namespace groupbot.Models
+namespace GroupBot.Models
 {
     public class GroupManager
     {

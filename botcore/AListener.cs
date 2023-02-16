@@ -1,7 +1,7 @@
-﻿using groupbot.BotCore;
+﻿using GroupBot.BotCore;
 
 
-namespace groupbot.BotCore
+namespace GroupBot.BotCore
 {
     public abstract class AListener
     {

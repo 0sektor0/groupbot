@@ -1,27 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using groupbot.Models;
-using groupbot.BotCore;
+using GroupBot.Models;
+using GroupBot.BotCore;
 using System.Linq;
 using System.Text;
 using System.IO;
 using System;
 using VkApi;
-using NLog;
 
 
 
-namespace groupbot.Infrastructure
+namespace GroupBot.Infrastructure
 {
     public class Executor : IExecutor
     {
-        private const string _helpFile = "data/help.txt";
-        private VkApiInterfaceBase _vkAccountCustom;
-        private VkApiInterfaceBase _vkAccountOfficial;
+        private const string HelpFile = "data/help.txt";
+        
+        private readonly VkApiInterfaceBase _vkAccountCustom;
+        private readonly VkApiInterfaceBase _vkAccountOfficial;
+        private readonly BotSettings _settings = BotSettings.GetSettings();
+        private readonly Random _random = new();
+        
         private Dictionary<string, CommandExecution> _handlers;
-        private BotSettings _settings = BotSettings.GetSettings();
-        private Logger _logger = LogManager.GetCurrentClassLogger();
-        private Random _random = new Random();
         
         private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
 
@@ -94,12 +94,20 @@ namespace groupbot.Infrastructure
 
         private void SendMessage(string message, string uid)
         {
-            _vkAccountOfficial.ApiMethodPost(new Dictionary<string, string>()
-                {
-                    { "message", message},
-                    { "user_id", uid},
-                    { "random_id", _random.Next().ToString()},
-                }, "messages.send");
+            if (!_settings.IsMessagesEnabled)
+            {
+                Console.WriteLine(message);
+                return;
+            }
+
+            var data = new Dictionary<string, string>
+            {
+                { "message", message },
+                { "user_id", uid },
+                { "random_id", _random.Next().ToString() },
+            };
+
+            _vkAccountOfficial.ApiMethodPost(data, "messages.send");
         }
 
         public static string RandomString(int size)
@@ -277,8 +285,8 @@ namespace groupbot.Infrastructure
 
         private void Help(ref Command command, ref IContext db, ref Admin admin)
         {
-            if (File.Exists(_helpFile))
-                using (StreamReader reader = new StreamReader(_helpFile))
+            if (File.Exists(HelpFile))
+                using (StreamReader reader = new StreamReader(HelpFile))
                     SendMessage(reader.ReadToEnd(), command.uid);
             else
                 SendMessage("help file dosent exist", command.uid);

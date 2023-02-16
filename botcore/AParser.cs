@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 
 
-namespace groupbot.BotCore
+namespace GroupBot.BotCore
 {
     public abstract class AParser
     {

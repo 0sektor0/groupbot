@@ -3,7 +3,7 @@ using System.Net;
 using System.IO;
 using System;
 using System.Web;
-using groupbot.BotCore;
+using GroupBot.BotCore;
 
 
 namespace VkApi

@@ -1,7 +1,7 @@
-﻿using groupbot.Infrastructure;
+﻿using GroupBot.Infrastructure;
 
 
-namespace groupbot.BotCore
+namespace GroupBot.BotCore
 {
     public interface IExecutor
     {
