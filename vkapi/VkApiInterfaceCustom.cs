@@ -43,7 +43,7 @@ namespace VkApi
             //отправляем логин и пароль
             request = (HttpWebRequest)HttpWebRequest.Create("https://login.vk.com/?act=login&soft=1");
             request.CookieContainer = cookie_container;
-            request.AllowAutoRedirect = false;
+            request.AllowAutoRedirect = true;
             request.Method = "POST";
             using (StreamWriter writer = new StreamWriter(request.GetRequestStream()))
                 writer.Write(post_data);
@@ -53,13 +53,18 @@ namespace VkApi
                 throw new AuthException("Invalid login or password");
 
             //переходим по Location в ответе
-            request = (HttpWebRequest)HttpWebRequest.Create(response.Headers["Location"]);
+            var location = response.Headers["Location"];
+            request = (HttpWebRequest)HttpWebRequest.Create(location);
             request.CookieContainer = cookie_container;
             request.AllowAutoRedirect = false;
             response = GetResponse302(request);
 
+            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                html = reader.ReadToEnd();
+
             //и еще раз
-            request = (HttpWebRequest)HttpWebRequest.Create(response.Headers["Location"]);
+            location = response.Headers["Location"];
+            request = (HttpWebRequest)HttpWebRequest.Create(location);
             request.CookieContainer = cookie_container;
             request.AllowAutoRedirect = false;
             response = GetResponse302(request);
@@ -68,7 +73,7 @@ namespace VkApi
             // I hate this shitty project and myself
             //res = new string[] { res[1], res[3], res[5] };
             _token = new VkToken(res[3]);
-            //_token = new VkToken(res[1], Convert.ToInt32(res[3]));
+            //_token = new VkToken(res[1], Convert.ToInt32(res[3]));*/
         }
 
         //core 2.0 rise exception on 302 response

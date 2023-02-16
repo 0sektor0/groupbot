@@ -34,11 +34,11 @@ namespace groupbot.Infrastructure
                 return;
             }
             
-            var vkClientCustom = new VkApiInterfaceCustom(settings.BotLogin, settings.BotPass, 270460, 1800, 3);
+            //var vkClientCustom = new VkApiInterfaceCustom(settings.BotLogin, settings.BotPass, 270460, 1800, 3);
             var vkClientOfficial = new VkApiInterfaceOfficial(settings.BotLogin, settings.BotPass, 274556, 1800, 3);
             Models.GroupContext.connection_string = settings.ConnectionString;
 
-            var executor = new Executor(vkClientCustom, vkClientOfficial);
+            var executor = new Executor(vkClientOfficial, vkClientOfficial);
             var parser = new Parser(executor);
             var listener = new RListener(parser, vkClientOfficial);
 
