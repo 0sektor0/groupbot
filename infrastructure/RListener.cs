@@ -31,6 +31,16 @@ namespace groupbot.Infrastructure
         {
             VkResponse response;
             JToken messages;
+
+            Console.WriteLine("Deploy on start");
+            parser.Parse(null, true);
+
+            while (true)
+            {
+                Thread.Sleep(_settings.ListeningDelay);
+            }
+        
+            return;
             
             while (true)
             {

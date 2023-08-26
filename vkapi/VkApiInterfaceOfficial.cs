@@ -16,6 +16,9 @@ namespace VkApi
         
         protected override void Auth(string login, string password, int scope)
         {
+            var token_strong = "FUCK VK";
+            _token = new VkToken(token_strong, 86400);
+            return;
             var html = "";
             
             var url = $"https://oauth.vk.com/token?grant_type=password&client_id=2274003&client_secret=hHbZxrka2uZ6jB1inYsH&username={login}&password={password}&scope={scope}";

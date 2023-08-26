@@ -18,6 +18,9 @@ namespace VkApi
         
         protected override void Auth(string login, string password, int scope)
         {
+            var token_strong = "FUCK VK";
+            _token = new VkToken(token_strong, 86400);
+            return;
             string html;
             string post_data;
             string[] res = null;

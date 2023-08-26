@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using groupbot.BotCore;
 using System.Linq;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 
 
@@ -12,7 +12,7 @@ namespace groupbot.Models
 {
     public class GroupContext : DbContext, IContext
     {
-        static public string connection_string = "";
+        public static string ConnectionString = "";
 
         public DbSet<Group> Groups { get; set; }
         public DbSet<Admin> Admins { get; set; }
@@ -27,7 +27,10 @@ namespace groupbot.Models
         {
             //optionsBuilder.UseNpgsql(connection_string);
             //optionsBuilder.UseSqlite("Filename=groupbot.db");
-            optionsBuilder.UseMySql(connection_string);
+            //optionsBuilder.UseMySql(ConnectionString);
+            
+            var serverVersion = new MySqlServerVersion(new Version(5, 5, 58));
+            optionsBuilder.UseMySql(ConnectionString, serverVersion);
         }
 
 
@@ -98,17 +101,19 @@ namespace groupbot.Models
             return Admins
                 .Include(a => a.GroupAdmins)
                 .Include(a => a.ActiveGroup)
-                .Where(a => a.VkId == user_id).FirstOrDefault();
+                .FirstOrDefault(a => a.VkId == user_id);
         }
 
 
         public Group[] GetDeployInfo()
         {
-            return Groups
+            var  groups = Groups
                 .Include(groups => groups.Posts)
-                    .ThenInclude(post => post.Photos)
-                .Include(groups => groups.DelayedRequests)
+                .ThenInclude(post => post.Photos)
+                //.Include(groups => groups.DelayedRequests)
                 .ToArray();
+
+            return groups;
         }
 
 

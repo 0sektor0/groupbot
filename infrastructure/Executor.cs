@@ -94,6 +94,8 @@ namespace groupbot.Infrastructure
 
         private void SendMessage(string message, string uid)
         {
+            Console.WriteLine(message);
+            return;
             _vkAccountOfficial.ApiMethodPost(new Dictionary<string, string>()
                 {
                     { "message", message},
@@ -388,57 +390,54 @@ namespace groupbot.Infrastructure
 
         private void Deployment(ref Command command, ref IContext db, ref Admin admin)
         {
-            if (command.parametrs.Count == 1)
+            if (command.parametrs.Count != 1)
+                return;
+            
+            Group g = db.GetCurrentGroup(admin.VkId, false);
+            GroupManager current_group;
+
+            if (g != null)
+                current_group = new GroupManager( _settings.BotId, g, _vkAccountCustom, db);
+            else
+                return;
+
+            switch (command.parametrs[0])
             {
-                Group g = db.GetCurrentGroup(admin.VkId, false);
-                GroupManager current_group;
+                case "":
+                    if (current_group.GroupInfo.PostponeEnabled)
+                    {
+                        SendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
+                        current_group.Deployment();
+                    }
+                    else
+                        SendMessage("семпай, вы такой непостоянный, то вы говорите никогда не выкладывать в отложку этой группы, то неожиданно просите меня это сделать, странный вы", command.uid);
+                    break;
 
-                if (g != null)
-                    current_group = new GroupManager( _settings.BotId, g, _vkAccountCustom, db);
-                else
-                    return;
-
-                switch (command.parametrs[0])
-                {
-                    case "":
-                        if (current_group.GroupInfo.PostponeEnabled)
+                case "all":
+                    if (command.uid == _settings.AdminId)
+                    {
+                        Group[] groups = db.GetDeployInfo();
+                        foreach (Group group in groups)
                         {
-                            SendMessage("семпай, я начала выкладвать мусор, оставшийся из-за вашей некомпетенции в качестве управляющего группой", command.uid);
-                            current_group.Deployment();
+                            GroupManager gm = new GroupManager(_settings.BotId, group, _vkAccountCustom, db);
+                            int depinfo = gm.Deployment();
+                            if (depinfo < group.MinPostCount && group.Notify)
+                                foreach (GroupAdmins ga in group.GroupAdmins)
+                                    if(ga.Notify && group.Notify)
+                                        SendMessage($"Семпай, в группе {group.Name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", Convert.ToString(ga.Admin.VkId));
                         }
-                        else
-                            SendMessage("семпай, вы такой непостоянный, то вы говорите никогда не выкладывать в отложку этой группы, то неожиданно просите меня это сделать, странный вы", command.uid);
-                        break;
+                    }
+                    break;
 
-                    case "all":
-                        if (command.uid == _settings.AdminId)
-                        {
-                            Group[] groups = db.GetDeployInfo();
-                            foreach (Group group in groups)
-                            {
-                                GroupManager gm = new GroupManager( _settings.BotId, group, _vkAccountCustom, db);
-                                int depinfo = gm.Deployment();
-                                if (depinfo < group.MinPostCount && group.Notify)
-                                    foreach (GroupAdmins ga in group.GroupAdmins)
-                                        if(ga.Notify && group.Notify)
-                                            SendMessage($"Семпай, в группе {group.Name} заканчиваются посты и это все вина вашей безответственности и некомпетентности", Convert.ToString(ga.Admin.VkId));
-                            }
-                        }
-                        break;
+                case "off":
+                    current_group.GroupInfo.PostponeEnabled = false;
+                    Console.WriteLine($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
+                    break;
 
-                    case "off":
-                        current_group.GroupInfo.PostponeEnabled = false;
-                        Console.WriteLine($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
-                        break;
-
-                    case "on":
-                        current_group.GroupInfo.PostponeEnabled = true;
-                        Console.WriteLine($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
-                        break;
-
-                    default:
-                        break;
-                }
+                case "on":
+                    current_group.GroupInfo.PostponeEnabled = true;
+                    Console.WriteLine($"{command}\r\n{current_group.GroupInfo.Name}'s postponedOn = {current_group.GroupInfo.PostponeEnabled}");
+                    break;
             }
         }
 
