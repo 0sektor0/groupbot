@@ -2,82 +2,76 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using Core;
 
 namespace Core;
 
 class Parser
 {
-    //TODO: move executor outside
-    private Executor _executor;
-    private BotSettings _settings = BotSettings.GetSettings();
-
-    public Parser(Executor executor)
+    public List<Command> ParseMessages(JToken messages)
     {
-        _executor = executor;
-    }
+        if (messages == null) 
+            return new List<Command>();
 
-    public void Parse(JToken messages, bool timer)
-    {
-        string uid;
-        int comType;
-        string[] parametrs;
-        string[] inputCommands;
-        List<string> photos = new List<string>();
-
-        if (timer)
+        var commands = new List<Command>();
+        
+        for (var i = 1; i < messages.Count(); i++)
         {
-            _settings.LastCheckTime = DateTime.UtcNow;
-            _executor.ExecuteAsync(new Command("deployment", "", _settings.AdminId, "all"));
-            _executor.ExecuteAsync(new Command("save", "", _settings.AdminId, ""));
+            var message = messages[i];
+            ParseMessageTo(message, commands);
         }
 
-        if (messages == null) return;
+        return commands;
+    }
 
-        for (int i = 1; i < messages.Count(); i++)
+    public void ParseMessageTo(JToken message, List<Command> destination)
+    {
+        var uid = (string) message["from_id"];
+        var inputCommands = Convert.ToString(message["text"])?.Replace("<br>", "").Split(';');
+
+        if (inputCommands == null)
+            return;
+            
+        var photos = new List<string>();
+        for (int j = 0; j < inputCommands.Length; j++)
         {
-            uid = (string)messages[i]["from_id"];
-            inputCommands = Convert.ToString(messages[i]["text"]).Replace("<br>", "").Split(';');
+            var comType = (from num in Convert.ToString(inputCommands[j]) where num == '#' select num).Count();
 
-            for (int j = 0; j < inputCommands.Length; j++)
+            if (message["fwd_messages"] != null && j == 0)
             {
-                comType = (from num in Convert.ToString(inputCommands[j]) where num == '#' select num).Count();
+                //photos in each fwd message
+                foreach (JToken reMessage in message["fwd_messages"])
+                    photos.AddRange(GetAttachments(reMessage));
+            }
 
-                if (messages[i]["fwd_messages"] != null && j == 0)
-                    foreach (JToken reMeessage in messages[i]["fwd_messages"])
-                        photos.AddRange(GetAttachments(reMeessage)); //photos in each fwd message
-                else
-                    photos = new List<string>();
+            photos.AddRange(GetAttachments(message)); //photos in message
+            Command command = new Command(uid, photos);
 
-                photos.AddRange(GetAttachments(messages[i])); //photos in message
-                Command command = new Command(uid, photos);
+            string[] parameters;
+            switch (comType)
+            {
+                case 2:
+                    parameters = Convert.ToString(inputCommands[j]).Split('#');
+                    if (parameters[0] == "null")
+                        parameters[0] = "nope";
+                    command.Type = parameters[0];
+                    command.SetParametrs("#" + parameters[2]);
+                    destination.Add(command);
+                    break;
 
-                switch (comType)
-                {
-                    case 2:
-                        parametrs = Convert.ToString(inputCommands[j]).Split('#');
-                        if (parametrs[0] == "null")
-                            parametrs[0] = "nope";
-                        command.Type = parametrs[0];
-                        command.SetParametrs("#" + parametrs[2]);
-                        _executor.ExecuteAsync(command);
-                        break;
+                case 1:
+                    parameters = Convert.ToString(inputCommands[j]).Split('#');
+                    if (parameters[0] == "null")
+                        parameters[0] = "nope";
+                    command.Type = parameters[0];
+                    command.SetParametrs(parameters[1]);
+                    destination.Add(command);
+                    break;
 
-                    case 1:
-                        parametrs = Convert.ToString(inputCommands[j]).Split('#');
-                        if (parametrs[0] == "null")
-                            parametrs[0] = "nope";
-                        command.Type = parametrs[0];
-                        command.SetParametrs(parametrs[1]);
-                        _executor.ExecuteAsync(command);
-                        break;
-
-                    case 0:
-                        command.SetParametrs(Convert.ToString(messages[i]["body"]));
-                        if (command.Attachments.Count > 0)
-                            _executor.ExecuteAsync(command);
-                        break;
-                }
+                case 0:
+                    command.SetParametrs(Convert.ToString(message["body"]));
+                    if (command.Attachments.Count > 0)
+                        destination.Add(command);
+                    break;
             }
         }
     }

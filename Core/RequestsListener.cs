@@ -1,72 +1,69 @@
 ﻿using System;
-using System.Threading;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using NLog;
-using VkApi;
 
 namespace Core;
 
 class RequestsListener
 {
-    private readonly BotSettings _settings = BotSettings.GetSettings();
+    private readonly Executor _executor;
     private readonly Parser _parser;
-    private readonly VkApiClient _client;
-    private readonly Logger _logger;
 
-    public RequestsListener(Parser parser, VkApiClient client)
+    public RequestsListener(Executor executor,  Parser parser)
     {
-        _client = client;
+        _executor = executor;
         _parser = parser;
-        _logger = LogManager.GetCurrentClassLogger();
     }
 
-    private void Listen()
+    public void Listen()
     {
-        VkResponse response;
-        JToken messages;
+        var httpListener = new HttpListener();
+        httpListener.Prefixes.Add(BotSettings.GetSettings().MessagesEndpoint);
+        httpListener.Start();
 
-        Console.WriteLine("Deploy on start");
-        return;
-        _parser.Parse(null, true);
-
-        while (true)
+        while (httpListener.IsListening)
         {
-            Thread.Sleep(_settings.ListeningDelay);
+            var context = httpListener.GetContext();
+            HandleRequest(context);
         }
         
-        return;
-            
-        while (true)
-        {
-            try
-            {
-                // TODO remake auth
-                bool is_ttu = (int)((DateTime.UtcNow - _settings.LastCheckTime).TotalSeconds) >= _settings.SavingDelay;
-                response = _client.PullMessages();
-                messages = response.Tokens;
-
-                if (response.IsCorrect)
-                    if ((string)messages[0] != "0")
-                        _parser.Parse(messages, false);
-
-                if (is_ttu)
-                    _parser.Parse(null, is_ttu);
-
-                Thread.Sleep(_settings.ListeningDelay);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
+        Console.WriteLine("stop listening");
     }
 
-    public void Run()
-    {            
-        _client.Auth();
-        _logger.Trace($"Acces granted\r\nlogin: {BotSettings.GetSettings().BotLogin}");
-        Console.WriteLine("authorized");
+    private void HandleRequest(HttpListenerContext context)
+    {
+        Action handler = () =>
+        {
+            var request = context.Request;
+            var response = context.Response;
 
-        Listen();
+            if (request.HttpMethod != "POST")
+            {
+                WriteOkResponse(response.OutputStream);
+                return;
+            }
+
+            using var reader = new StreamReader(request.InputStream);
+            var data = reader.ReadToEnd();
+            var jObject = JObject.Parse(data);
+            
+            var commands = new List<Command>();
+            _parser.ParseMessageTo(jObject, commands);
+            foreach (var command in commands)
+                _executor.Execute(command);
+            
+            WriteOkResponse(response.OutputStream);
+        };
+
+        Task.Run(handler);
+    }
+
+    private void WriteOkResponse(Stream stream)
+    {
+        using var writer = new StreamWriter(stream);
+        writer.Write("ok");
     }
 }

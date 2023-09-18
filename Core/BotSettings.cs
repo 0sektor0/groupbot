@@ -51,6 +51,9 @@ public class BotSettings
     [JsonProperty("client_secret")]
     public string ClientSecret { get; set; }
 
+    [JsonProperty("messages_endpoint")]
+    public string MessagesEndpoint { get; set; }
+
     public DateTime LastCheckTime { get; set; }
 
     public static void SetPath(string path) => Path = path;

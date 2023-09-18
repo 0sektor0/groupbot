@@ -13,25 +13,17 @@ public class Executor
 {
     private const string _helpFile = "data/help.txt";
     
-    private readonly VkApiClient _vkAccountCustom;
-    private readonly VkApiClient _vkAccountOfficial;
+    private readonly VkApiClient _client;
     private readonly BotSettings _settings = BotSettings.GetSettings();
     private readonly Random _random = new();
     private readonly Dictionary<string, CommandExecution> _handlers;
         
     private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
 
-    public Executor(VkApiClient vkAccountCustom, VkApiClient vkAccountOfficial)
+    public Executor(VkApiClient client)
     {
-        _vkAccountCustom = vkAccountCustom;
-        _vkAccountOfficial = vkAccountOfficial;
+        _client = client;
         _handlers = CreateHandlerTable();
-    }
-
-    public async void ExecuteAsync(Command command)
-    {
-        if (_handlers.Keys.Contains(command.Type))
-            await Task.Run(() => Execute(command));
     }
 
     public void Execute(Command command)
@@ -94,7 +86,7 @@ public class Executor
     {
         Console.WriteLine(message);
         return;
-        _vkAccountOfficial.ApiMethodPost(new Dictionary<string, string>()
+        _client.ApiMethodPost(new Dictionary<string, string>()
         {
             { "message", message},
             { "user_id", uid},
@@ -120,7 +112,7 @@ public class Executor
     {
         SendMessage($"last check time: {_settings.LastCheckTime}\r\n" +
                     $"is sync: { _settings.IsSync }\r\n" +
-                    $"vk req period: {_vkAccountCustom.PaceController.RequestsPeriod}\r\n" +
+                    $"vk req period: {_client.PaceController.RequestsPeriod}\r\n" +
                     $"save delay: {_settings.SavingDelay}\r\n", command.Uid);
     }
         
@@ -177,7 +169,7 @@ public class Executor
                 case 1:
                     Group current_group = db.GetCurrentGroup(admin.VkId, false);
                     if (current_group != null)
-                        new GroupManager( _settings.BotId, current_group, _vkAccountCustom).CreatePost(command.Attachments, command.Parameters[0], true);
+                        new GroupManager( _settings.BotId, current_group, _client).CreatePost(command.Attachments, command.Parameters[0], true);
                     break;
 
                 case 2:
@@ -191,7 +183,7 @@ public class Executor
                                 commands.Push(new Command("post", atachment, command.Uid, $"{command.Parameters[0]}/s"));
                         //как один пост
                         if (command.Parameters[1] == "s")
-                            new GroupManager( _settings.BotId, group, _vkAccountCustom).CreatePost(command.Attachments, "", true);
+                            new GroupManager( _settings.BotId, group, _client).CreatePost(command.Attachments, "", true);
                     }
                     break;
 
@@ -221,7 +213,7 @@ public class Executor
                     case "rp":
                         if (Int32.TryParse(command.Parameters[i], out new_val))
                         {
-                            _vkAccountCustom.PaceController.RequestsPeriod = new_val;
+                            _client.PaceController.RequestsPeriod = new_val;
                             Console.WriteLine($"rp changed\r\nUser: {admin.VkId}");
                         }
                         break;
@@ -271,7 +263,7 @@ public class Executor
         {
             string request = $"{command.Parameters[0]}";
             request = request.Replace("amp;", "");
-            SendMessage(Convert.ToString(_vkAccountCustom.ApiMethodGet(request).Tokens), command.Uid);
+            SendMessage(Convert.ToString(_client.ApiMethodGet(request).Tokens), command.Uid);
         }
     }
 
@@ -357,7 +349,7 @@ public class Executor
         GroupManager current_group;
 
         if (group != null)
-            current_group = new GroupManager( _settings.BotId, admin.ActiveGroup, _vkAccountCustom, db);
+            current_group = new GroupManager( _settings.BotId, admin.ActiveGroup, _client, db);
         else
             return;
 
@@ -395,7 +387,7 @@ public class Executor
         GroupManager current_group;
 
         if (g != null)
-            current_group = new GroupManager( _settings.BotId, g, _vkAccountCustom, db);
+            current_group = new GroupManager( _settings.BotId, g, _client, db);
         else
             return;
 
@@ -417,7 +409,7 @@ public class Executor
                     Group[] groups = db.GetDeployInfo();
                     foreach (Group group in groups)
                     {
-                        GroupManager gm = new GroupManager(_settings.BotId, group, _vkAccountCustom, db);
+                        GroupManager gm = new GroupManager(_settings.BotId, group, _client, db);
                         int depinfo = gm.Deployment();
                         if (depinfo < group.MinPostCount && group.Notify)
                             foreach (GroupAdmins ga in group.GroupAdmins)
@@ -445,7 +437,7 @@ public class Executor
         GroupManager current_group;
 
         if (g != null)
-            current_group = new GroupManager( _settings.BotId, g, _vkAccountCustom, db);
+            current_group = new GroupManager( _settings.BotId, g, _client, db);
         else
             return;
 
