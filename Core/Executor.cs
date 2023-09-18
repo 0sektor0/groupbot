@@ -84,14 +84,14 @@ public class Executor
 
     private void SendMessage(string message, string uid)
     {
-        Console.WriteLine(message);
-        return;
-        _client.ApiMethodPost(new Dictionary<string, string>()
+        var parameters = new Dictionary<string, string>
         {
-            { "message", message},
-            { "user_id", uid},
-            { "random_id", _random.Next().ToString()},
-        }, "messages.send");
+            { "message", message },
+            { "user_id", uid },
+            { "random_id", _random.Next().ToString() },
+        };
+        
+        _client.ApiMethodPost(parameters, "messages.send");
     }
 
     public static string RandomString(int size)
@@ -259,12 +259,12 @@ public class Executor
 
     private void Api(ref Command command, ref IContext db, ref Admin admin)
     {
-        if (command.Uid == _settings.AdminId.ToString())
-        {
-            string request = $"{command.Parameters[0]}";
-            request = request.Replace("amp;", "");
-            SendMessage(Convert.ToString(_client.ApiMethodGet(request).Tokens), command.Uid);
-        }
+        if (command.Uid != _settings.AdminId)
+            return;
+        
+        string request = $"{command.Parameters[0]}";
+        request = request.Replace("amp;", "");
+        SendMessage(Convert.ToString(_client.ApiMethodGet(request).Tokens), command.Uid);
     }
 
     private void Help(ref Command command, ref IContext db, ref Admin admin)

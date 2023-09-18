@@ -40,21 +40,21 @@ public class GroupContext : DbContext, IContext
                 .Where(ga => ga.Admin.VkId == user_id)
                 .Select(ga => ga.Group)
                 .Include(g => g.Posts)
-                .Include(g => g.DelayedRequests)
+                //.Include(g => g.DelayedRequests)
                 .ToArray();
         else if (group_name == "")
             return Admins
                 .Where(u => u.VkId == user_id)
                 .Select(u => u.ActiveGroup)
                 .Include(g => g.Posts)
-                .Include(g => g.DelayedRequests)
+                //.Include(g => g.DelayedRequests)
                 .ToArray();
         else
             groups = GroupAdmins
                 .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
                 .Select(ga => ga.Group)
                 .Include(g => g.Posts)
-                .Include(g => g.DelayedRequests)
+                //.Include(g => g.DelayedRequests)
                 .ToArray();
 
         return groups;
@@ -67,11 +67,13 @@ public class GroupContext : DbContext, IContext
                 .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
                 .Select(ga => ga.Group)
                 .Include(g => g.Posts.Select(p => p.Photos))
-                .Include(g => g.DelayedRequests).FirstOrDefault();
-        else
-            return GroupAdmins
-                .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
-                .Select(ga => ga.Group).FirstOrDefault();
+                //.Include(g => g.DelayedRequests)
+                .FirstOrDefault();
+        
+        return GroupAdmins
+            .Where(ga => ga.Admin.VkId == user_id && ga.Group.PseudoName == group_name)
+            .Select(ga => ga.Group)
+            .FirstOrDefault();
     }
 
     public Group GetCurrentGroup(int user_id, bool is_eager)
@@ -81,12 +83,13 @@ public class GroupContext : DbContext, IContext
                 .Where(u => u.VkId == user_id)
                 .Select(u => u.ActiveGroup)
                 .FirstOrDefault();
-        else
-            return Admins
-                .Where(u => u.VkId == user_id)
-                .Select(u => u.ActiveGroup)
-                .Include(g => g.Posts.Select(p => p.Photos))
-                .Include(g => g.DelayedRequests).FirstOrDefault();
+       
+        return Admins
+            .Where(u => u.VkId == user_id)
+            .Select(u => u.ActiveGroup)
+            .Include(g => g.Posts.Select(p => p.Photos))
+            //.Include(g => g.DelayedRequests)
+            .FirstOrDefault();
     }
 
     public Admin GetAdmin(int user_id)

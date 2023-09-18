@@ -37,14 +37,15 @@ Models.GroupContext.ConnectionString = settings.ConnectionString;
             
 var authenticator = new VkAuthenticator();
 var vkClient = new VkApiClient(authenticator, 1800, 3);
-vkClient.Auth();
 Console.WriteLine($"Access granted\r\nlogin: {BotSettings.GetSettings().BotLogin}");
 
 var parser = new Parser();
 var executor = new Executor(vkClient);
-var listener = new RequestsListener(executor, parser);
+//var listener = new RequestsListener(executor, parser);
+var listener = new LegacyRequestsListener(vkClient, executor, parser);
 
 logger.Trace("Listening");
 Console.WriteLine("Started");
 VkRequest.SetDefaultVersion(BotSettings.GetSettings().ApiVersion);
+//TODO add separate vkClient only for messages
 listener.Listen();

@@ -85,7 +85,7 @@ public class VkApiClient
         var authData = new AuthData(
             settings.BotLogin,
             settings.BotPass,
-            270460,
+            262144,
             settings.ClientId,
             settings.ClientSecret
         );
@@ -120,9 +120,9 @@ public class VkApiClient
         return response;
     }
 
-    public VkResponse ApiMethodPost(Dictionary<string, string> post_params, string url)
+    public VkResponse ApiMethodPost(Dictionary<string, string> postParameters, string url)
     {
-        VkRequest request = new VkRequest(url, post_params, Token);
+        VkRequest request = new VkRequest(url, postParameters, Token);
         VkResponse response = new VkResponse(_sender.Send(request, false), request);
 
         if (!response.IsEmpty && _isLogging)
