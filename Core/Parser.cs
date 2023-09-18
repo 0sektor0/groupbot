@@ -8,6 +8,7 @@ namespace Core;
 
 class Parser
 {
+    //TODO: move executor outside
     private Executor _executor;
     private BotSettings _settings = BotSettings.GetSettings();
 
