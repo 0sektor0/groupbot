@@ -2,22 +2,18 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using GroupBot.BotCore;
+using Core;
 
-namespace GroupBot.Infrastructure;
+namespace Infrastructure;
 
 class Parser : AParser
 {
-    BotSettings settings = BotSettings.GetSettings();
-    const string ultimate_admin_id = "29334144";
+    private BotSettings _settings = BotSettings.GetSettings();
 
-
-
-    public Parser(IExecutor executor) : base(executor)
+    public Parser(IExecutor executor) : base(executor) 
     {
+            
     }
-
-
 
     public override void Parse(JToken messages, bool timer)
     {
@@ -29,9 +25,9 @@ class Parser : AParser
 
         if (timer)
         {
-            settings.LastCheckTime = DateTime.UtcNow;
-            executor.ExecuteAsync(new Command("deployment", "", ultimate_admin_id, "all"));
-            executor.ExecuteAsync(new Command("save", "", ultimate_admin_id, ""));
+            _settings.LastCheckTime = DateTime.UtcNow;
+            _executor.ExecuteAsync(new Command("deployment", "", _settings.AdminId, "all"));
+            _executor.ExecuteAsync(new Command("save", "", _settings.AdminId, ""));
         }
 
         if (messages == null) return;
@@ -47,11 +43,11 @@ class Parser : AParser
 
                 if (messages[i]["fwd_messages"] != null && j == 0)
                     foreach (JToken reMeessage in messages[i]["fwd_messages"])
-                        photos.AddRange(GetAttachments(reMeessage, uid)); //photos in each fwd message
+                        photos.AddRange(GetAttachments(reMeessage)); //photos in each fwd message
                 else
                     photos = new List<string>();
 
-                photos.AddRange(GetAttachments(messages[i], uid)); //photos in message
+                photos.AddRange(GetAttachments(messages[i])); //photos in message
                 Command command = new Command(uid, photos);
 
                 switch (comType)
@@ -60,48 +56,47 @@ class Parser : AParser
                         parametrs = Convert.ToString(inputCommands[j]).Split('#');
                         if (parametrs[0] == "null")
                             parametrs[0] = "nope";
-                        command.type = parametrs[0];
-                        command.Setparametrs("#" + parametrs[2]);
-                        executor.ExecuteAsync(command);
+                        command.Type = parametrs[0];
+                        command.SetParametrs("#" + parametrs[2]);
+                        _executor.ExecuteAsync(command);
                         break;
 
                     case 1:
                         parametrs = Convert.ToString(inputCommands[j]).Split('#');
                         if (parametrs[0] == "null")
                             parametrs[0] = "nope";
-                        command.type = parametrs[0];
-                        command.Setparametrs(parametrs[1]);
-                        executor.ExecuteAsync(command);
+                        command.Type = parametrs[0];
+                        command.SetParametrs(parametrs[1]);
+                        _executor.ExecuteAsync(command);
                         break;
 
                     case 0:
-                        command.Setparametrs(Convert.ToString(messages[i]["body"]));
-                        if (command.atachments.Count > 0)
-                            executor.ExecuteAsync(command);
-                        break;
-
-                    default:
+                        command.SetParametrs(Convert.ToString(messages[i]["body"]));
+                        if (command.Attachments.Count > 0)
+                            _executor.ExecuteAsync(command);
                         break;
                 }
             }
         }
     }
 
-
-    private List<string> GetAttachments(JToken message, string uid) // берем фото
+    private List<string> GetAttachments(JToken message) // берем фото
     {
+        if (message["attachments"] == null)
+            return new List<string>();
+        
         List<string> photos = new List<string>();
-        if (message["attachments"] != null)
+        message = message["attachments"];
+        
+        foreach (JToken jo in message)
         {
-            message = message["attachments"];
-            foreach (JToken jo in message)
-                if ((string)jo["type"] == "photo")
-                {
-                    JToken photo = jo["photo"];
-                    photos.Add(photo["owner_id"] + "_" + photo["id"] + "_" + photo["access_key"]);
-                }
+            if ((string)jo["type"] == "photo")
+            {
+                JToken photo = jo["photo"];
+                photos.Add(photo["owner_id"] + "_" + photo["id"] + "_" + photo["access_key"]);
+            }
         }
-
+        
         return photos;
     }
 }

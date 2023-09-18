@@ -3,48 +3,40 @@ using System.Text;
 using System.Net;
 using System.IO;
 
+namespace VkApi;
 
-
-
-namespace VkApi
+public class VkRequestSender
 {
-    public class VkRequestSender
+    private readonly VkRpController _periodController;
+
+    public VkRequestSender(VkRpController periodController)
     {
-        VkRpController period_controller;
-        VkToken token;
+        _periodController = periodController;
+    }
 
+    public JObject Send(VkRequest vkRequest, bool isEmpty)
+    {
+        JObject json = null;
+        _periodController.Control();
 
-        public VkRequestSender(VkRpController period_controller, VkToken token)
+        HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create(vkRequest.Url);
+        if (vkRequest.IsPost)
         {
-            this.token = token;
-            this.period_controller = period_controller;
+            apiRequest.Method = "POST";
+            using Stream writer = apiRequest.GetRequestStream();
+            byte[] postData = Encoding.UTF8.GetBytes(vkRequest.PostData);
+            writer.Write(postData, 0, postData.Length);
         }
 
+        HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
 
-        public JObject Send(VkRequest vkRequest, bool is_empty)
+        if (!isEmpty)
         {
-            JObject json = null;
-            period_controller.Control();
-
-            HttpWebRequest apiRequest = (HttpWebRequest)HttpWebRequest.Create(vkRequest.Url);
-            if (vkRequest.IsPost)
-            {
-                apiRequest.Method = "POST";
-                using (Stream writer = apiRequest.GetRequestStream())
-                {
-                    byte[] postData = Encoding.UTF8.GetBytes(vkRequest.PostData);
-                    writer.Write(postData, 0, postData.Length);
-                }
-            }
-
-            HttpWebResponse apiRespose = (HttpWebResponse)apiRequest.GetResponse();
-
-            if (!is_empty)
-                using (StreamReader resp_stream = new StreamReader(apiRespose.GetResponseStream()))
-                    json = JObject.Parse(resp_stream.ReadToEnd());
-
-            apiRequest.Abort();
-            return json;
+            using StreamReader respStream = new StreamReader(apiRespose.GetResponseStream());
+            json = JObject.Parse(respStream.ReadToEnd());
         }
+
+        apiRequest.Abort();
+        return json;
     }
 }

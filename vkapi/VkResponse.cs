@@ -1,77 +1,67 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 
+namespace VkApi;
 
-
-
-namespace VkApi
+public class VkResponse
 {
-    public class VkResponse
+    public static bool Debug = false;
+    
+    public VkRequest Request;
+    public bool IsCorrect;
+    public JToken Tokens;
+    public bool IsEmpty;
+
+    public VkResponse()
     {
-        static public bool debug = false;
-        public VkRequest request;
-        public bool isCorrect;
-        public JToken tokens;
-        public bool isEmpty;
 
+    }
 
+    public VkResponse(JObject response, VkRequest request)
+    {
+        Request = request;
 
+        IsCorrect = CheckResponse(response);
+        IsEmpty = false;
 
-        public VkResponse()
+        if (IsCorrect)
         {
+            Tokens = response["response"];
 
+            if (Tokens.Type == JTokenType.Array)
+                if (Tokens[0].Type == JTokenType.Integer)
+                    if ((int)Tokens[0] == 0)
+                    {
+                        IsEmpty = true;
+                        return;
+                    }
+
+            if(Debug)
+                Console.WriteLine(Tokens);
         }
-
-
-        public VkResponse(JObject response, VkRequest request)
+        else
         {
-            this.request = request;
+            Tokens = response["error"];
 
-            isCorrect = CheckResponse(response);
-            isEmpty = false;
-
-            if (isCorrect)
-            {
-                this.tokens = response["response"];
-
-                if (tokens.Type == JTokenType.Array)
-                    if (tokens[0].Type == JTokenType.Integer)
-                        if ((int)tokens[0] == 0)
-                        {
-                            isEmpty = true;
-                            return;
-                        }
-
-                if(debug)
-                    Console.WriteLine(tokens);
-            }
-            else
-            {
-                this.tokens = response["error"];
-
-                if (debug)
-                    Console.WriteLine(tokens);
-            }
+            if (Debug)
+                Console.WriteLine(Tokens);
         }
+    }
+
+    bool CheckResponse(JObject json)
+    {
+        if (json["error"] != null)
+            return false;
+        
+        return true;
+    }
 
 
-
-
-        bool CheckResponse(JObject json)
-        {
-            if (json["error"] != null)
-                return false;
-            else
-                return true;
-        }
-
-
-        public override string ToString()
-        {
-            if (tokens == null)
-                return "";
-            else
-                return tokens.ToString();
-        }
+    public override string ToString()
+    {
+        if (Tokens == null)
+            return "";
+        
+        return Tokens.ToString();
     }
 }

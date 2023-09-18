@@ -1,14 +1,17 @@
 ﻿using System;
 using System.IO;
-using GroupBot.BotCore;
-using VkApi;
+using Core;
 using NLog;
-using GroupBot.Models;
-using GroupBot.Infrastructure;
+using VkApi;
+using Infrastructure;
+using VkApi.Auth;
 
+//This software is a piece of shit
+//Dont ever think about using it
+//https://oauth.vk.com/authorize?client_id=51736899&redirect_uri=https://oauth.vk.com/blank.html&scope=8196&display=mobile&response_type=token
 
 var logger = LogManager.GetCurrentClassLogger();
-VkResponse.debug = true;
+VkResponse.Debug = true;
 
 BotSettings settings;
 try
@@ -18,8 +21,8 @@ try
 }
 catch(FileNotFoundException)
 {
-    logger.Fatal($"cannot find file {BotSettings.path}");
-    Console.WriteLine($"cannot find file {BotSettings.path}");
+    logger.Fatal($"cannot find file {BotSettings.Path}");
+    Console.WriteLine($"cannot find file {BotSettings.Path}");
     return;
 }
 catch(Exception ex)
@@ -29,12 +32,13 @@ catch(Exception ex)
     return;
 }
             
-var vkClientOfficial = new VkApiInterfaceOfficial(settings.BotLogin, settings.BotPass, 274556, 1800, 3);
-GroupContext.connection_string = settings.ConnectionString;
+var authenticator = new FakeVkAuthenticator("");
+var vkClient = new VkApiClient(authenticator, settings.BotLogin, settings.BotPass, 274556, 1800, 3);
+Models.GroupContext.ConnectionString = settings.ConnectionString;
 
-var executor = new Executor(vkClientOfficial, vkClientOfficial);
+var executor = new Executor(vkClient, vkClient);
 var parser = new Parser(executor);
-var listener = new RListener(parser, vkClientOfficial);
+var listener = new RListener(parser, vkClient);
 
 logger.Trace("Listening");
 Console.WriteLine("Started");

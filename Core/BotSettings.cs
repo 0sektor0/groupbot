@@ -4,18 +4,17 @@ using Newtonsoft.Json;
 using System.IO;
 using Newtonsoft.Json.Converters;
 
-namespace GroupBot.BotCore;
-
+namespace Core;
 
 public class BotSettings
 {
-    public static string path = Directory.GetCurrentDirectory()+"/data/botconfig.json";
-    
-    private static readonly BotSettings instanse = LoadConfigs(path);
-    
+    public static string Path = Directory.GetCurrentDirectory()+"/data/botconfig.json";
+        
+    private static readonly BotSettings _instanse = LoadConfigs(Path);
+        
     [JsonProperty("api_version")]
     public string ApiVersion { get; set; }
-    
+        
     [JsonProperty("is_sync")]
     public bool IsSync { get; set; }
 
@@ -46,18 +45,11 @@ public class BotSettings
     [JsonProperty("admin_id")]
     public string AdminId { get; set; }
 
-    [JsonProperty("is_messages_enabled")]
-    public bool IsMessagesEnabled { get; set; }
-
-    [JsonProperty("should_deploy_on_start")]
-    public bool ShouldDeployOnStart { get; set; }
-
     public DateTime LastCheckTime { get; set; }
 
-    
-    public static void SetPath(string path) => BotSettings.path = path;
+    public static void SetPath(string path) => BotSettings.Path = path;
 
-    public static BotSettings GetSettings() => instanse;
+    public static BotSettings GetSettings() => _instanse;
 
     private static BotSettings FromJson(string json) => JsonConvert.DeserializeObject<BotSettings>(json, Converter.Settings);
 
@@ -75,13 +67,6 @@ public class BotSettings
         return s;
     }
 }
-
-
-internal static class Serialize
-{
-    public static string ToJson(this BotSettings self) => JsonConvert.SerializeObject(self, Converter.Settings);
-}
-
 
 internal static class Converter
 {
