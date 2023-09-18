@@ -4,18 +4,19 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Core;
 
-namespace Infrastructure;
+namespace Core;
 
-class Parser : AParser
+class Parser
 {
+    private Executor _executor;
     private BotSettings _settings = BotSettings.GetSettings();
 
-    public Parser(IExecutor executor) : base(executor) 
+    public Parser(Executor executor)
     {
-            
+        _executor = executor;
     }
 
-    public override void Parse(JToken messages, bool timer)
+    public void Parse(JToken messages, bool timer)
     {
         string uid;
         int comType;

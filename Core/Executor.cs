@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System;
-using Core;
 using Models;
 using VkApi;
 
-namespace Infrastructure;
+namespace Core;
 
-public class Executor : IExecutor
+public class Executor
 {
     private const string _helpFile = "data/help.txt";
     

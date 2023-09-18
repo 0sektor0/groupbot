@@ -4,15 +4,14 @@ using System;
 using System.Linq;
 using Core;
 using VkApi;
-using NLog;
 
 namespace Models;
 
 public class GroupManager
 {
-    private static Logger _logger = LogManager.GetCurrentClassLogger();
-    private VkApiClient _vkClient;
     private readonly int _botId;
+    
+    private VkApiClient _vkClient;
     public Group GroupInfo;
 
     public GroupManager(int botId, Group groupInfo, VkApiClient vkClient)

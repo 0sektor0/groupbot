@@ -3,7 +3,6 @@ using System.IO;
 using Core;
 using NLog;
 using VkApi;
-using Infrastructure;
 using VkApi.Auth;
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
@@ -39,7 +38,7 @@ Models.GroupContext.ConnectionString = settings.ConnectionString;
 
 var executor = new Executor(vkClient, vkClient);
 var parser = new Parser(executor);
-var listener = new RListener(parser, vkClient);
+var listener = new RequestsListener(parser, vkClient);
 
 logger.Trace("Listening");
 Console.WriteLine("Started");
