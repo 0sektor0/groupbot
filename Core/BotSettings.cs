@@ -45,9 +45,15 @@ public class BotSettings
     [JsonProperty("admin_id")]
     public string AdminId { get; set; }
 
+    [JsonProperty("client_id")]
+    public int ClientId { get; set; }
+    
+    [JsonProperty("client_secret")]
+    public string ClientSecret { get; set; }
+
     public DateTime LastCheckTime { get; set; }
 
-    public static void SetPath(string path) => BotSettings.Path = path;
+    public static void SetPath(string path) => Path = path;
 
     public static BotSettings GetSettings() => _instanse;
 

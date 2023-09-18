@@ -9,7 +9,7 @@ public class FakeVkAuthenticator : IVkAuthenticator
         Token = token;
     }
     
-    public VkToken Auth(string login, string password, int scope)
+    public VkToken Auth(AuthData data)
     {
         return new VkToken(Token, 86400);
     }

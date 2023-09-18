@@ -6,9 +6,10 @@ using VkApi;
 using Infrastructure;
 using VkApi.Auth;
 
-//This software is a piece of shit
-//Dont ever think about using it
-//https://oauth.vk.com/authorize?client_id=51736899&redirect_uri=https://oauth.vk.com/blank.html&scope=8196&display=mobile&response_type=token
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
+//This software is a piece of shit//
+//Dont ever think about using it  //
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
 
 var logger = LogManager.GetCurrentClassLogger();
 VkResponse.Debug = true;
@@ -32,8 +33,8 @@ catch(Exception ex)
     return;
 }
             
-var authenticator = new FakeVkAuthenticator("");
-var vkClient = new VkApiClient(authenticator, settings.BotLogin, settings.BotPass, 274556, 1800, 3);
+var authenticator = new VkAuthenticator();
+var vkClient = new VkApiClient(authenticator, 1800, 3);
 Models.GroupContext.ConnectionString = settings.ConnectionString;
 
 var executor = new Executor(vkClient, vkClient);
