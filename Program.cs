@@ -9,7 +9,8 @@ using VkApi.Auth;
 //Dont ever think about using it  //
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
 
-//TODO: remove logger
+//TODO: add VkClient's pool
+//TODO: fix group# command
 VkResponse.Debug = true;
 
 BotSettings settings;
