@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace VkApi;
 
-public class VkRpController
+public class VkRequestsPaceController
 {
     private readonly int _maxRequestsCount = 1;
     
@@ -11,9 +11,9 @@ public class VkRpController
     
     private DateTime _lastRequestTime;
     private DateTime _firstRequestTime = DateTime.UtcNow;
-    private int _requestsCounter = 0;
+    private int _requestsCounter;
 
-    public VkRpController(int requestsPeriod, int maxRequestsCount)
+    public VkRequestsPaceController(int requestsPeriod, int maxRequestsCount)
     {
         RequestsPeriod = requestsPeriod;
         _maxRequestsCount = maxRequestsCount - 1;

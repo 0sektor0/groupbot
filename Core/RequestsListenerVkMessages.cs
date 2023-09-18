@@ -4,13 +4,13 @@ using VkApi;
 
 namespace Core;
 
-class LegacyRequestsListener
+class RequestsListenerVkMessages
 {
     private readonly Executor _executor;
     private readonly Parser _parser;
     private readonly VkApiClient _client;
 
-    public LegacyRequestsListener(VkApiClient client, Executor executor,  Parser parser)
+    public RequestsListenerVkMessages(VkApiClient client, Executor executor,  Parser parser)
     {
         _client = client;
         _executor = executor;
@@ -19,6 +19,8 @@ class LegacyRequestsListener
 
     public void Listen()
     {
+        Console.WriteLine("Listening");
+        
         while (true)
             HandleMessages();
     }

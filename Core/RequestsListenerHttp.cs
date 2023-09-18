@@ -7,12 +7,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Core;
 
-class RequestsListener
+class RequestsListenerHttp
 {
     private readonly Executor _executor;
     private readonly Parser _parser;
 
-    public RequestsListener(Executor executor,  Parser parser)
+    public RequestsListenerHttp(Executor executor,  Parser parser)
     {
         _executor = executor;
         _parser = parser;

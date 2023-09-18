@@ -7,9 +7,9 @@ namespace VkApi;
 
 public class VkRequestSender
 {
-    private readonly VkRpController _periodController;
+    private readonly VkRequestsPaceController _periodController;
 
-    public VkRequestSender(VkRpController periodController)
+    public VkRequestSender(VkRequestsPaceController periodController)
     {
         _periodController = periodController;
     }

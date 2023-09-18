@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Core;
-using NLog;
 using VkApi;
 using VkApi.Auth;
 
@@ -11,41 +10,50 @@ using VkApi.Auth;
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
 
 //TODO: remove logger
-var logger = LogManager.GetCurrentClassLogger();
 VkResponse.Debug = true;
 
 BotSettings settings;
 try
 {
     settings = BotSettings.GetSettings();
-    logger.Trace("Configs successfully loaded");
+    Console.WriteLine("Configs successfully loaded");
 }
 catch(FileNotFoundException)
 {
-    logger.Fatal($"Cannot find file {BotSettings.Path}");
     Console.WriteLine($"Cannot find file {BotSettings.Path}");
     return;
 }
 catch(Exception ex)
 {
-    logger.Fatal(ex.Message);
     Console.WriteLine(ex.Message);
     return;
 }
 
 Models.GroupContext.ConnectionString = settings.ConnectionString;
-            
-var authenticator = new VkAuthenticator();
-var vkClient = new VkApiClient(authenticator, 1800, 3);
+           
+var botAuthData = new AuthData(
+    settings.BotLogin,
+    settings.BotPassword,
+    settings.BotApiScope,
+    settings.BotClientId,
+    settings.BotClientSecret
+);   
+var clientForBot = new VkApiClient(new VkAuthenticator(), botAuthData, 1800, 3);
+
+var messagesAuthData = new AuthData(
+    settings.BotLogin,
+    settings.BotPassword,
+    settings.MessagesApiScope,
+    settings.MessagesClientId,
+    settings.MessagesClientSecret
+);
+var clientForMessages = new VkApiClient(new VkAuthenticator(), messagesAuthData, 1800, 3);
 Console.WriteLine($"Access granted\r\nlogin: {BotSettings.GetSettings().BotLogin}");
 
 var parser = new Parser();
-var executor = new Executor(vkClient);
-//var listener = new RequestsListener(executor, parser);
-var listener = new LegacyRequestsListener(vkClient, executor, parser);
+var executor = new Executor(clientForBot, clientForMessages);
+//var listener = new RequestsListenerHttp(executor, parser);
+var listener = new RequestsListenerVkMessages(clientForMessages, executor, parser);
 
-logger.Trace("Listening");
-Console.WriteLine("Started");
 VkRequest.SetDefaultVersion(BotSettings.GetSettings().ApiVersion);
-//TODO add separate vkClient only for messages
 listener.Listen();

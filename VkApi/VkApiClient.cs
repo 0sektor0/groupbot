@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Text;
 using System.IO;
 using System;
-using Core;
 using NLog;
 using VkApi.Auth;
 
@@ -13,11 +12,12 @@ namespace VkApi;
 
 public class VkApiClient
 {
-    public readonly VkRpController PaceController;
+    public readonly VkRequestsPaceController PaceController;
     
     private readonly VkRequestSender _sender;
     private readonly IVkAuthenticator _authenticator;
     private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private readonly AuthData _authData;
         
     private VkToken _token;
     private bool _isLogging = true;
@@ -52,11 +52,12 @@ public class VkApiClient
         
     #endregion
 
-    public VkApiClient(IVkAuthenticator authenticator, int reqPeriod, int maxReqCount)
+    public VkApiClient(IVkAuthenticator authenticator, AuthData authData, int reqPeriod, int maxReqCount)
     {
         _authenticator = authenticator;
+        _authData = authData;
             
-        PaceController = new VkRpController(reqPeriod, maxReqCount);
+        PaceController = new VkRequestsPaceController(reqPeriod, maxReqCount);
         _sender = new VkRequestSender(PaceController);
 
         _getMessagesScript = ReadScriptFromFile(SCRIPT_GET_MESSAGES_FILE);
@@ -74,23 +75,9 @@ public class VkApiClient
         }
     }
 
-    private void Auth(AuthData data)
+    private void Auth()
     {
-        _token = _authenticator.Auth(data);
-    }
-
-    public void Auth()
-    {
-        var settings = BotSettings.GetSettings();
-        var authData = new AuthData(
-            settings.BotLogin,
-            settings.BotPass,
-            262144,
-            settings.ClientId,
-            settings.ClientSecret
-        );
-        
-        Auth(authData);
+        _token = _authenticator.Auth(_authData);
         _logger.Trace("auth completed");
     }
         

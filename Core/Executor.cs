@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -11,18 +10,20 @@ namespace Core;
 
 public class Executor
 {
-    private const string _helpFile = "data/help.txt";
+    private const string HELP_FILE = "data/help.txt";
     
-    private readonly VkApiClient _client;
+    private readonly VkApiClient _clientForBot;
+    private readonly VkApiClient _clientForMessages;
     private readonly BotSettings _settings = BotSettings.GetSettings();
     private readonly Random _random = new();
     private readonly Dictionary<string, CommandExecution> _handlers;
         
     private delegate void CommandExecution(ref Command command, ref IContext db, ref Admin admin);
 
-    public Executor(VkApiClient client)
+    public Executor(VkApiClient clientForBot, VkApiClient clientForMessages)
     {
-        _client = client;
+        _clientForBot = clientForBot;
+        _clientForMessages = clientForMessages;
         _handlers = CreateHandlerTable();
     }
 
@@ -91,7 +92,7 @@ public class Executor
             { "random_id", _random.Next().ToString() },
         };
         
-        _client.ApiMethodPost(parameters, "messages.send");
+        _clientForMessages.ApiMethodPost(parameters, "messages.send");
     }
 
     public static string RandomString(int size)
@@ -112,7 +113,7 @@ public class Executor
     {
         SendMessage($"last check time: {_settings.LastCheckTime}\r\n" +
                     $"is sync: { _settings.IsSync }\r\n" +
-                    $"vk req period: {_client.PaceController.RequestsPeriod}\r\n" +
+                    $"vk req period: {_clientForBot.PaceController.RequestsPeriod}\r\n" +
                     $"save delay: {_settings.SavingDelay}\r\n", command.Uid);
     }
         
@@ -169,7 +170,7 @@ public class Executor
                 case 1:
                     Group current_group = db.GetCurrentGroup(admin.VkId, false);
                     if (current_group != null)
-                        new GroupManager( _settings.BotId, current_group, _client).CreatePost(command.Attachments, command.Parameters[0], true);
+                        new GroupManager( _settings.BotId, current_group, _clientForBot).CreatePost(command.Attachments, command.Parameters[0], true);
                     break;
 
                 case 2:
@@ -183,11 +184,8 @@ public class Executor
                                 commands.Push(new Command("post", atachment, command.Uid, $"{command.Parameters[0]}/s"));
                         //как один пост
                         if (command.Parameters[1] == "s")
-                            new GroupManager( _settings.BotId, group, _client).CreatePost(command.Attachments, "", true);
+                            new GroupManager( _settings.BotId, group, _clientForBot).CreatePost(command.Attachments, "", true);
                     }
-                    break;
-
-                default:
                     break;
             }
         }
@@ -213,7 +211,7 @@ public class Executor
                     case "rp":
                         if (Int32.TryParse(command.Parameters[i], out new_val))
                         {
-                            _client.PaceController.RequestsPeriod = new_val;
+                            _clientForBot.PaceController.RequestsPeriod = new_val;
                             Console.WriteLine($"rp changed\r\nUser: {admin.VkId}");
                         }
                         break;
@@ -264,13 +262,13 @@ public class Executor
         
         string request = $"{command.Parameters[0]}";
         request = request.Replace("amp;", "");
-        SendMessage(Convert.ToString(_client.ApiMethodGet(request).Tokens), command.Uid);
+        SendMessage(Convert.ToString(_clientForBot.ApiMethodGet(request).Tokens), command.Uid);
     }
 
     private void Help(ref Command command, ref IContext db, ref Admin admin)
     {
-        if (File.Exists(_helpFile))
-            using (StreamReader reader = new StreamReader(_helpFile))
+        if (File.Exists(HELP_FILE))
+            using (StreamReader reader = new StreamReader(HELP_FILE))
                 SendMessage(reader.ReadToEnd(), command.Uid);
         else
             SendMessage("help file dosent exist", command.Uid);
@@ -325,7 +323,7 @@ public class Executor
         }
     }
 
-    void Offset(ref Command command, ref IContext db, ref Admin admin)
+    private void Offset(ref Command command, ref IContext db, ref Admin admin)
     {
         if (command.Parameters[0] == "")
             SendMessage($"{admin.ActiveGroup.Offset}", command.Uid);
@@ -349,7 +347,7 @@ public class Executor
         GroupManager current_group;
 
         if (group != null)
-            current_group = new GroupManager( _settings.BotId, admin.ActiveGroup, _client, db);
+            current_group = new GroupManager( _settings.BotId, admin.ActiveGroup, _clientForBot, db);
         else
             return;
 
@@ -387,7 +385,7 @@ public class Executor
         GroupManager current_group;
 
         if (g != null)
-            current_group = new GroupManager( _settings.BotId, g, _client, db);
+            current_group = new GroupManager( _settings.BotId, g, _clientForBot, db);
         else
             return;
 
@@ -409,7 +407,7 @@ public class Executor
                     Group[] groups = db.GetDeployInfo();
                     foreach (Group group in groups)
                     {
-                        GroupManager gm = new GroupManager(_settings.BotId, group, _client, db);
+                        GroupManager gm = new GroupManager(_settings.BotId, group, _clientForBot, db);
                         int depinfo = gm.Deployment();
                         if (depinfo < group.MinPostCount && group.Notify)
                             foreach (GroupAdmins ga in group.GroupAdmins)
@@ -437,7 +435,7 @@ public class Executor
         GroupManager current_group;
 
         if (g != null)
-            current_group = new GroupManager( _settings.BotId, g, _client, db);
+            current_group = new GroupManager( _settings.BotId, g, _clientForBot, db);
         else
             return;
 

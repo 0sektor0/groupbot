@@ -8,7 +8,7 @@ namespace Core;
 
 public class BotSettings
 {
-    public static string Path = Directory.GetCurrentDirectory()+"/data/botconfig.json";
+    public static string Path = $"{Directory.GetCurrentDirectory()}/data/botconfig.json";
         
     private static readonly BotSettings _instanse = LoadConfigs(Path);
         
@@ -34,7 +34,7 @@ public class BotSettings
     public string BotLogin { get; set; }
 
     [JsonProperty("bot_pass")]
-    public string BotPass { get; set; }
+    public string BotPassword { get; set; }
 
     [JsonProperty("bot_id")]
     public int BotId { get; set; }
@@ -45,11 +45,23 @@ public class BotSettings
     [JsonProperty("admin_id")]
     public string AdminId { get; set; }
 
-    [JsonProperty("client_id")]
-    public int ClientId { get; set; }
+    [JsonProperty("bot_client_id")]
+    public int BotClientId { get; set; }
     
-    [JsonProperty("client_secret")]
-    public string ClientSecret { get; set; }
+    [JsonProperty("bot_client_secret")]
+    public string BotClientSecret { get; set; }
+
+    [JsonProperty("bot_api_scope")]
+    public int BotApiScope { get; set; }
+
+    [JsonProperty("messages_client_id")]
+    public int MessagesClientId { get; set; }
+    
+    [JsonProperty("messages_client_secret")]
+    public string MessagesClientSecret { get; set; }
+
+    [JsonProperty("messages_api_scope")]
+    public int MessagesApiScope { get; set; }
 
     [JsonProperty("messages_endpoint")]
     public string MessagesEndpoint { get; set; }
