@@ -9,8 +9,9 @@ using VkApi.Auth;
 //Dont ever think about using it  //
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
 
-//TODO: add VkClient's pool
-//TODO: fix group# command
+//TODO: add VkClient's pool.
+//TODO: fix group# command.
+//TODO: random sleep time for RequestsListenerVkMessages. Maybe will help with bans.
 VkResponse.Debug = true;
 
 BotSettings settings;
