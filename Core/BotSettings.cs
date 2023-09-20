@@ -24,11 +24,11 @@ public class BotSettings
     [JsonProperty("saving_delay")]
     public int SavingDelay { get; set; }
 
-    [JsonProperty("listening_delay")]
-    public int ListeningDelay { get; set; }
+    [JsonProperty("min_listening_delay")]
+    public int MinListeningDelay { get; set; }
 
-    [JsonProperty("vk_requests_period")]
-    public int VkRequestsPeriod { get; set; }
+    [JsonProperty("max_listening_delay")]
+    public int MaxListeningDelay { get; set; }
 
     [JsonProperty("bot_login")]
     public string BotLogin { get; set; }

@@ -11,7 +11,6 @@ using VkApi.Auth;
 
 //TODO: add VkClient's pool.
 //TODO: fix group# command.
-//TODO: random sleep time for RequestsListenerVkMessages. Maybe will help with bans.
 VkResponse.Debug = true;
 
 BotSettings settings;
@@ -42,20 +41,20 @@ var botAuthData = new AuthData(
 );   
 var clientForBot = new VkApiClient(new VkAuthenticator(), botAuthData, 1800, 3);
 
-var messagesAuthData = new AuthData(
+/*var messagesAuthData = new AuthData(
     settings.BotLogin,
     settings.BotPassword,
     settings.MessagesApiScope,
     settings.MessagesClientId,
     settings.MessagesClientSecret
 );
-var clientForMessages = new VkApiClient(new VkAuthenticator(), messagesAuthData, 1800, 3);
+var clientForMessages = new VkApiClient(new VkAuthenticator(), messagesAuthData, 1800, 3);*/
 Console.WriteLine($"Access granted\r\nlogin: {BotSettings.GetSettings().BotLogin}");
 
 var parser = new Parser();
-var executor = new Executor(clientForBot, clientForMessages);
+var executor = new Executor(clientForBot, clientForBot);
 //var listener = new RequestsListenerHttp(executor, parser);
-var listener = new RequestsListenerVkMessages(clientForMessages, executor, parser);
+var listener = new RequestsListenerVkMessages(clientForBot, executor, parser);
 
 VkRequest.SetDefaultVersion(BotSettings.GetSettings().ApiVersion);
 listener.Listen();

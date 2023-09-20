@@ -9,6 +9,7 @@ class RequestsListenerVkMessages
     private readonly Executor _executor;
     private readonly Parser _parser;
     private readonly VkApiClient _client;
+    private readonly Random _random = new();
 
     public RequestsListenerVkMessages(VkApiClient client, Executor executor,  Parser parser)
     {
@@ -49,7 +50,8 @@ class RequestsListenerVkMessages
                 _executor.Execute(new Command("save", "", settings.AdminId, ""));
             }
 
-            Thread.Sleep(settings.ListeningDelay);
+            var delay = _random.Next(settings.MinListeningDelay, settings.MaxListeningDelay); 
+            Thread.Sleep(delay);
         }
         catch (Exception ex)
         {
